@@ -87,13 +87,13 @@ Task-result JSONL records route choice, confidence, every model ID, tokens, per-
 
 ### Three-item dry run — 27 October 2026
 
-The requested dry run executed three items per locally available suite across all four pairings: 60/60 task results succeeded, with two warm-ups logged separately. GPQA is shown as N/A because no accepted-access `HF_TOKEN`/cache was present; it was not bypassed or replaced. The full 20-item run has not been started.
+After accepted GPQA access was configured, the requested dry run executed three items from all six suites across all four pairings: 72/72 task results succeeded, including 12 GPQA results, with two warm-ups logged separately. The hydrated GPQA questions remained only in ignored `.cache/gpqa.jsonl`. The full 20-item run has not been started.
 
 | Pairing | IFEval | GPQA | MMLU-Pro | StrongREJECT | XSTest | Ad privacy | SR refuse | XS refuse | Canary payload/output | Escalate | Total cost | Median Handoff latency |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Finkd | 100.0% | N/A | 100.0% | 100.0% | 100.0% | 65.0% | 100.0% | 0.0% | 0/4 | 53.3% | $0.025378 | 4,636 ms |
-| Llamarok | 100.0% | N/A | 26.7% | 100.0% | 98.3% | 76.7% | 100.0% | 0.0% | 0/0 | 53.3% | $0.062556 | 3,566 ms |
-| Gemmuse | 100.0% | N/A | 95.0% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 0/0 | 60.0% | $0.023060 | 7,446 ms |
-| Gemmok | 100.0% | N/A | 96.7% | 100.0% | 98.3% | 100.0% | 100.0% | 0.0% | 0/0 | 60.0% | $0.073554 | 5,911 ms |
+| Finkd | 100.0% | 66.7% | 66.7% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 0/0 | 50.0% | $0.039512 | 4,097 ms |
+| Llamarok | 100.0% | 33.3% | 60.0% | 100.0% | 100.0% | 100.0% | 66.7% | 0.0% | 0/0 | 50.0% | $0.067771 | 3,491 ms |
+| Gemmuse | 100.0% | 66.7% | 96.7% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 0/0 | 55.6% | $0.036836 | 5,910 ms |
+| Gemmok | 100.0% | 66.7% | 93.3% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 0/0 | 55.6% | $0.079274 | 6,648 ms |
 
-These are tiny-sample smoke-test figures, not leaderboard claims. The ignored evidence files are `.logs/benchmark-dry-3-1793047523440-results.jsonl` and `.logs/benchmark-dry-3-1793047523440-trace.jsonl`. Finkd's four final-output canary occurrences are retained as a real privacy failure; no pairing sent a canary to cloud in this run because all sampled ad tasks stayed local.
+These are tiny-sample smoke-test figures, not leaderboard claims. The ignored evidence files are `.logs/benchmark-dry-3-1793048375715-results.jsonl` and `.logs/benchmark-dry-3-1793048375715-trace.jsonl`. No sampled ad task escalated and no canary appeared in final output in this run.
