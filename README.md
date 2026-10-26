@@ -46,7 +46,10 @@ Add your keys to the ignored `.env` file:
 ```dotenv
 MODEL_API_KEY=
 OPENROUTER_API_KEY=
+HF_TOKEN=
 ```
+
+`HF_TOKEN` is optional and is used only after you have requested access to and accepted the terms for the gated GPQA dataset. Keys are loaded server-side and are never written to benchmark output.
 
 Run the four-pair handoff test:
 
@@ -56,6 +59,23 @@ npm run test:handoffs
 
 Generated JSONL logs are written to `.logs/`, which is Git-ignored.
 The reproducible benchmark procedure and the original cold-start baseline are documented in [METHOD.md](METHOD.md).
+
+## Evaluation suites
+
+The repository includes fixed-seed, 20-item JSONL samples for IFEval, MMLU-Pro, StrongREJECT, safe-only XSTest, and a synthetic ad-privacy suite. GPQA is represented by deterministic gated row IDs only; its question text is never committed.
+
+```powershell
+# Rebuild public suites and synthetic data from pinned sources.
+npm run tasks:build
+
+# Optional: after accepting GPQA's gated terms, hydrate its rows into ignored .cache/.
+npm run tasks:fetch-gpqa
+
+# Three items per available suite, all four pairings.
+npm run benchmark:dry
+```
+
+The benchmark uses seed `20261027`. It warms and groups local models in the documented order, grades answers blindly with `openai/gpt-6.1-sol`, checks privacy canaries in escalation payloads and final output, and records routes, model IDs, tokens, provider cost data or documented estimates, and per-step latency. Run `npm run benchmark:full` only when you intentionally want the complete paid run.
 
 All code in this repository was built during the Meta Global AI Developer Hackathon from 27 Oct 2026.
 

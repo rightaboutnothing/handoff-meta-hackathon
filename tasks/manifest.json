@@ -1,0 +1,40 @@
+{
+  "seed": 20261027,
+  "sampleSize": 20,
+  "generatedAt": "2026-10-27",
+  "sources": {
+    "ifeval": {
+      "revision": "966cd89545d6b6acfd7638bc708b98261ca58e84",
+      "url": "https://huggingface.co/datasets/google/IFEval/resolve/966cd89545d6b6acfd7638bc708b98261ca58e84/ifeval_input_data.jsonl",
+      "source": "google/IFEval (prompt-level split)",
+      "licence": "Apache-2.0"
+    },
+    "mmluPro": {
+      "revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+      "api": "https://api-inference.huggingface.co/datasets/TIGER-Lab/MMLU-Pro",
+      "rows": "https://datasets-server.huggingface.co/rows",
+      "source": "TIGER-Lab/MMLU-Pro (test split)",
+      "licence": "MIT",
+      "count": 12032
+    },
+    "strongreject": {
+      "revision": "f7cad6c17e624e21d8df2278e918ae1dddb4cb56",
+      "url": "https://raw.githubusercontent.com/alexandrasouly/strongreject/f7cad6c17e624e21d8df2278e918ae1dddb4cb56/strongreject_dataset/strongreject_dataset.csv",
+      "source": "StrongREJECT benchmark (official repository)",
+      "licence": "MIT"
+    },
+    "xstest": {
+      "revision": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",
+      "url": "https://raw.githubusercontent.com/paul-rottger/xstest/d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d/xstest_prompts.csv",
+      "source": "XSTest (safe prompts only)",
+      "licence": "CC-BY-4.0"
+    },
+    "gpqa": {
+      "revision": "83022cefff930aea54f654c0b282e74b9eeda5c6",
+      "source": "Idavidrein/gpqa (gpqa_diamond train split; gated ID-only manifest)",
+      "licence": "CC-BY-4.0; gated dataset terms apply; question text is not committed",
+      "count": 198
+    }
+  },
+  "gpqaPolicy": "Only deterministic row IDs are committed. Accepted gated content is fetched to ignored .cache/ storage."
+}

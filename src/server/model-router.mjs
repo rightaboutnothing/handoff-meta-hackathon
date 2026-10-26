@@ -146,7 +146,7 @@ function addTokens(left, right) {
 
 export function createJsonlLogger(
   logPath,
-  { pairing, handoffName, runId = randomUUID() },
+  { pairing, handoffName, runId = randomUUID(), context = {} },
 ) {
   return async function log(event, modelId, details = {}) {
     if (!modelId) {
@@ -172,6 +172,7 @@ export function createJsonlLogger(
       localRoutingMaxOutputTokens:
         BENCHMARK_SETTINGS.localRoutingMaxOutputTokens,
       cloudReasoningEffort: BENCHMARK_SETTINGS.cloudReasoningEffort,
+      ...context,
       ...eventDetails,
       tokens,
       latencyMs,
@@ -212,10 +213,14 @@ async function executeRoute(
     const response = await getClient(route).responses.create(request);
     const tokens = tokenMetrics(response.usage);
     const latencyMs = round(performance.now() - startedAt, 2);
-    const costEstimateUsd = estimateCost(
-      tokens,
-      route.pricePerMillionTokens,
+    const providerReportedCostUsd = Number(
+      response.usage?.cost ??
+        response.usage?.cost_details?.upstream_inference_cost,
     );
+    const hasProviderReportedCost = Number.isFinite(providerReportedCostUsd);
+    const costEstimateUsd = hasProviderReportedCost
+      ? round(providerReportedCostUsd, 8)
+      : estimateCost(tokens, route.pricePerMillionTokens);
     const result = {
       modelId: route.model,
       responseModelId: response.model ?? route.model,
@@ -223,6 +228,9 @@ async function executeRoute(
       tokens,
       latencyMs,
       costEstimateUsd,
+      costSource: hasProviderReportedCost
+        ? "provider_usage"
+        : "token_price_estimate",
     };
 
     await log?.("response_completed", route.model, {
@@ -378,13 +386,20 @@ function firstResponderPrompt(task) {
   ].join("\n");
 }
 
-export async function runHandoff(pairingName, task, { logPath }) {
+export async function runHandoff(
+  pairingName,
+  task,
+  { logPath, captureEscalationPayload = false, logContext = {} } = {},
+) {
   const pairing = getPairing(pairingName);
   const firstRoute = getRoute(pairing.firstResponderRoute);
   const escalationRoute = getRoute(pairing.escalationRoute);
+  const runId = randomUUID();
   const log = createJsonlLogger(logPath, {
     pairing: pairingName,
     handoffName: pairing.name,
+    runId,
+    context: logContext,
   });
   const runStartedAt = performance.now();
   let firstResult;
@@ -448,13 +463,35 @@ export async function runHandoff(pairingName, task, { logPath }) {
     });
 
     return {
+      runId,
       pairing: pairingName,
       handoffName: pairing.name,
       decision: "answer",
+      routeChosen: "local",
       confidence: decision.confidence,
+      decisionReason: decision.reason,
       firstResponderModelId: firstRoute.model,
       finalModelId: firstRoute.model,
       outputText: answerResult.outputText,
+      escalationPayload: null,
+      steps: [
+        {
+          stage: "first_responder",
+          modelId: firstRoute.model,
+          tokens: firstResult.tokens,
+          latencyMs: firstResult.latencyMs,
+          costEstimateUsd: firstResult.costEstimateUsd,
+          costSource: firstResult.costSource,
+        },
+        {
+          stage: "local_answer",
+          modelId: firstRoute.model,
+          tokens: answerResult.tokens,
+          latencyMs: answerResult.latencyMs,
+          costEstimateUsd: answerResult.costEstimateUsd,
+          costSource: answerResult.costSource,
+        },
+      ],
       tokens,
       latencyMs,
       costEstimateUsd,
@@ -489,13 +526,35 @@ export async function runHandoff(pairingName, task, { logPath }) {
   });
 
   return {
+    runId,
     pairing: pairingName,
     handoffName: pairing.name,
     decision: "escalate",
+    routeChosen: "escalate",
     confidence: decision.confidence,
+    decisionReason: decision.reason,
     firstResponderModelId: firstRoute.model,
     finalModelId: escalationRoute.model,
     outputText: escalationResult.outputText,
+    escalationPayload: captureEscalationPayload ? task : undefined,
+    steps: [
+      {
+        stage: "first_responder",
+        modelId: firstRoute.model,
+        tokens: firstResult?.tokens ?? ZERO_TOKENS,
+        latencyMs: firstResult?.latencyMs ?? 0,
+        costEstimateUsd: firstResult?.costEstimateUsd ?? 0,
+        costSource: firstResult?.costSource ?? "unavailable",
+      },
+      {
+        stage: "escalation",
+        modelId: escalationRoute.model,
+        tokens: escalationResult.tokens,
+        latencyMs: escalationResult.latencyMs,
+        costEstimateUsd: escalationResult.costEstimateUsd,
+        costSource: escalationResult.costSource,
+      },
+    ],
     tokens,
     latencyMs,
     costEstimateUsd,

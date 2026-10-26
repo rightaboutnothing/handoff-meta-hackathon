@@ -3,6 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "tasks:build": "node scripts/build-task-suites.mjs && node scripts/generate-ad-privacy.mjs",
+    "tasks:fetch-gpqa": "node scripts/fetch-gpqa.mjs",
+    "benchmark:dry": "node scripts/run-benchmark.mjs --limit 3",
+    "benchmark:full": "node scripts/run-benchmark.mjs --full",
+    "test:scoring": "node scripts/test-scoring.mjs",
     "test:meta-api": "node scripts/test-meta-api.mjs",
     "test:openrouter": "node scripts/test-openrouter.mjs",
     "test:router": "node scripts/test-router-e2e.mjs",
@@ -10,6 +15,7 @@
     "test:routing-confidence": "node scripts/test-routing-confidence.mjs"
   },
   "dependencies": {
+    "csv-parse": "^7.0.3",
     "dotenv": "^18.0.9",
     "openai": "^6.0.0"
   }
