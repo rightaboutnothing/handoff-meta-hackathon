@@ -29,6 +29,18 @@ ollama pull llama3.1:8b
 ollama pull gemma3:12b
 ```
 
+Keep local models loaded between requests so benchmark timings do not include avoidable reloads. On Windows, set the user environment variable and then restart Ollama:
+
+```powershell
+[Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "-1", "User")
+```
+
+On macOS or Linux, start the Ollama server with the equivalent setting:
+
+```bash
+OLLAMA_KEEP_ALIVE=-1 ollama serve
+```
+
 Add your keys to the ignored `.env` file:
 
 ```dotenv
@@ -43,6 +55,7 @@ npm run test:handoffs
 ```
 
 Generated JSONL logs are written to `.logs/`, which is Git-ignored.
+The reproducible benchmark procedure and the original cold-start baseline are documented in [METHOD.md](METHOD.md).
 
 All code in this repository was built during the Meta Global AI Developer Hackathon from 27 Oct 2026.
 

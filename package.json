@@ -6,7 +6,8 @@
     "test:meta-api": "node scripts/test-meta-api.mjs",
     "test:openrouter": "node scripts/test-openrouter.mjs",
     "test:router": "node scripts/test-router-e2e.mjs",
-    "test:handoffs": "node scripts/test-handoff-pairings.mjs"
+    "test:handoffs": "node scripts/test-handoff-pairings.mjs",
+    "test:routing-confidence": "node scripts/test-routing-confidence.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.9",
