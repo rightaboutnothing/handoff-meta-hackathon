@@ -2,7 +2,7 @@ import { parse } from "csv-parse/sync";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const SEED = 20261027;
-const SAMPLE_SIZE = 20;
+const SAMPLE_SIZE = 50;
 const TASKS_DIR = new URL("../tasks/", import.meta.url);
 
 const SOURCES = Object.freeze({

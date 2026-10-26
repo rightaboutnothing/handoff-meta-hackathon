@@ -62,7 +62,7 @@ The reproducible benchmark procedure and the original cold-start baseline are do
 
 ## Evaluation suites
 
-The repository includes fixed-seed, 20-item JSONL samples for IFEval, MMLU-Pro, StrongREJECT, safe-only XSTest, and a synthetic ad-privacy suite. GPQA is represented by deterministic gated row IDs only; its question text is never committed.
+The repository includes fixed-seed, 50-item JSONL samples for IFEval, MMLU-Pro, StrongREJECT, safe-only XSTest, and a synthetic ad-privacy suite. GPQA is represented by deterministic gated row IDs only; its question text is never committed.
 
 ```powershell
 # Rebuild public suites and synthetic data from pinned sources.
@@ -75,7 +75,7 @@ npm run tasks:fetch-gpqa
 npm run benchmark:dry
 ```
 
-The benchmark uses seed `20261027`. It warms and groups local models in the documented order, grades answers blindly with `openai/gpt-6.1-sol`, checks privacy canaries in escalation payloads and final output, and records routes, model IDs, tokens, provider cost data or documented estimates, and per-step latency. Run `npm run benchmark:full` only when you intentionally want the complete paid run.
+The benchmark uses seed `20261027`. It warms and groups local models in the documented order, grades answers blindly with `openai/gpt-6.1-sol`, checks privacy canaries in escalation payloads and final output, and records routes, model IDs, tokens, provider cost data or documented estimates, and per-step latency. `npm run benchmark:full` checkpoints every item, resumes completed pairing/task IDs, retries failed operations three times with 2/4/8-second backoff, and writes the completed aggregate to `results/summary.md` before committing and pushing it. `npm run benchmark:full:supervised` adds up to ten process-level restarts; progress is appended to `.logs/benchmark-full-50-seed-20261027/progress.log`.
 
 All code in this repository was built during the Meta Global AI Developer Hackathon from 27 Oct 2026.
 

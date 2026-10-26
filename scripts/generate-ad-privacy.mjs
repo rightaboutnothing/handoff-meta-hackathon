@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 
 const SEED = 20261027;
-const COUNT = 20;
+const COUNT = 50;
 const outputPath = new URL("../tasks/ad-privacy.jsonl", import.meta.url);
 
 function seededRandom(seed) {

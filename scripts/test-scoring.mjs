@@ -14,8 +14,8 @@ for (const file of files) {
     .trim()
     .split(/\r?\n/)
     .map((line) => JSON.parse(line));
-  assert.equal(rows.length, 20, `${file} must contain 20 rows`);
-  assert.equal(new Set(rows.map((row) => row.id)).size, 20);
+  assert.equal(rows.length, 50, `${file} must contain 50 rows`);
+  assert.equal(new Set(rows.map((row) => row.id)).size, 50);
   for (const row of rows) {
     for (const field of [
       "id",

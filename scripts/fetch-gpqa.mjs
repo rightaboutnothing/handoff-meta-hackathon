@@ -1,5 +1,7 @@
 import "dotenv/config";
+import { parse } from "csv-parse/sync";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { setTimeout as delay } from "node:timers/promises";
 
 const REVISION = "83022cefff930aea54f654c0b282e74b9eeda5c6";
 const token = process.env.HF_TOKEN;
@@ -17,14 +19,27 @@ const manifest = (await readFile(manifestPath, "utf8"))
   .split(/\r?\n/)
   .map((line) => JSON.parse(line));
 
-const metadataResponse = await fetch(
-  "https://huggingface.co/api/datasets/Idavidrein/gpqa",
-  { headers: { Authorization: `Bearer ${token}` } },
-);
-if (!metadataResponse.ok) {
-  throw new Error(`GPQA metadata request failed: HTTP ${metadataResponse.status}`);
+async function fetchWithRetry(url, label) {
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) return response;
+    const retryable = response.status === 429 || response.status >= 500;
+    if (!retryable || attempt === 4) {
+      throw new Error(`${label} failed: HTTP ${response.status}`);
+    }
+    await delay(2 ** attempt * 1_000);
+  }
+  throw new Error(`${label} retry loop ended unexpectedly.`);
 }
-const metadata = await metadataResponse.json();
+
+const metadata = await (
+  await fetchWithRetry(
+    "https://huggingface.co/api/datasets/Idavidrein/gpqa",
+    "GPQA metadata request",
+  )
+).json();
 if (metadata.sha !== REVISION) {
   throw new Error(
     `GPQA HEAD changed from pinned revision ${REVISION} to ${metadata.sha}; update the pin intentionally before fetching.`,
@@ -46,25 +61,21 @@ function deterministicChoices(row, rowIndex) {
   };
 }
 
+const csv = await (
+  await fetchWithRetry(
+    `https://huggingface.co/datasets/Idavidrein/gpqa/resolve/${REVISION}/gpqa_diamond.csv`,
+    "Pinned GPQA Diamond CSV request",
+  )
+).text();
+const rows = parse(csv, { columns: true, skip_empty_lines: true });
+if (rows.length !== 198) {
+  throw new Error(`Expected 198 GPQA Diamond rows, received ${rows.length}.`);
+}
+
 const hydrated = [];
 for (const item of manifest) {
   const rowIndex = item.reference_answer_or_rubric.row_index;
-  const query = new URLSearchParams({
-    dataset: "Idavidrein/gpqa",
-    config: "gpqa_diamond",
-    split: "train",
-    offset: String(rowIndex),
-    length: "1",
-  });
-  const response = await fetch(
-    `https://datasets-server.huggingface.co/rows?${query}`,
-    { headers: { Authorization: `Bearer ${token}` } },
-  );
-  if (!response.ok) {
-    throw new Error(`GPQA row ${rowIndex} request failed: HTTP ${response.status}`);
-  }
-  const data = await response.json();
-  const row = data.rows?.[0]?.row;
+  const row = rows[rowIndex];
   if (!row) throw new Error(`GPQA row ${rowIndex} was not returned.`);
   const { options, answerIndex } = deterministicChoices(row, rowIndex);
   hydrated.push({

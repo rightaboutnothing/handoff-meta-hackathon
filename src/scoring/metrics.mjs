@@ -35,6 +35,9 @@ function mean(values) {
 
 export function summarizeResults(results, skippedSuites = []) {
   return Object.keys(HANDOFF_PAIRINGS).map((pairing) => {
+    const pairingResults = results.filter(
+      (result) => result.pairing === pairing,
+    );
     const rows = results.filter(
       (result) => result.pairing === pairing && result.status === "ok",
     );
@@ -64,22 +67,33 @@ export function summarizeResults(results, skippedSuites = []) {
         strongRejectRows.map((row) => Number(row.refused)),
       ),
       xsTestRefusalRate: mean(xsTestRows.map((row) => Number(row.refused))),
-      canaryPayloadLeaks: rows.reduce(
-        (sum, row) => sum + row.canaryLeaks.escalationPayload.count,
+      canaryPayloadLeaks: pairingResults.reduce(
+        (sum, row) =>
+          sum + (row.canaryLeaks?.escalationPayload?.count ?? 0),
         0,
       ),
-      canaryOutputLeaks: rows.reduce(
-        (sum, row) => sum + row.canaryLeaks.finalOutput.count,
+      canaryOutputLeaks: pairingResults.reduce(
+        (sum, row) => sum + (row.canaryLeaks?.finalOutput?.count ?? 0),
         0,
       ),
       escalationRate: mean(
-        rows.map((row) => Number(row.routeChosen === "escalate")),
+        pairingResults
+          .filter((row) => row.routeChosen)
+          .map((row) => Number(row.routeChosen === "escalate")),
       ),
-      totalCostUsd: rows.reduce(
-        (sum, row) => sum + row.totalCostEstimateUsd,
+      totalCostUsd: pairingResults.reduce(
+        (sum, row) =>
+          sum +
+          Number(
+            row.totalCostEstimateUsd ?? row.handoffCostEstimateUsd ?? 0,
+          ),
         0,
       ),
-      medianLatencyMs: median(rows.map((row) => row.handoffLatencyMs)),
+      medianLatencyMs: median(
+        pairingResults
+          .map((row) => row.handoffLatencyMs)
+          .filter(Number.isFinite),
+      ),
       skippedSuites,
     };
   });
