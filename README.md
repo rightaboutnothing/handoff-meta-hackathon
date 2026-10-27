@@ -60,6 +60,25 @@ npm run test:handoffs
 Generated JSONL logs are written to `.logs/`, which is Git-ignored.
 The reproducible benchmark procedure and the original cold-start baseline are documented in [METHOD.md](METHOD.md).
 
+## Dashboard
+
+The local dashboard turns each Handoff decision into an animated, event-driven scene and presents the real interim benchmark results. Demo mode is the default and works without model or API access. Optional live mode runs through the server-side local Ollama route only. Meta access defaults to paused and the dashboard cannot make a Meta call in that state.
+
+Install the dashboard dependencies once, then start it from the repository root:
+
+```powershell
+npm install --prefix dashboard
+npm run dashboard
+```
+
+Open `http://127.0.0.1:4173`. Use Presentation mode for a clean 1920 by 1080 recording loop. Run the production build and protected-text bundle check with:
+
+```powershell
+npm run dashboard:check
+```
+
+The visual research notes are in [dashboard/DESIGN.md](dashboard/DESIGN.md). Three reproducible demo captures are stored in [dashboard/screenshots](dashboard/screenshots).
+
 ## Evaluation suites
 
 The repository includes fixed-seed, 50-item JSONL samples for IFEval, MMLU-Pro, StrongREJECT, safe-only XSTest, and a synthetic ad-privacy suite. GPQA is represented by deterministic gated row IDs only; its question text is never committed.

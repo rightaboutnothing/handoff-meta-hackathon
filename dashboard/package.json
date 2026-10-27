@@ -1,0 +1,34 @@
+{
+  "name": "handoff-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "sync:data": "node scripts/sync-results.mjs",
+    "predev": "npm run sync:data",
+    "dev": "vite --host 127.0.0.1",
+    "prebuild": "npm run sync:data",
+    "build": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "check:safety": "node scripts/check-bundle-safety.mjs",
+    "check": "npm run build && npm run check:safety"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.24",
+    "openai": "^6.8.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.2"
+  }
+}

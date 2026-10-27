@@ -1,0 +1,94 @@
+{
+  "generatedFrom": "results/summary.md",
+  "generatedAt": "2026-10-27T18:49:14.158Z",
+  "seed": 20261027,
+  "progress": {
+    "completed": 900,
+    "total": 1200,
+    "deferred": 300
+  },
+  "trust": {
+    "harmfulCloudPrompts": 0,
+    "verifiedFromRequestTrace": true,
+    "offlinePassMadeZeroMetaCalls": true,
+    "note": "StrongREJECT stayed local-only and every cloud route used the local safety screen."
+  },
+  "pairings": [
+    {
+      "id": "meta-meta",
+      "name": "Finkd",
+      "localModel": "llama3.1:8b",
+      "cloudModel": "muse-spark-1.3",
+      "accuracy": 77,
+      "handoffRate": 29.6,
+      "medianLatencyMs": 1306,
+      "costUsd": 0.402803,
+      "estimatedCostSavedUsd": 2.11,
+      "benchmarks": {
+        "ifeval": 100,
+        "gpqa": 59.4,
+        "mmlu-pro": 46.8,
+        "strongreject": 98,
+        "xstest": null,
+        "ad-privacy": 80.9
+      }
+    },
+    {
+      "id": "meta-grok",
+      "name": "Llamarok",
+      "localModel": "llama3.1:8b",
+      "cloudModel": "x-ai/grok-4.7",
+      "accuracy": 74.8,
+      "handoffRate": 33.7,
+      "medianLatencyMs": 1550,
+      "costUsd": 3.798489,
+      "estimatedCostSavedUsd": 2.39,
+      "benchmarks": {
+        "ifeval": 95.4,
+        "gpqa": 58.9,
+        "mmlu-pro": 47.4,
+        "strongreject": 97,
+        "xstest": 62.4,
+        "ad-privacy": 87.9
+      }
+    },
+    {
+      "id": "gemma-meta",
+      "name": "Gemmuse",
+      "localModel": "gemma3:12b",
+      "cloudModel": "muse-spark-1.3",
+      "accuracy": 100,
+      "handoffRate": 0,
+      "medianLatencyMs": 2022,
+      "costUsd": 0,
+      "estimatedCostSavedUsd": 0.6,
+      "benchmarks": {
+        "ifeval": null,
+        "gpqa": null,
+        "mmlu-pro": null,
+        "strongreject": 100,
+        "xstest": null,
+        "ad-privacy": null
+      }
+    },
+    {
+      "id": "gemma-grok",
+      "name": "Gemmok",
+      "localModel": "gemma3:12b",
+      "cloudModel": "x-ai/grok-4.7",
+      "accuracy": 85.4,
+      "handoffRate": 45.7,
+      "medianLatencyMs": 10713,
+      "costUsd": 5.479994,
+      "estimatedCostSavedUsd": 1.95,
+      "benchmarks": {
+        "ifeval": 95,
+        "gpqa": 77.6,
+        "mmlu-pro": 73,
+        "strongreject": 100,
+        "xstest": 68.1,
+        "ad-privacy": 98.5
+      }
+    }
+  ]
+}

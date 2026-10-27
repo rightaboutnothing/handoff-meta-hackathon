@@ -1,6 +1,6 @@
 # Handoff build log
 
-## 28 October 2026 — Interim offline-Meta benchmark
+## 28 October 2026: Interim offline-Meta benchmark
 
 The resumable benchmark has reached **900/1200 effective results**. This is an interim checkpoint, not the final six-suite result: **300 Meta-dependent items remain deferred until Meta access is explicitly confirmed restored**.
 

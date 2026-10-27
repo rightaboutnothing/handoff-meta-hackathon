@@ -95,7 +95,7 @@ Ordinary safe answers are graded by `openai/gpt-6.1-sol` through OpenRouter. The
 
 Task-result JSONL records route choice, confidence, every model ID, tokens, per-step and total Handoff latency, cost, blind grade, refusal classification, and both canary leak channels. Provider-reported usage cost is used when supplied; otherwise the record uses the configured token-price estimate and labels its cost source. Summary cost includes Handoff calls and the blind grader. Local hardware/electricity remains excluded.
 
-### Three-item dry run — 27 October 2026
+### Three-item dry run: 27 October 2026
 
 After accepted GPQA access was configured, the original pre-safety-screen dry run executed three items from all six suites across all four pairings: 72/72 task results succeeded, including 12 GPQA results, with two warm-ups logged separately. The hydrated GPQA questions remained only in ignored `.cache/gpqa.jsonl`. These historical figures do not include the safety screen and are not comparable with the resumed method.
 

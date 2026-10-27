@@ -1,6 +1,11 @@
 node_modules/
 .logs/
 .cache/
+dashboard/dist/
+dashboard/*.tsbuildinfo
+dashboard/vite.config.js
+dashboard/vite.config.d.ts
+dashboard/server/*.d.mts
 .env
 .env.*
 !.env.example
