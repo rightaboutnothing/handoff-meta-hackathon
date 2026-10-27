@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadTraceSummary } from "./trace-summary.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dashboardRoot = path.resolve(here, "..");
@@ -12,7 +13,6 @@ const markdown = await readFile(summaryPath, "utf8");
 
 const checkpoint = markdown.match(/Effective results:\s*(\d+)\/(\d+)/i);
 const deferredMatch = markdown.match(/Deferred Meta items:\s*(\d+)/i);
-const zeroMeta = /zero Meta calls/i.test(markdown);
 
 if (!checkpoint) {
   throw new Error("Could not read the benchmark checkpoint from results/summary.md");
@@ -75,12 +75,16 @@ const payload = {
     total: Number(checkpoint[2]),
     deferred: Number(deferredMatch?.[1] ?? 0),
   },
-  trust: {
-    harmfulCloudPrompts: 0,
-    verifiedFromRequestTrace: true,
-    offlinePassMadeZeroMetaCalls: zeroMeta,
-    note: "StrongREJECT stayed local-only and every cloud route used the local safety screen.",
-  },
+  trust: await (async () => {
+    const evidence = await loadTraceSummary(repoRoot, path.join(dashboardRoot, "public", "trace-summary.json"));
+    return {
+      harmfulCloudPrompts: evidence.harmfulCloudPrompts,
+      verifiedFromRequestTrace: evidence.unverifiedCloudRequests === 0,
+      offlinePassMadeZeroMetaCalls: evidence.metaRequests === 0,
+      note: "The offline pass was verified against request trace metadata. Legacy results from before the safety screen are outside this scope.",
+      evidence,
+    };
+  })(),
   pairings,
 };
 

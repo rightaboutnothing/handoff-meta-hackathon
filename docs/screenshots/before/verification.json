@@ -1,0 +1,23 @@
+{
+  "phase": "before",
+  "viewport": "1920x1080",
+  "scenarios": [
+    {
+      "name": "local-answer",
+      "terminal": "answered",
+      "passed": true
+    },
+    {
+      "name": "muse-spark-handoff",
+      "terminal": "answered",
+      "passed": true
+    },
+    {
+      "name": "guard-blocking",
+      "terminal": "blocked",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": []
+}

@@ -1,0 +1,59 @@
+{
+  "phase": "after",
+  "viewport": "1920x1080",
+  "scenarios": [
+    {
+      "name": "local-answer",
+      "terminal": "answered",
+      "passed": true
+    },
+    {
+      "name": "muse-spark-handoff",
+      "terminal": "answered",
+      "passed": true
+    },
+    {
+      "name": "guard-blocking",
+      "terminal": "blocked",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "mobileOverflowPx": 0,
+  "reducedMotion": {
+    "emulated": true,
+    "runningLoops": 0
+  },
+  "stepsView": true,
+  "cloudLabels": [
+    {
+      "pairing": "meta-meta",
+      "label": "Muse Spark",
+      "passed": true
+    },
+    {
+      "pairing": "meta-grok",
+      "label": "Grok 4.7",
+      "passed": true
+    },
+    {
+      "pairing": "gemma-meta",
+      "label": "Muse Spark",
+      "passed": true
+    },
+    {
+      "pairing": "gemma-grok",
+      "label": "Grok 4.7",
+      "passed": true
+    }
+  ],
+  "chartToggle": true,
+  "presentationCycle": [
+    "Easy local answer",
+    "Thoughtful cloud handoff",
+    "Protected locally",
+    "Easy local answer"
+  ],
+  "escapeExitsPresentation": true
+}

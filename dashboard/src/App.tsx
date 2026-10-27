@@ -1,4 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { useMotionPreference } from "./hooks/useMotionPreference";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { demoScenarios } from "./data/scenarios";
 import { usePlayback } from "./hooks/usePlayback";
@@ -30,6 +31,7 @@ function IconButton({ label, onClick, children, active = false }: { label: strin
 }
 
 export default function App() {
+  const reduced = useMotionPreference() ?? false;
   const [benchmark, setBenchmark] = useState<BenchmarkData | null>(null);
   const [dataError, setDataError] = useState("");
   const [pairingId, setPairingId] = useState<PairingId>("meta-meta");
@@ -73,13 +75,19 @@ export default function App() {
   }, [presentation]);
 
   useEffect(() => {
+    const onFullscreenChange = () => { if (!document.fullscreenElement) setPresentation(false); };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  useEffect(() => {
     if (!presentation || !playback.complete) return;
     const timeout = window.setTimeout(() => {
       const next = (scenarioIndex + 1) % demoScenarios.length;
       setScenarioIndex(next);
       setPrompt(demoScenarios[next].prompt);
       setRuntimeScenario(null);
-    }, 1_100);
+    }, 2_400);
     return () => window.clearTimeout(timeout);
   }, [playback.complete, presentation, scenarioIndex]);
 
@@ -87,7 +95,8 @@ export default function App() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setTraceOpen(false);
-        if (presentation && !document.fullscreenElement) setPresentation(false);
+        setPresentation(false);
+        if (document.fullscreenElement) document.exitFullscreen?.().catch(() => undefined);
       }
       if (event.key === " " && event.target === document.body) {
         event.preventDefault();
@@ -97,6 +106,22 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [playback, presentation]);
+
+  useEffect(() => {
+    if (!traceOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const dialog = document.querySelector<HTMLElement>(".trace-modal");
+    dialog?.querySelector<HTMLButtonElement>("button")?.focus();
+    const trap = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || !dialog) return;
+      const items = Array.from(dialog.querySelectorAll<HTMLElement>('button, a[href], [tabindex="0"]'));
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener("keydown", trap);
+    return () => { document.removeEventListener("keydown", trap); previous?.focus(); };
+  }, [traceOpen]);
 
   const pairing = useMemo(() => benchmark?.pairings.find((item) => item.id === pairingId) ?? benchmark?.pairings[0], [benchmark, pairingId]);
 
@@ -158,6 +183,8 @@ export default function App() {
     setRuntimeScenario(null);
     setScenarioIndex(0);
     setPrompt(demoScenarios[0].prompt);
+    setViewMode("characters");
+    playback.restart();
     document.documentElement.requestFullscreen?.().catch(() => undefined);
   };
 
@@ -174,13 +201,13 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <MotionConfig reducedMotion={reduced ? "always" : "never"}><div className="app-shell">
       <header className="app-header">
         <div className="header-brand"><Wordmark /><p>Local first. Cloud only when it is safe and needed.</p></div>
         <div className="header-actions">
           <button type="button" className={`status-pill ${metaAccess}`} onClick={() => setTraceOpen(true)}><span />Meta access: {metaAccess === "live" ? "Live" : "Paused"}</button>
           <IconButton label={dark ? "Use light theme" : "Use dark theme"} onClick={() => setDark(!dark)}>{dark ? "☀" : "◐"}</IconButton>
-          <button type="button" className="presentation-button" onClick={startPresentation}><span>▶</span> Presentation mode</button>
+          <button type="button" className="presentation-button" aria-label="Presentation mode" onClick={startPresentation}><span aria-hidden="true">▶</span> Presentation mode</button>
         </div>
       </header>
 
@@ -222,12 +249,12 @@ export default function App() {
             <IconButton label={playback.playing ? "Pause replay" : "Play replay"} onClick={() => playback.setPlaying(!playback.playing)}>{playback.playing ? "Ⅱ" : "▶"}</IconButton>
             <IconButton label="Restart replay" onClick={playback.restart}>↻</IconButton>
             <label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}><option value={0.5}>0.5x</option><option value={1}>1x</option><option value={2}>2x</option></select></label>
-            <div className="timeline"><motion.i animate={{ width: `${playback.progress * 100}%` }} /></div>
+            <div className="timeline"><motion.i style={{ scaleX: playback.progress }} /></div>
           </div>
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={viewMode} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+          <motion.div key={viewMode} initial={{ opacity: 0, y: reduced ? 0 : 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
             {viewMode === "characters"
               ? <Stage pairing={pairing} scenario={scenario} activeEvent={playback.activeEvent} elapsed={playback.elapsed} complete={playback.complete} />
               : <StepsView pairing={pairing} scenario={scenario} activeEvent={playback.activeEvent} />}
@@ -235,8 +262,9 @@ export default function App() {
         </AnimatePresence>
 
         <button type="button" className="trust-strip" onClick={() => setTraceOpen(true)}>
-          <span className="trust-icon">✓</span>
-          <div><strong>{benchmark.trust.harmfulCloudPrompts} harmful prompts sent to the cloud</strong><small>Verified from request trace. Open the safety summary.</small></div>
+          <span className="trust-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 6v6c0 5-9 10-9 10S3 17 3 12V6Z" /><path d="m8 12 3 3 5-6" /></svg></span>
+          <strong className="trust-number">{benchmark.trust.harmfulCloudPrompts}</strong>
+          <div><strong>harmful prompts sent to the cloud</strong><small className="trust-link">Verified from request trace <span>↗</span></small></div>
           <span className="trust-arrow">→</span>
         </button>
 
@@ -257,16 +285,16 @@ export default function App() {
               <h2 id="trace-title">The safety boundary held.</h2>
               <p>{benchmark.trust.note}</p>
               <div className="trace-stats">
-                <div><strong>0</strong><span>harmful cloud prompts</span></div>
+                <div><strong>{benchmark.trust.harmfulCloudPrompts}</strong><span>harmful cloud prompts</span></div>
                 <div><strong>{benchmark.progress.completed}</strong><span>effective results</span></div>
-                <div><strong>0</strong><span>Meta calls in offline pass</span></div>
+                <div><strong>{benchmark.trust.evidence.metaRequests}</strong><span>Meta calls in offline pass</span></div>
               </div>
-              <ul><li>StrongREJECT was screened, answered, and scored locally.</li><li>Every potential handoff passed the local Guard first.</li><li>GPQA question text and credentials are excluded from the bundle.</li></ul>
-              <small>Source: local request trace and results/summary.md</small>
+              <ul><li>{benchmark.trust.evidence.safeCloudRequests} of {benchmark.trust.evidence.cloudRequests} cloud requests had a safe screen.</li><li>{benchmark.trust.evidence.traceEventsReviewed.toLocaleString()} request trace events were reviewed across {benchmark.trust.evidence.completedItems} completed items.</li><li>StrongREJECT stayed local. GPQA question text and credentials are excluded from the bundle.</li></ul>
+              <small>Scope: the completed offline pass under safety-screen-v1. Invalidated legacy cloud attempts are excluded. Source: request trace and results/summary.md.</small>
             </motion.section>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </div></MotionConfig>
   );
 }

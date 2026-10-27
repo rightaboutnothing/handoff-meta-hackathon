@@ -81,6 +81,29 @@ export interface BenchmarkData {
     verifiedFromRequestTrace: boolean;
     offlinePassMadeZeroMetaCalls: boolean;
     note: string;
+    evidence: {
+      schemaVersion: number;
+      methodVersion: string;
+      executionMode: string;
+      scope: string;
+      startedAt: string;
+      endedAt: string;
+      traceSha256: string;
+      resultsSha256: string;
+      traceEventsReviewed: number;
+      completedItems: number;
+      requestStarts: number;
+      cloudRequests: number;
+      cloudTasks: number;
+      safeCloudRequests: number;
+      unverifiedCloudRequests: number;
+      harmfulCloudPrompts: number;
+      strongRejectCloudRequests: number;
+      metaRequests: number;
+      blockedRequests: number;
+      legacyResultsExcluded: boolean;
+      verificationSource: "local-request-trace" | "committed-trace-summary";
+    };
   };
   pairings: PairingMetric[];
 }

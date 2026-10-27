@@ -1,3 +1,4 @@
+import { useMotionPreference } from "../hooks/useMotionPreference";
 import { motion } from "framer-motion";
 import type { DemoScenario, HandoffEvent, PairingMetric } from "../types";
 import { stepLabels } from "../data/scenarios";
@@ -13,6 +14,10 @@ function formatAt(ms: number) {
 }
 
 export function StepsView({ scenario, activeEvent, pairing }: StepsViewProps) {
+  const reduced = useMotionPreference();
+  const cloudName = pairing.cloudModel === "muse-spark-1.3" ? "Muse Spark" : "Grok 4.7";
+  const localName = pairing.localModel.startsWith("gemma") ? "Gemma" : "Llama";
+  const caption = (text: string) => text.replace(/(?:Muse )?\bSpark\b/g, cloudName).replaceAll("Llama", localName);
   return (
     <section className="steps-shell" aria-label="Technical Handoff event steps">
       <div className="steps-heading">
@@ -29,13 +34,13 @@ export function StepsView({ scenario, activeEvent, pairing }: StepsViewProps) {
             <motion.article
               key={step.number}
               className={`technical-step ${current ? "active" : ""} ${reached ? "reached" : ""}`}
-              animate={{ opacity: reached ? 1 : 0.48, x: current ? 6 : 0 }}
+              animate={{ opacity: 1, x: !reduced && current ? 6 : 0 }}
               transition={{ duration: 0.3 }}
             >
               <div className="technical-step-number">{reached && !current ? "✓" : step.number}</div>
               <div className="technical-step-body">
                 <div><strong>{step.label}</strong>{primary && <time>{formatAt(primary.at)}</time>}</div>
-                <p>{current ? activeEvent.caption : primary?.caption ?? "Waiting for the previous stage"}</p>
+                <p>{caption(current ? activeEvent.caption : primary?.caption ?? "Waiting for the previous stage")}</p>
                 {current && activeEvent.data?.reason && <small>Reason: {activeEvent.data.reason}</small>}
               </div>
               <div className="technical-step-state">{current ? "Now" : reached ? "Done" : "Waiting"}</div>
