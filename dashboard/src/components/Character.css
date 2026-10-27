@@ -1,0 +1,19 @@
+.flat-character {
+  --character-main: #F5A623;
+  --character-shade: #D98A0F;
+  --character-inner: #FFF1D6;
+  --character-eye: #0B1220;
+}
+.flat-character[data-kind="gemma"] { --character-main: #14B8A6; --character-shade: #0E8F82; --character-inner: #CFFAF4; }
+.flat-character[data-kind="guard"] { --character-main: #10B981; --character-shade: #0B8F63; --character-inner: #D1FAE5; }
+.flat-character[data-kind="spark"] { --character-main: #0866FF; --character-shade: #0650C7; --character-inner: #FFFFFF; }
+.flat-character[data-kind="spark"][data-variant="grok"] { --character-main: #111827; --character-shade: #000000; --character-inner: #F3F4F6; --character-eye: #F3F4F6; }
+.flat-character .character-main { fill: var(--character-main); }
+.flat-character path.character-main[stroke] { fill: none; }
+.flat-character .character-shade { fill: var(--character-shade); }
+.flat-character .character-inner { fill: var(--character-inner); }
+.flat-character .character-eye { fill: var(--character-eye); }
+.flat-character .character-mouth { stroke: var(--character-eye); }
+.flat-character .character-lock { fill: #E5484D; }
+.flat-character[data-variant="grok"] .character-body > path.character-main { stroke: var(--character-inner); stroke-width: 2px; }
+.flat-character .character-name { text-shadow: none; }

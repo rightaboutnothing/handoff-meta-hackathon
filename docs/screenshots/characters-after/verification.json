@@ -1,0 +1,62 @@
+{
+  "phase": "after",
+  "viewport": "1920x1080",
+  "scenarios": [
+    {
+      "name": "local-answer",
+      "passed": true
+    },
+    {
+      "name": "handoff",
+      "passed": true
+    },
+    {
+      "name": "guard-blocking",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "observedStates": [
+    "idle",
+    "receive",
+    "think",
+    "confident",
+    "answer",
+    "celebrate",
+    "hand_off",
+    "unsure",
+    "block"
+  ],
+  "reducedMotion": {
+    "emulated": true,
+    "runningLoops": 0
+  },
+  "flatSvg": [
+    {
+      "label": "Llama, idle",
+      "shapeCount": 10,
+      "prohibitedElements": 0
+    },
+    {
+      "label": "Muse Spark, idle",
+      "shapeCount": 8,
+      "prohibitedElements": 0
+    },
+    {
+      "label": "Guard, idle",
+      "shapeCount": 9,
+      "prohibitedElements": 0
+    },
+    {
+      "label": "Gemma, idle",
+      "shapeCount": 10,
+      "prohibitedElements": 0
+    },
+    {
+      "label": "Grok 4.7, idle",
+      "shapeCount": 8,
+      "prohibitedElements": 0
+    }
+  ]
+}

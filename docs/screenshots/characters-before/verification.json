@@ -1,0 +1,20 @@
+{
+  "phase": "before",
+  "viewport": "1920x1080",
+  "scenarios": [
+    {
+      "name": "local-answer",
+      "passed": true
+    },
+    {
+      "name": "handoff",
+      "passed": true
+    },
+    {
+      "name": "guard-blocking",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": []
+}
