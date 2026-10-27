@@ -88,7 +88,7 @@ Gloss, layered shading, decorative particles and the neural shimmer were removed
 
 ## Stage and motion
 
-The light wall and original navy stage background remain. Character platforms now use two solid flat tones without reflections or layered shadows. The bloom behind the cloud character and decorative stage particles are hidden to support the simpler artwork.
+The stage uses a restrained navy gradient from #0D1727 to #142942. The safety boundary is a quiet static hairline. The radial lighting, floor glow, drifting clouds, bloom and decorative stars are hidden to support the simpler artwork. Caption dots and the safety scan have no glow, and the handoff trail is subdued. Character platforms use two solid flat tones without reflections or layered shadows.
 
 The request card uses glass on navy and a red lock treatment when blocked. The handoff follows a curved arc through compositor transforms. Scene dimensions are read by ResizeObserver, not measured every animation frame. Captions fade in by word. The rail derives step durations from existing event timestamps and animates its fill with scaleX.
 
