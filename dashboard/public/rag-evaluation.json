@@ -1,0 +1,318 @@
+{
+  "synthetic": true,
+  "generatedAt": "2026-10-27T19:40:46.638Z",
+  "mode": "paired",
+  "seed": 20261027,
+  "fingerprint": "04985309b038ada1",
+  "datasetSha256": "cb673478154eed624f80924c3d7c8d51a4b87b57e71c879f8be8b15e92e12503",
+  "questionCount": 60,
+  "offlineMeta": true,
+  "method": {
+    "methodVersion": "private-gateway-rag-v1",
+    "seed": 20261027,
+    "localModel": "llama3.1:8b",
+    "guardModel": "llama-guard3:8b",
+    "cloudModel": "muse-spark-1.3",
+    "metaAccess": "paused",
+    "embeddingModel": "nomic-embed-text:v1.5",
+    "topK": 4,
+    "cloudMaxChunks": 2,
+    "cloudContextMaxTokens": 1400,
+    "confidenceThreshold": 0.8,
+    "retrievalQualityThreshold": 0.35,
+    "maxOutputTokens": 384,
+    "reasoningEffort": "medium",
+    "keepAlive": -1,
+    "temperature": 0,
+    "baseline": {
+      "name": "Finkd published interim benchmark, different task suites",
+      "medianLatencyMs": 1300,
+      "handoffRate": 0.296
+    },
+    "indexIdentity": {
+      "ready": true,
+      "chunks": 23,
+      "files": 14,
+      "embeddingModel": {
+        "provider": "ollama",
+        "model": "nomic-embed-text:v1.5",
+        "dimensions": 768
+      },
+      "indexedAt": "2026-10-27T19:36:07.776Z",
+      "piiItemsRedacted": 42,
+      "indexFingerprint": "a33924f7566b1795f61d22b2a364adb07871dfd7695e9da6a5829cdbfe680eea",
+      "chunkSettings": {
+        "approximateTokens": 500,
+        "overlapTokens": 80,
+        "charsPerToken": 4
+      }
+    },
+    "warmUpExcluded": true,
+    "warmUp": {
+      "latencyMs": 31990.272399999998,
+      "excludedFromTimings": true,
+      "models": [
+        "llama3.1:8b",
+        "llama-guard3:8b",
+        "nomic-embed-text:v1.5"
+      ],
+      "stages": [
+        {
+          "modelId": "llama3.1:8b",
+          "latencyMs": 119.77420000000004
+        },
+        {
+          "modelId": "llama-guard3:8b",
+          "latencyMs": 28753.4701,
+          "classification": "safe"
+        },
+        {
+          "modelId": "nomic-embed-text:v1.5",
+          "latencyMs": 3111.4966999999997
+        }
+      ]
+    },
+    "maxRetries": 3,
+    "runOrder": [
+      "rag",
+      "control"
+    ]
+  },
+  "historicalBaseline": {
+    "name": "Finkd published interim benchmark, different task suites",
+    "medianLatencyMs": 1300,
+    "handoffRate": 0.296,
+    "comparisonWarning": "Different datasets and safety boundary; descriptive reference only, not a causal before/after."
+  },
+  "summary": {
+    "rag": {
+      "items": 60,
+      "completed": 52,
+      "scored": 52,
+      "deferred": 8,
+      "errors": 0,
+      "blockedLocal": 0,
+      "scoringCoverage": 0.8666666666666667,
+      "answerAccuracy": 0.8541666666666667,
+      "citationAccuracy": 0.9278846153846152,
+      "citationRecall": 0.891025641025641,
+      "localAnswerRate": 0.8666666666666667,
+      "handoffRate": 0.13333333333333333,
+      "actualCloudCallRate": 0,
+      "medianLatencyMs": 601.5,
+      "p95LatencyMs": 2126.299999999995,
+      "tokensSentToCloud": 0,
+      "outboundChunks": 0,
+      "estimatedCloudInputTokens": 3764,
+      "piiItemsRedacted": 297,
+      "guardBlocks": 0,
+      "receiptsIssued": 8,
+      "receiptsVerified": 8,
+      "knownCloudCostUsd": 0,
+      "actualCostUsd": 0,
+      "cloudCostUnknownItems": 0,
+      "estimatedCloudCostUsd": 0,
+      "estimatedHandoffPer1000Usd": 0.4854666666666667,
+      "estimatedAllCloudPer1000Usd": 2.6104999999999996,
+      "estimatedLocalAllowancePer1000Usd": 0.2,
+      "categories": {
+        "lookup": {
+          "scored": 36,
+          "answerAccuracy": 0.9722222222222222
+        },
+        "multi_document": {
+          "scored": 14,
+          "answerAccuracy": 0.6011904761904762
+        },
+        "cloud": {
+          "scored": 2,
+          "answerAccuracy": 0.5
+        }
+      },
+      "stages": {
+        "retrieval:nomic-embed-text:v1.5": {
+          "count": 60,
+          "medianLatencyMs": 27.5,
+          "p95LatencyMs": 202.94999999999084
+        },
+        "local_answer:llama3.1:8b": {
+          "count": 60,
+          "medianLatencyMs": 546.510850000006,
+          "p95LatencyMs": 1087.3596649999981
+        },
+        "guard_outbound:llama-guard3:8b": {
+          "count": 8,
+          "medianLatencyMs": 139.66734999999608,
+          "p95LatencyMs": 157.60522499999715
+        }
+      }
+    },
+    "control": {
+      "items": 60,
+      "completed": 0,
+      "scored": 0,
+      "deferred": 60,
+      "errors": 0,
+      "blockedLocal": 0,
+      "scoringCoverage": 0,
+      "answerAccuracy": null,
+      "citationAccuracy": null,
+      "citationRecall": null,
+      "localAnswerRate": 0,
+      "handoffRate": 1,
+      "actualCloudCallRate": 0,
+      "medianLatencyMs": 340,
+      "p95LatencyMs": 519.4499999999999,
+      "tokensSentToCloud": 0,
+      "outboundChunks": 0,
+      "estimatedCloudInputTokens": 5460,
+      "piiItemsRedacted": 0,
+      "guardBlocks": 0,
+      "receiptsIssued": 60,
+      "receiptsVerified": 60,
+      "knownCloudCostUsd": 0,
+      "actualCostUsd": 0,
+      "cloudCostUnknownItems": 0,
+      "estimatedCloudCostUsd": 0,
+      "estimatedHandoffPer1000Usd": 1.582,
+      "estimatedAllCloudPer1000Usd": 1.5183000000000004,
+      "estimatedLocalAllowancePer1000Usd": 0.2,
+      "categories": {
+        "lookup": {
+          "scored": 0,
+          "answerAccuracy": null
+        },
+        "multi_document": {
+          "scored": 0,
+          "answerAccuracy": null
+        },
+        "cloud": {
+          "scored": 0,
+          "answerAccuracy": null
+        }
+      },
+      "stages": {
+        "retrieval:control-no-retrieval": {
+          "count": 60,
+          "medianLatencyMs": 0,
+          "p95LatencyMs": 0
+        },
+        "local_answer:llama3.1:8b": {
+          "count": 60,
+          "medianLatencyMs": 279.37514999999985,
+          "p95LatencyMs": 463.81390499999253
+        },
+        "guard_outbound:llama-guard3:8b": {
+          "count": 60,
+          "medianLatencyMs": 50.518199999998615,
+          "p95LatencyMs": 58.965585000009014
+        }
+      }
+    }
+  },
+  "comparison": {
+    "medianLatencyChangeMs": 261.5,
+    "handoffRateChangePercentagePoints": -86.66666666666667,
+    "note": "Matched synthetic questions and settings; control disables retrieval. Offline latency excludes cloud completion, so this is a local routing comparison."
+  },
+  "pricingAssumptions": {
+    "currency": "USD",
+    "assumption": true,
+    "label": "Illustrative pricing assumptions, not verified Muse Spark list prices",
+    "museInputPerMillionUsd": 2,
+    "museOutputPerMillionUsd": 6,
+    "expectedOutputTokens": 200,
+    "localPerQueryUsd": 0.0002,
+    "queriesPerComparison": 1000,
+    "tokenEstimator": "ceil(character count / 4); actual provider usage is recorded separately",
+    "notes": [
+      "All-cloud sends every query and the full top-k redacted retrieval context to Muse Spark.",
+      "Handoff sends only selected chunks when a safe handoff is needed.",
+      "Projected cost includes deferred handoffs and is not an observed invoice.",
+      "The local allowance is an illustrative electricity and hardware allocation, not a measurement.",
+      "Update these assumptions before making a purchasing decision."
+    ]
+  },
+  "limitations": [
+    "Answer accuracy is deterministic required-fact coverage, not an expert or model-graded quality score.",
+    "Citation accuracy is precision against expected source chunk IDs; source coverage is reported separately as citation recall.",
+    "Deferred cloud answers and execution errors are excluded from scored accuracy, with coverage and counts shown.",
+    "Offline latency measures local processing and handoff preparation, not unavailable cloud completion.",
+    "PII redaction counts are placeholder occurrences processed per query, not unique people or unique records.",
+    "Cost figures per 1,000 queries are assumptions, not measured all-cloud bills. Known cloud cost sums only provider-reported charges; missing charges and uncertain failed-request charges are counted separately, never replaced by estimates or treated as a complete bill."
+  ],
+  "deferredIds": {
+    "rag": [
+      "acme-041",
+      "acme-058",
+      "acme-057",
+      "acme-053",
+      "acme-055",
+      "acme-060",
+      "acme-054",
+      "acme-042"
+    ],
+    "control": [
+      "acme-032",
+      "acme-003",
+      "acme-025",
+      "acme-041",
+      "acme-056",
+      "acme-043",
+      "acme-058",
+      "acme-009",
+      "acme-047",
+      "acme-051",
+      "acme-007",
+      "acme-057",
+      "acme-023",
+      "acme-046",
+      "acme-011",
+      "acme-036",
+      "acme-001",
+      "acme-020",
+      "acme-049",
+      "acme-012",
+      "acme-027",
+      "acme-029",
+      "acme-017",
+      "acme-031",
+      "acme-040",
+      "acme-053",
+      "acme-035",
+      "acme-055",
+      "acme-060",
+      "acme-019",
+      "acme-054",
+      "acme-021",
+      "acme-004",
+      "acme-002",
+      "acme-022",
+      "acme-052",
+      "acme-034",
+      "acme-006",
+      "acme-045",
+      "acme-015",
+      "acme-010",
+      "acme-008",
+      "acme-016",
+      "acme-005",
+      "acme-024",
+      "acme-044",
+      "acme-037",
+      "acme-038",
+      "acme-059",
+      "acme-014",
+      "acme-028",
+      "acme-030",
+      "acme-039",
+      "acme-013",
+      "acme-042",
+      "acme-018",
+      "acme-050",
+      "acme-033",
+      "acme-048",
+      "acme-026"
+    ]
+  }
+}
