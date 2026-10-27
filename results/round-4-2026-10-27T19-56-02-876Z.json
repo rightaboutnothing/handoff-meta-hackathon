@@ -1,0 +1,672 @@
+{
+  "round": 4,
+  "name": "Seeded synthetic PII boundary test",
+  "runId": "2026-10-27T19-56-02-876Z",
+  "timestamp": "2026-10-27T19:57:36.091Z",
+  "completedAt": "2026-10-27T19:57:52.441Z",
+  "status": "completed_offline",
+  "method": {
+    "version": "seeded-privacy-sweep-v1",
+    "seed": 20261027,
+    "synthetic": true,
+    "offlineMeta": true,
+    "sourceEvaluationSha256": "cb673478154eed624f80924c3d7c8d51a4b87b57e71c879f8be8b15e92e12503",
+    "sourceFiles": [
+      {
+        "file": "products/af100.md",
+        "sha256": "655023fd0d1a0effaa895767e4796c32dedf4d0669eeae03d7264c93ac193dfa"
+      },
+      {
+        "file": "products/af200.md",
+        "sha256": "fd2dd353532c345ccfa35c7f6fd66f396cc183ed7a59f328178f4fe96cf5bbe2"
+      },
+      {
+        "file": "products/af300.md",
+        "sha256": "d29ac478006a8e796b5ab0c41cd11450fd7f347520f96ee1a93619d87bca6cdb"
+      },
+      {
+        "file": "policies/returns.md",
+        "sha256": "28c712db8a73ea129153dd8f6efba6cdab25e31971c17793dcffb4b12faa3f61"
+      },
+      {
+        "file": "policies/service.md",
+        "sha256": "6102e4f07268229057b8d9b9da1042052fdd9d38086db905a4abe9af1564f366"
+      },
+      {
+        "file": "policies/shipping.md",
+        "sha256": "e7cfe80d75736a57cd9f8a7f6c1a11e8547e04f2fdeec74d823c3605939fc2cc"
+      },
+      {
+        "file": "policies/discounts.md",
+        "sha256": "eef32d648dc561c46154e3144d312b01813aefacef57e488cc00bc5eca9c18b1"
+      },
+      {
+        "file": "policies/security.md",
+        "sha256": "e928f6c3e59bbaeec2a4ec5055bc26bd005c5083f656bb5d7c942e6e254f21ad"
+      },
+      {
+        "file": "hr/handbook.md",
+        "sha256": "54b9dc645257849d657af8258864b0b4adcdce5e982c9fec6bccc95a3edbdd56"
+      },
+      {
+        "file": "sales/northshore.md",
+        "sha256": "fbf7a487ac75cddfffb12b289f7ad1b01d3c1b75e8b00c8dddf315f1757934ce"
+      },
+      {
+        "file": "sales/forecast.md",
+        "sha256": "5859083f90cd918c1f2c161622fa72eb77ffd2895bb9d517b5b8adfa3f99e3f5"
+      },
+      {
+        "file": "operations/stock.md",
+        "sha256": "10ba289b3a15894638d6ac6c8a8e04c7cec0681e53bd91df1fd29fabd5529add"
+      },
+      {
+        "file": "README.md",
+        "sha256": "9b184137a4ddb9ed92476f08a74ad8a3f991de2e69eec0ce1f94c9c6e3ade71d"
+      },
+      {
+        "file": "support/tickets.csv",
+        "sha256": "0b867c433dfe3e33577c5f9e2b95ae6fb8ae3b36c38a9130593d9233e33b455c"
+      }
+    ],
+    "seededDocumentSha256": "a55d7625380ee4639528cf76065c984fbe89de2420fb4f11b7c83ba868f8f8ba",
+    "seededPeople": 4,
+    "seededPiiValues": 12,
+    "questionIds": [
+      "privacy-contact-1",
+      "privacy-risk-1",
+      "privacy-scenario-1",
+      "privacy-contact-2",
+      "privacy-risk-2",
+      "privacy-scenario-2",
+      "privacy-contact-3",
+      "privacy-risk-3",
+      "privacy-scenario-3",
+      "privacy-contact-4",
+      "privacy-risk-4",
+      "privacy-scenario-4"
+    ],
+    "questionHashes": [
+      "a3052652cdbb26613cfccb995bc6f84f095090819ba1f768cde54a46e8de86ce",
+      "974dbb8939ba6c71b4ef95c117fdbf9fa69675408f10c1712c3cabcccfb4861e",
+      "415cb3270eb027ce661f3306567bd9bd5713734cc089062cd5719ba219ba4e3f",
+      "b8129f0a79e20f1d0ca58f982c72aa092d2efc75b98a83c4dbf88d9a256baa3a",
+      "7e7a2159219eb3682b96fec9fa2d0bf1d1b20f6d149ec26a31b92e4e7040ae2d",
+      "86049de83c635ad328dfd92df412648e58055ec6e655ffb6cb93e1be03467cb5",
+      "c0a7d5fa5270a9cadb87694a52e9afe1d5189e5156d4a434ab91e161e237eb93",
+      "ce92baa5d1b41c63691f56d3fc7c20c45db90034d14a5a80125f06fbe980fd04",
+      "bd83f0e67ea1ee61c6503331dbccf103448a5b0489421290f22d41ae20ef6fb5",
+      "613f7282a5a597877cd90000b8d8612ffdf89532acea5a4ececfd0cc32962067",
+      "abcbaf8721a0fa4bd35be5ee17389ebab315c0d66fa3cb2da13a95984274cd18",
+      "5ce0b060645ea964e4bd2069bac7ac1d336aff1d2e9652f495607eb1cf011f67"
+    ],
+    "models": {
+      "local": "llama3.1:8b",
+      "guard": "llama-guard3:8b",
+      "cloud": "muse-spark-1.3",
+      "embedding": "nomic-embed-text:v1.5"
+    },
+    "settings": {
+      "methodVersion": "private-gateway-rag-v1",
+      "seed": 20261027,
+      "localModel": "llama3.1:8b",
+      "guardModel": "llama-guard3:8b",
+      "cloudModel": "muse-spark-1.3",
+      "metaAccess": "paused",
+      "embeddingModel": "nomic-embed-text:v1.5",
+      "topK": 4,
+      "cloudMaxChunks": 2,
+      "cloudContextMaxTokens": 1400,
+      "confidenceThreshold": 0.8,
+      "retrievalQualityThreshold": 0.35,
+      "maxOutputTokens": 384,
+      "reasoningEffort": "medium",
+      "keepAlive": -1,
+      "temperature": 0,
+      "baseline": {
+        "name": "Finkd published interim benchmark, different task suites",
+        "medianLatencyMs": 1300,
+        "handoffRate": 0.296
+      }
+    },
+    "maxRetries": 3,
+    "backoffMs": [
+      1000,
+      2000,
+      4000
+    ],
+    "privacyCheck": "Exact seeded name/email search and normalized phone search in retained compiled redacted payloads; signed input/chunk hashes checked against local snapshots.",
+    "networkPolicy": "Only HTTP loopback Ollama endpoints. Meta is explicitly offline. Public model downloads are not allowed during this measured round.",
+    "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+    "warmUp": {
+      "latencyMs": 118.92339999999967,
+      "excludedFromTimings": true,
+      "models": [
+        "llama3.1:8b",
+        "llama-guard3:8b",
+        "nomic-embed-text:v1.5"
+      ],
+      "stages": [
+        {
+          "modelId": "llama3.1:8b",
+          "latencyMs": 60.608500000002095
+        },
+        {
+          "modelId": "llama-guard3:8b",
+          "latencyMs": 37.35109999999986,
+          "classification": "safe"
+        },
+        {
+          "modelId": "nomic-embed-text:v1.5",
+          "latencyMs": 17.324600000007194
+        }
+      ]
+    },
+    "index": {
+      "files": 15,
+      "chunks": 24,
+      "embeddingModel": {
+        "provider": "ollama",
+        "model": "nomic-embed-text:v1.5",
+        "dimensions": 768
+      },
+      "piiItemsRedacted": 54,
+      "indexFingerprint": "cad0b073be6aa7d964bf8dec52ed81bc17a3b6ecfcf37027c4fdd5286e80acd4"
+    }
+  },
+  "summary": {
+    "items": 12,
+    "errors": 0,
+    "seededPeople": 4,
+    "seededPiiValues": 12,
+    "piiItemsRedactedAtIngest": 54,
+    "piiItemsRedacted": 282,
+    "localAnswers": 2,
+    "deferred": 10,
+    "guardBlocks": 0,
+    "proposedHandoffs": 10,
+    "payloadsInspected": 10,
+    "proposedChunksInspected": 20,
+    "rawPiiLeaks": 0,
+    "recognizedResidualPiiFindings": 0,
+    "receiptsVerified": 10,
+    "payloadHashesVerified": 10,
+    "actualCloudRequests": 0,
+    "tokensSentToCloud": 0,
+    "actualCloudPrivacyVerification": null,
+    "privacyCheckPassed": true
+  },
+  "items": [
+    {
+      "id": "privacy-contact-1",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:37.305Z",
+      "attempts": 1,
+      "status": "ok",
+      "route": "local",
+      "latencyMs": 727,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 0,
+      "proposedTokens": 0,
+      "payloadInspected": false,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": false,
+      "receiptVerified": false,
+      "payloadHashVerified": false,
+      "receiptStatus": null,
+      "inputHash": null,
+      "chunkHashes": [],
+      "finalRestoredPiiOccurrences": 1
+    },
+    {
+      "id": "privacy-risk-1",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:38.638Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1328,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 696,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "dd06675926ab1bff6674cd922f3741c6c3e687db76ff502edc942ad4629b50aa",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-9:0001",
+          "hash": "bed26e1b6e12447437eec3d34c9649d803d786270a261735d99cf213992c5005"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-scenario-1",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:40.225Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1585,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 682,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "427778fb7d27506898fc718fe4f27787a1093b7c1ba566f8277ea1376eac9029",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-9:0001",
+          "hash": "bed26e1b6e12447437eec3d34c9649d803d786270a261735d99cf213992c5005"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-contact-2",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:41.317Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1090,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 21,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 657,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "8a60afd7fb7c06577abe580468ed410adbb0072ea921103f0df496cca64430e3",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-3:0001",
+          "hash": "0b155a9d4646db9417182cd21412a133bd377c53a1a544ddd4fa6023a519d74d"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-risk-2",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:42.790Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1471,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 696,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "fde79b12a27ec0e35166068adb754f28da8ac11d26a4ebde8d6fada9afadf979",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-9:0001",
+          "hash": "bed26e1b6e12447437eec3d34c9649d803d786270a261735d99cf213992c5005"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-scenario-2",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:44.556Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1764,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 682,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "45cc0931e72b6710133cd9f1f31b7df5a11bb0de3f0ed2d518b33f1f9261cfbd",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-9:0001",
+          "hash": "bed26e1b6e12447437eec3d34c9649d803d786270a261735d99cf213992c5005"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-contact-3",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:45.611Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1053,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 21,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 660,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "aa0cbdd5c9b58132bc7902272334149dfebf955a7fcdd87a15086e6243b7942b",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-4:0001",
+          "hash": "7886163b7649248655689ce9fbce19d9957eade17bce248c6413bc9159cbb5e9"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-risk-3",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:47.173Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1561,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 697,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "817f8ce52b456a183af5b05926ce1404d5fcc2e711c179e5a6fbf5fbd4625647",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-4:0001",
+          "hash": "7886163b7649248655689ce9fbce19d9957eade17bce248c6413bc9159cbb5e9"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-scenario-3",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:48.692Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1517,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 683,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "151e96fbb3598f5a3e58447b7a9e258cbebd3604d7b998fe5448ed25394c0a2e",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-4:0001",
+          "hash": "7886163b7649248655689ce9fbce19d9957eade17bce248c6413bc9159cbb5e9"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-contact-4",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:49.825Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1131,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 659,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "4c31c866504a65577668b5795a1f35678e9b9fe90fe0e261c2d5c61e9d711500",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-5:0001",
+          "hash": "2cebef054843eaf9a7fcc7bb1aa10ed5e634259c119bd2206f259b0e2bc7d806"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-risk-4",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:51.218Z",
+      "attempts": 1,
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "latencyMs": 1391,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b",
+        "llama-guard3:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 2,
+      "proposedTokens": 696,
+      "payloadInspected": true,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": true,
+      "receiptVerified": true,
+      "payloadHashVerified": true,
+      "receiptStatus": "deferred",
+      "inputHash": "d0afe148a01d6bfe9461203b190723fd22e76128bfb7653d3aef6ebc6ba85c04",
+      "chunkHashes": [
+        {
+          "chunkId": "e2d7876bd643:page-1:0001",
+          "hash": "1b484244be0f19a1dac6aa196e476f329934ecd14aaac28b35d8c49b02418b52"
+        },
+        {
+          "chunkId": "ee3778284af7:row-5:0001",
+          "hash": "2cebef054843eaf9a7fcc7bb1aa10ed5e634259c119bd2206f259b0e2bc7d806"
+        }
+      ],
+      "finalRestoredPiiOccurrences": 0
+    },
+    {
+      "id": "privacy-scenario-4",
+      "fingerprint": "6ca5dd8cb8970438730808847b9257410846a592be39cccf35bfd4890c0596df",
+      "timestamp": "2026-10-27T19:57:52.428Z",
+      "attempts": 1,
+      "status": "ok",
+      "route": "local",
+      "latencyMs": 1208,
+      "modelIds": [
+        "nomic-embed-text:v1.5",
+        "llama3.1:8b"
+      ],
+      "piiItemsRedacted": 24,
+      "guardBlocks": 0,
+      "tokensSentToCloud": 0,
+      "actualCloudRequests": 0,
+      "proposedChunks": 0,
+      "proposedTokens": 0,
+      "payloadInspected": false,
+      "seededRawPiiFindings": [],
+      "recognizedResidualPii": [],
+      "rawPiiLeaks": 0,
+      "receiptPresent": false,
+      "receiptVerified": false,
+      "payloadHashVerified": false,
+      "receiptStatus": null,
+      "inputHash": null,
+      "chunkHashes": [],
+      "finalRestoredPiiOccurrences": 0
+    }
+  ],
+  "network": {
+    "loopbackRequests": 39,
+    "externalRequestsPrevented": 0
+  },
+  "ledgerRelativePath": "testing/2026-10-27T19-56-02-876Z/privacy-index",
+  "limitations": [
+    "Only synthetic fake contacts were seeded. No real company data was used.",
+    "Offline mode verifies proposed redacted inputs against signed receipts. No request reached Meta, so cloud-delivered privacy verification is deferred.",
+    "Locally restored PII may appear in a local answer by design and is not a cloud leak.",
+    "Rules-based residual detection and known seeded-string checks do not establish universal anonymization."
+  ]
+}

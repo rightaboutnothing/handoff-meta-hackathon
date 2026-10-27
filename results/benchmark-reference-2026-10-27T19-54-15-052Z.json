@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-27T19-54-15-052Z",
+  "timestamp": "2026-10-27T19:54:15.057Z",
+  "status": "historical_interim",
+  "generatedAt": "2026-10-27T19:11:01.958Z",
+  "seed": 20261027,
+  "progress": {
+    "completed": 900,
+    "total": 1200,
+    "deferred": 300
+  },
+  "trust": {
+    "harmfulCloudPrompts": 0,
+    "verifiedFromRequestTrace": true,
+    "offlinePassMadeZeroMetaCalls": true,
+    "note": "The offline pass was verified against request trace metadata. Legacy results from before the safety screen are outside this scope.",
+    "evidence": {
+      "schemaVersion": 1,
+      "methodVersion": "safety-screen-v1",
+      "executionMode": "offline-meta",
+      "scope": "Offline pass after the local safety screen was introduced",
+      "startedAt": "2026-10-27T01:25:43.065Z",
+      "endedAt": "2026-10-27T06:27:44.661Z",
+      "traceSha256": "33813368e4fa4265c5a2d37f6697787221374338e8275601138673da1b430edc",
+      "resultsSha256": "1c503618bb2431abddd5d87fa380812e1f55a008c12e336ad5e4fa1f831d0df6",
+      "traceEventsReviewed": 4837,
+      "completedItems": 596,
+      "requestStarts": 1611,
+      "cloudRequests": 166,
+      "cloudTasks": 166,
+      "safeCloudRequests": 166,
+      "unverifiedCloudRequests": 0,
+      "harmfulCloudPrompts": 0,
+      "strongRejectCloudRequests": 0,
+      "metaRequests": 0,
+      "blockedRequests": 235,
+      "legacyResultsExcluded": true,
+      "verificationSource": "local-request-trace"
+    }
+  },
+  "pairings": [
+    {
+      "id": "meta-meta",
+      "name": "Finkd",
+      "localModel": "llama3.1:8b",
+      "cloudModel": "muse-spark-1.3",
+      "accuracy": 77,
+      "handoffRate": 29.6,
+      "medianLatencyMs": 1306,
+      "costUsd": 0.402803,
+      "estimatedCostSavedUsd": 2.11,
+      "benchmarks": {
+        "ifeval": 100,
+        "gpqa": 59.4,
+        "mmlu-pro": 46.8,
+        "strongreject": 98,
+        "xstest": null,
+        "ad-privacy": 80.9
+      }
+    },
+    {
+      "id": "meta-grok",
+      "name": "Llamarok",
+      "localModel": "llama3.1:8b",
+      "cloudModel": "x-ai/grok-4.7",
+      "accuracy": 74.8,
+      "handoffRate": 33.7,
+      "medianLatencyMs": 1550,
+      "costUsd": 3.798489,
+      "estimatedCostSavedUsd": 2.39,
+      "benchmarks": {
+        "ifeval": 95.4,
+        "gpqa": 58.9,
+        "mmlu-pro": 47.4,
+        "strongreject": 97,
+        "xstest": 62.4,
+        "ad-privacy": 87.9
+      }
+    },
+    {
+      "id": "gemma-meta",
+      "name": "Gemmuse",
+      "localModel": "gemma3:12b",
+      "cloudModel": "muse-spark-1.3",
+      "accuracy": 100,
+      "handoffRate": 0,
+      "medianLatencyMs": 2022,
+      "costUsd": 0,
+      "estimatedCostSavedUsd": 0.6,
+      "benchmarks": {
+        "ifeval": null,
+        "gpqa": null,
+        "mmlu-pro": null,
+        "strongreject": 100,
+        "xstest": null,
+        "ad-privacy": null
+      }
+    },
+    {
+      "id": "gemma-grok",
+      "name": "Gemmok",
+      "localModel": "gemma3:12b",
+      "cloudModel": "x-ai/grok-4.7",
+      "accuracy": 85.4,
+      "handoffRate": 45.7,
+      "medianLatencyMs": 10713,
+      "costUsd": 5.479994,
+      "estimatedCostSavedUsd": 1.95,
+      "benchmarks": {
+        "ifeval": 95,
+        "gpqa": 77.6,
+        "mmlu-pro": 73,
+        "strongreject": 100,
+        "xstest": 68.1,
+        "ad-privacy": 98.5
+      }
+    }
+  ],
+  "provenance": {
+    "benchmarkSource": "dashboard/public/benchmark-data.json",
+    "benchmarkSha256": "e5d984c717b4374e592f765a9217a8fbd0802dd890969fa91ac05c1bcd6c9189",
+    "summarySource": "results/summary.md",
+    "summarySha256": "fa722cbd24e50f373968c363bea7d823be9fa33eb7a8b3fbe90ee823ea5f8c06"
+  },
+  "coverage": {
+    "status": "partial",
+    "completed": 900,
+    "total": 1200,
+    "deferred": 300,
+    "warning": "Historical interim results have unequal suite coverage across pairings. They do not establish a fair ranking or explain a causal retrieval improvement.",
+    "pairings": [
+      {
+        "id": "meta-meta",
+        "completedSuites": [
+          "ifeval",
+          "gpqa",
+          "mmlu-pro",
+          "strongreject",
+          "ad-privacy"
+        ],
+        "missingSuites": [
+          "xstest"
+        ]
+      },
+      {
+        "id": "meta-grok",
+        "completedSuites": [
+          "ifeval",
+          "gpqa",
+          "mmlu-pro",
+          "strongreject",
+          "xstest",
+          "ad-privacy"
+        ],
+        "missingSuites": []
+      },
+      {
+        "id": "gemma-meta",
+        "completedSuites": [
+          "strongreject"
+        ],
+        "missingSuites": [
+          "ifeval",
+          "gpqa",
+          "mmlu-pro",
+          "xstest",
+          "ad-privacy"
+        ]
+      },
+      {
+        "id": "gemma-grok",
+        "completedSuites": [
+          "ifeval",
+          "gpqa",
+          "mmlu-pro",
+          "strongreject",
+          "xstest",
+          "ad-privacy"
+        ],
+        "missingSuites": []
+      }
+    ]
+  }
+}

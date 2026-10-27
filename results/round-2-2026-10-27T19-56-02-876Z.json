@@ -1,0 +1,4254 @@
+{
+  "schemaVersion": 1,
+  "round": 2,
+  "title": "Company data retrieval",
+  "runId": "2026-10-27T19-56-02-876Z",
+  "timestamp": "2026-10-27T19:56:52.251Z",
+  "finishedAt": "2026-10-27T19:57:29.692Z",
+  "status": "completed_offline",
+  "offlineMeta": true,
+  "fingerprint": "8715d6ad9cc3dd5a",
+  "datasetSha256": "cb673478154eed624f80924c3d7c8d51a4b87b57e71c879f8be8b15e92e12503",
+  "baseline": {
+    "name": "Finkd published interim benchmark, different task suites",
+    "medianLatencyMs": 1300,
+    "handoffRate": 0.296
+  },
+  "method": {
+    "methodVersion": "private-gateway-rag-v1",
+    "seed": 20261027,
+    "localModel": "llama3.1:8b",
+    "guardModel": "llama-guard3:8b",
+    "cloudModel": "muse-spark-1.3",
+    "metaAccess": "paused",
+    "embeddingModel": "nomic-embed-text:v1.5",
+    "topK": 4,
+    "cloudMaxChunks": 2,
+    "cloudContextMaxTokens": 1400,
+    "confidenceThreshold": 0.8,
+    "retrievalQualityThreshold": 0.35,
+    "maxOutputTokens": 384,
+    "reasoningEffort": "medium",
+    "keepAlive": -1,
+    "temperature": 0,
+    "baseline": {
+      "name": "Finkd published interim benchmark, different task suites",
+      "medianLatencyMs": 1300,
+      "handoffRate": 0.296
+    },
+    "indexIdentity": {
+      "ready": true,
+      "chunks": 23,
+      "files": 14,
+      "embeddingModel": {
+        "provider": "ollama",
+        "model": "nomic-embed-text:v1.5",
+        "dimensions": 768
+      },
+      "indexedAt": "2026-10-27T19:36:07.776Z",
+      "piiItemsRedacted": 42,
+      "indexFingerprint": "a33924f7566b1795f61d22b2a364adb07871dfd7695e9da6a5829cdbfe680eea",
+      "chunkSettings": {
+        "approximateTokens": 500,
+        "overlapTokens": 80,
+        "charsPerToken": 4
+      }
+    },
+    "warmUpExcluded": true,
+    "warmUp": {
+      "latencyMs": 100.34870000000228,
+      "excludedFromTimings": true,
+      "models": [
+        "llama3.1:8b",
+        "llama-guard3:8b",
+        "nomic-embed-text:v1.5"
+      ],
+      "stages": [
+        {
+          "modelId": "llama3.1:8b",
+          "latencyMs": 40.70999999999913
+        },
+        {
+          "modelId": "llama-guard3:8b",
+          "latencyMs": 38.820400000004156,
+          "classification": "safe"
+        },
+        {
+          "modelId": "nomic-embed-text:v1.5",
+          "latencyMs": 15.287799999998242
+        }
+      ]
+    },
+    "maxRetries": 3,
+    "runOrder": [
+      "rag"
+    ]
+  },
+  "pricing": {
+    "currency": "USD",
+    "assumption": true,
+    "label": "Illustrative pricing assumptions, not verified Muse Spark list prices",
+    "museInputPerMillionUsd": 2,
+    "museOutputPerMillionUsd": 6,
+    "expectedOutputTokens": 200,
+    "localPerQueryUsd": 0.0002,
+    "queriesPerComparison": 1000,
+    "tokenEstimator": "ceil(character count / 4); actual provider usage is recorded separately",
+    "notes": [
+      "All-cloud sends every query and the full top-k redacted retrieval context to Muse Spark.",
+      "Handoff sends only selected chunks when a safe handoff is needed.",
+      "Projected cost includes deferred handoffs and is not an observed invoice.",
+      "The local allowance is an illustrative electricity and hardware allocation, not a measurement.",
+      "Update these assumptions before making a purchasing decision."
+    ]
+  },
+  "summary": {
+    "items": 60,
+    "completed": 51,
+    "scored": 51,
+    "deferred": 9,
+    "errors": 0,
+    "blockedLocal": 0,
+    "scoringCoverage": 0.85,
+    "answerAccuracy": 0.8709150326797387,
+    "citationAccuracy": 0.9428104575163397,
+    "citationRecall": 0.8986928104575163,
+    "localAnswerRate": 0.85,
+    "handoffRate": 0.15,
+    "actualCloudCallRate": 0,
+    "medianLatencyMs": 480,
+    "p95LatencyMs": 1136.3,
+    "tokensSentToCloud": 0,
+    "outboundChunks": 0,
+    "estimatedCloudInputTokens": 4074,
+    "piiItemsRedacted": 297,
+    "guardBlocks": 0,
+    "receiptsIssued": 9,
+    "receiptsVerified": 9,
+    "knownCloudCostUsd": 0,
+    "actualCostUsd": 0,
+    "cloudCostUnknownItems": 0,
+    "estimatedCloudCostUsd": 0,
+    "estimatedHandoffPer1000Usd": 0.5158,
+    "estimatedAllCloudPer1000Usd": 2.6104999999999996,
+    "estimatedLocalAllowancePer1000Usd": 0.2,
+    "categories": {
+      "lookup": {
+        "scored": 36,
+        "answerAccuracy": 0.9722222222222222
+      },
+      "multi_document": {
+        "scored": 14,
+        "answerAccuracy": 0.6011904761904762
+      },
+      "cloud": {
+        "scored": 1,
+        "answerAccuracy": 1
+      }
+    },
+    "stages": {
+      "retrieval:nomic-embed-text:v1.5": {
+        "count": 60,
+        "medianLatencyMs": 28.5,
+        "p95LatencyMs": 35.05
+      },
+      "local_answer:llama3.1:8b": {
+        "count": 60,
+        "medianLatencyMs": 437.16170000000056,
+        "p95LatencyMs": 935.9307100000009
+      },
+      "guard_outbound:llama-guard3:8b": {
+        "count": 9,
+        "medianLatencyMs": 64.36109999999462,
+        "p95LatencyMs": 95.78062000000499
+      }
+    },
+    "projectionCoverage": 1,
+    "projectionsComplete": true,
+    "estimatedAllCloudInputTokens": 42315,
+    "estimatedHandoffInputTokens": 4074,
+    "projectedTokensKeptLocal": 38241,
+    "projectedTokensKeptLocalPer1000": 637350,
+    "projectedSavingRate": 0.8024133307795441,
+    "projectedSavingPer1000Usd": 2.0946999999999996,
+    "actualCloudCalls": 0,
+    "blockedOutbound": 0,
+    "flaggedInbound": null,
+    "inboundStatus": "deferred_no_cloud_response"
+  },
+  "items": [
+    {
+      "id": "acme-032",
+      "category": "lookup",
+      "questionHash": "6194be82fb5ab217ef445540c51ff2507640c7943f6eb53553bd55df70f2de7b",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.767866849899292,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 3,
+        "totalFacts": 3,
+        "reason": "Matched 3/3 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "sales/northshore.md",
+          "chunkId": "f23f89eb78e5:page-1:0001",
+          "location": "page:1",
+          "hash": "fe5accda9a7ae6df47fdd12d2d0e2e577af9cba79ef08ff09881b6428a4edf7a"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 420,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 18,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 399.50679999999556,
+            "tokens": {
+              "input": 781,
+              "output": 52,
+              "total": 833
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002784,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 792,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-003",
+      "category": "lookup",
+      "questionHash": "6194d4b9063d38b3d0f6a5ad9fde8f95ad0bb9d27728d7d91b75c2926d8c1e04",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.712597668170929,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 462,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 30,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 429.8423000000039,
+            "tokens": {
+              "input": 764,
+              "output": 51,
+              "total": 815
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002692,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 746,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-025",
+      "category": "lookup",
+      "questionHash": "05b857f4156188c16884f3c04fe912f16c46bb22dafe129c761ec3a0d6329b64",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6667463481426239,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/shipping.md",
+          "chunkId": "57b7c78b3fcb:page-1:0001",
+          "location": "page:1",
+          "hash": "1951caf02c0e3541be78118da565cf449c17d51c6f4bf97729a88f9e6eac28ca"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 501,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 31,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 468.1995999999999,
+            "tokens": {
+              "input": 753,
+              "output": 55,
+              "total": 808
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002704,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 752,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-041",
+      "category": "multi_document",
+      "questionHash": "d2f754ab6d03da212449fe8b9dd2cec0624d72eb19022312dd2f074354cf4310",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 1,
+      "retrievalQuality": 0.682532399892807,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 835,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 23,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 595.5362999999998,
+            "tokens": {
+              "input": 760,
+              "output": 74,
+              "total": 834
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 109.4939000000013,
+            "tokens": {
+              "input": 668,
+              "output": 2,
+              "total": 670
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002718,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 759,
+        "estimatedCloudInputTokens": 424,
+        "projectedHandoffCostUsd": 0.002048
+      },
+      "receipt": {
+        "runId": "94497c36-dbba-4d3e-b9e7-bcde08f8428a",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "33d9f387fb9f0d1af79ed9d216ead64134a04e9c24a3ad18af9a4c31ff9495f9",
+        "chunks": [
+          {
+            "chunkId": "aef32b872e1d:page-1:0001",
+            "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+          },
+          {
+            "chunkId": "57b7c78b3fcb:page-1:0001",
+            "hash": "1951caf02c0e3541be78118da565cf449c17d51c6f4bf97729a88f9e6eac28ca"
+          }
+        ],
+        "chain": {
+          "sequence": 78,
+          "entryHash": "9d41af72e2ba5d5845dc60fbb9da5c7fc13c56accb2c667fc8adf0db0213e7ea"
+        }
+      }
+    },
+    {
+      "id": "acme-056",
+      "category": "cloud",
+      "questionHash": "1ec17112a32d3930718df94fdf7a7c5377f177a1464edd9a6169edab9906c4a1",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0.5,
+      "retrievalQuality": 0.685593843460083,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 912,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 22,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 739.7307999999975,
+            "tokens": {
+              "input": 655,
+              "output": 86,
+              "total": 741
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 46.07020000000193,
+            "tokens": {
+              "input": 622,
+              "output": 2,
+              "total": 624
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002482,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 641,
+        "estimatedCloudInputTokens": 321,
+        "projectedHandoffCostUsd": 0.001842
+      },
+      "receipt": {
+        "runId": "1e93a583-dded-4e08-9543-2f2df490407a",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "e47ecac9977d898466911d30b80902bec4229e44ae079a2e94739853ab451707",
+        "chunks": [
+          {
+            "chunkId": "ee3778284af7:row-6:0001",
+            "hash": "5f56d13f5e8ae0f82a6877dc9b126ecd711687bd1ec07fa041fdc2a22b8b9cb5"
+          },
+          {
+            "chunkId": "ee3778284af7:row-2:0001",
+            "hash": "3d874120110771f43b2aa94f84c7e229e50402fb1723d3927e88a6d66bb85d18"
+          }
+        ],
+        "chain": {
+          "sequence": 79,
+          "entryHash": "42891e316d33eb4a0b984863be0eda6c8f981ce727e8181bba501c7a160cf538"
+        }
+      }
+    },
+    {
+      "id": "acme-043",
+      "category": "multi_document",
+      "questionHash": "d009d21e5ee0779f3e929d8f356732b5e79f8b3763268412d4e1e3e72e67fd13",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7484296262264252,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0.5,
+        "citationAccuracy": 1,
+        "citationRecall": 0.5,
+        "matchedFacts": 1,
+        "totalFacts": 2,
+        "reason": "Matched 1/2 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/discounts.md",
+          "chunkId": "26ae7e5dcb07:page-1:0001",
+          "location": "page:1",
+          "hash": "a1241714015154feb02adb54ccbfdbb4832d55282c7e81592d259d60974b9f86"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 643,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 19,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 621.5240999999951,
+            "tokens": {
+              "input": 794,
+              "output": 80,
+              "total": 874
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002772,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 786,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-058",
+      "category": "cloud",
+      "questionHash": "5fb5f1ce66c17e5ddd97c39c759c287b3da3952e923851c46302f94be815c80e",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0.5,
+      "retrievalQuality": 0.7710400521755219,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 1135,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 27,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 935.6987000000008,
+            "tokens": {
+              "input": 801,
+              "output": 121,
+              "total": 922
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 65.1788000000015,
+            "tokens": {
+              "input": 773,
+              "output": 2,
+              "total": 775
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002866,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 833,
+        "estimatedCloudInputTokens": 511,
+        "projectedHandoffCostUsd": 0.002222
+      },
+      "receipt": {
+        "runId": "8a8dd593-1c88-4033-9cec-52f15fa209ac",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "23eea2bf4b4e02d7b26c4a6b162b04b16a6d9fb2f9cd5240cbd8a40ac9b27f7d",
+        "chunks": [
+          {
+            "chunkId": "f23f89eb78e5:page-1:0001",
+            "hash": "fe5accda9a7ae6df47fdd12d2d0e2e577af9cba79ef08ff09881b6428a4edf7a"
+          },
+          {
+            "chunkId": "26ae7e5dcb07:page-1:0001",
+            "hash": "a1241714015154feb02adb54ccbfdbb4832d55282c7e81592d259d60974b9f86"
+          }
+        ],
+        "chain": {
+          "sequence": 80,
+          "entryHash": "91b11e10ef24b99afa7a661d38afd295beb35685e3163e116a1eb56ca9b06cd5"
+        }
+      }
+    },
+    {
+      "id": "acme-009",
+      "category": "lookup",
+      "questionHash": "dcfda57b3dd336055701657fa0545c7b24c80cbf75c0e4c40864bccc8a54a3bf",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7713592350482941,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 423,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 28,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 392.8808000000063,
+            "tokens": {
+              "input": 695,
+              "output": 49,
+              "total": 744
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002532,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 666,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-047",
+      "category": "multi_document",
+      "questionHash": "8ddac01e33d5fd727180f263a0b6b085cfea5990c19056d9f1384d103d0643f3",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.714881420135498,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0.5,
+        "citationAccuracy": 0.3333333333333333,
+        "citationRecall": 0.5,
+        "matchedFacts": 1,
+        "totalFacts": 2,
+        "reason": "Matched 1/2 required facts; 1/3 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-9:0001",
+          "location": "row:9",
+          "hash": "2228f7eb497ae395720663c48263d47ca64cc38862ea2d3e792e1a59e4ffabd0"
+        },
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-2:0001",
+          "location": "row:2",
+          "hash": "3d874120110771f43b2aa94f84c7e229e50402fb1723d3927e88a6d66bb85d18"
+        },
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 781,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 29,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 750.3715999999986,
+            "tokens": {
+              "input": 615,
+              "output": 96,
+              "total": 711
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002264,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 532,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-051",
+      "category": "multi_document",
+      "questionHash": "ade675b62555358f2412ade6398300f1d7381b77d3c500d6343f62dcc53c3883",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6881809532642365,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 2,
+        "totalFacts": 2,
+        "reason": "Matched 2/2 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "hr/handbook.md",
+          "chunkId": "14fe3fa0276a:page-1:0001",
+          "location": "page:1",
+          "hash": "d592edc289838114e6441dd38985009cdd54f484f8d025cc4f24b960c6895437"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 528,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 21,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 504.3541999999943,
+            "tokens": {
+              "input": 734,
+              "output": 63,
+              "total": 797
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002742,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 771,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-007",
+      "category": "lookup",
+      "questionHash": "b4dc38a5f622526fa3148262c8726b8ad3c2f3c021bea7a00eb6c1098770b6f1",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7761017829179764,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 445,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 40,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 403.06550000000425,
+            "tokens": {
+              "input": 692,
+              "output": 51,
+              "total": 743
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00253,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 665,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-057",
+      "category": "cloud",
+      "questionHash": "013d68e0fefab656f7041f08cf445529f4b8080b1eba71590103eca22e5e0e91",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0,
+      "retrievalQuality": 0.70920330286026,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 1142,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 35,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 940.3389000000025,
+            "tokens": {
+              "input": 770,
+              "output": 123,
+              "total": 893
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 58.7528999999995,
+            "tokens": {
+              "input": 678,
+              "output": 2,
+              "total": 680
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002754,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 777,
+        "estimatedCloudInputTokens": 442,
+        "projectedHandoffCostUsd": 0.002084
+      },
+      "receipt": {
+        "runId": "e7337cfd-f995-4020-a124-6b10152b6872",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "67cdba59c724e663c7d4efe025b24c1360faf0087fa0eb5850c4191a359af340",
+        "chunks": [
+          {
+            "chunkId": "aef32b872e1d:page-1:0001",
+            "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+          },
+          {
+            "chunkId": "22ab0ca5fb75:page-1:0001",
+            "hash": "d4bf4a421ddadc9893111e32fac5d7d7d2ce4227acabe6d4ce7eefbfa21e55fe"
+          }
+        ],
+        "chain": {
+          "sequence": 81,
+          "entryHash": "59a4656d5dc0a11fa2f5d60d1332f23617cf24c1a07c02a008afadc65afbd073"
+        }
+      }
+    },
+    {
+      "id": "acme-023",
+      "category": "lookup",
+      "questionHash": "198069dc919608cfe1b857963039a5d64d976a721035bdc6ea718c4bf833ca95",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7228595018386841,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/shipping.md",
+          "chunkId": "57b7c78b3fcb:page-1:0001",
+          "location": "page:1",
+          "hash": "1951caf02c0e3541be78118da565cf449c17d51c6f4bf97729a88f9e6eac28ca"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 435,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 20,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 412.79119999999966,
+            "tokens": {
+              "input": 804,
+              "output": 51,
+              "total": 855
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002802,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 801,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-046",
+      "category": "multi_document",
+      "questionHash": "6c37b28c26b4155beea30bcb522651b254998b769561f261a104bc8066262b64",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6488243639469147,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0,
+        "citationAccuracy": 1,
+        "citationRecall": 0.5,
+        "matchedFacts": 0,
+        "totalFacts": 2,
+        "reason": "Matched 0/2 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/service.md",
+          "chunkId": "ede292c5393b:page-1:0001",
+          "location": "page:1",
+          "hash": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 453,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 19,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 432.1070000000036,
+            "tokens": {
+              "input": 662,
+              "output": 52,
+              "total": 714
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 12,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002352,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 576,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-011",
+      "category": "lookup",
+      "questionHash": "ac0f5f5df82ca450e3c52084102ce75dc19af6885f8d2cf497bfd20a753a33be",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7815905660390854,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 472,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 35,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 435.32800000000134,
+            "tokens": {
+              "input": 778,
+              "output": 52,
+              "total": 830
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002734,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 767,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-036",
+      "category": "lookup",
+      "questionHash": "c47a359a45a4806896cdeda81148a8fbb6609c6746673fe95c52e12dba4a6449",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6360295116901398,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "hr/handbook.md",
+          "chunkId": "14fe3fa0276a:page-1:0001",
+          "location": "page:1",
+          "hash": "d592edc289838114e6441dd38985009cdd54f484f8d025cc4f24b960c6895437"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 573,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 33,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 537.1226999999999,
+            "tokens": {
+              "input": 641,
+              "output": 68,
+              "total": 709
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 12,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002306,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 553,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-001",
+      "category": "lookup",
+      "questionHash": "b1448fbf6debb4f5002b627c2939985d51fd87ae92d823bad5f80fbfc2d37d64",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7780491709709167,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 445,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 28,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 415.0662999999986,
+            "tokens": {
+              "input": 696,
+              "output": 51,
+              "total": 747
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002518,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 659,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-020",
+      "category": "lookup",
+      "questionHash": "fbad3407e0025d84fa567b46496a9b78f47e62818da1465f1546f6e07d7aa78e",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6821514070034027,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/service.md",
+          "chunkId": "ede292c5393b:page-1:0001",
+          "location": "page:1",
+          "hash": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 423,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 28,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 392.19979999999487,
+            "tokens": {
+              "input": 684,
+              "output": 48,
+              "total": 732
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002506,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 653,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-049",
+      "category": "multi_document",
+      "questionHash": "80a8d4d9dda31d101179d3de50790524c6c6ea1cc9c83f6135e799c32ff33b23",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6911048591136932,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 3,
+        "totalFacts": 3,
+        "reason": "Matched 3/3 required facts; 2/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "sales/forecast.md",
+          "chunkId": "22ab0ca5fb75:page-1:0001",
+          "location": "page:1",
+          "hash": "d4bf4a421ddadc9893111e32fac5d7d7d2ce4227acabe6d4ce7eefbfa21e55fe"
+        },
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 749,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 21,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 726.0710999999937,
+            "tokens": {
+              "input": 732,
+              "output": 92,
+              "total": 824
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 0,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002672,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 736,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-012",
+      "category": "lookup",
+      "questionHash": "50a2e0b797d13e97cc4c1ee692394c393efaf88c207d05f93ddb6ed1840d21c7",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7837282121181488,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 449,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 27,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 420.1681000000026,
+            "tokens": {
+              "input": 726,
+              "output": 52,
+              "total": 778
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 0,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002656,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 728,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-027",
+      "category": "lookup",
+      "questionHash": "09abfb8b3111b5a389ad57eb8b3168d6461411dbb0b753e1388ebb37e3e20ca9",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6240737438201904,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/security.md",
+          "chunkId": "f8a6e63e6544:page-1:0001",
+          "location": "page:1",
+          "hash": "71cb03da410d86326effea6109fa2aee5bebfada277882971345b5bc81a1fcfb"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 444,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 24,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 417.34530000000086,
+            "tokens": {
+              "input": 782,
+              "output": 52,
+              "total": 834
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002806,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 803,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-029",
+      "category": "lookup",
+      "questionHash": "4f4f0d016beca380c6c73c26d2b3e424dc64b4f889b25a77c5ecc61f4e2faf14",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7122232019901276,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "hr/handbook.md",
+          "chunkId": "14fe3fa0276a:page-1:0001",
+          "location": "page:1",
+          "hash": "d592edc289838114e6441dd38985009cdd54f484f8d025cc4f24b960c6895437"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 416,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 29,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 384.97819999999774,
+            "tokens": {
+              "input": 783,
+              "output": 48,
+              "total": 831
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002804,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 802,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-017",
+      "category": "lookup",
+      "questionHash": "0e01e2c38531e83925a3811e6ada5446bbd89eb474eb09e698f544b52f4b5c37",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6913073360919952,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/returns.md",
+          "chunkId": "227cbd0a3670:page-1:0001",
+          "location": "page:1",
+          "hash": "42a02964183e8910090aade642dba6be2c6a5853d07146538ffae49d2475a88a"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 511,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 30,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 478.5376000000033,
+            "tokens": {
+              "input": 732,
+              "output": 58,
+              "total": 790
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002698,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 749,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-031",
+      "category": "lookup",
+      "questionHash": "bc6457d5e9681f576277965e6def2cebb855d5725a4247839c8187a83c615b30",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.5705832839012146,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "operations/stock.md",
+          "chunkId": "8ea1e58695b8:page-1:0001",
+          "location": "page:1",
+          "hash": "d4a62ab12cb03148fe77840ed7d03fafe0bbe3493f4a92f833c9e283b56be3cc"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 421,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 25,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 394.0659000000014,
+            "tokens": {
+              "input": 686,
+              "output": 49,
+              "total": 735
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00251,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 655,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-040",
+      "category": "multi_document",
+      "questionHash": "704aafae55e7a13420e786038ff9724b823b9b52cfcad2822e0be44cfa936bec",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7023186683654785,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0.25,
+        "citationAccuracy": 1,
+        "citationRecall": 0.3333333333333333,
+        "matchedFacts": 1,
+        "totalFacts": 4,
+        "reason": "Matched 1/4 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "sales/northshore.md",
+          "chunkId": "f23f89eb78e5:page-1:0001",
+          "location": "page:1",
+          "hash": "fe5accda9a7ae6df47fdd12d2d0e2e577af9cba79ef08ff09881b6428a4edf7a"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 656,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 23,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 630.318299999999,
+            "tokens": {
+              "input": 785,
+              "output": 70,
+              "total": 855
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002748,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 774,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-053",
+      "category": "cloud",
+      "questionHash": "08e91a2d48c23572efadc1676823ffc2d3ea5848eede490ec128a1118337f77e",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0,
+      "retrievalQuality": 0.7770830690860748,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 643,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 34,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 438.9953999999998,
+            "tokens": {
+              "input": 754,
+              "output": 54,
+              "total": 808
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 59.59740000000602,
+            "tokens": {
+              "input": 674,
+              "output": 2,
+              "total": 676
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002812,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 806,
+        "estimatedCloudInputTokens": 461,
+        "projectedHandoffCostUsd": 0.002122
+      },
+      "receipt": {
+        "runId": "8245be06-feff-47b1-8036-f69d2ff0958e",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "d9c0f2b01d300b98575869599a6ba56b765da6f143a0048084c801d5faafa7da",
+        "chunks": [
+          {
+            "chunkId": "8ea1e58695b8:page-1:0001",
+            "hash": "d4a62ab12cb03148fe77840ed7d03fafe0bbe3493f4a92f833c9e283b56be3cc"
+          },
+          {
+            "chunkId": "227cbd0a3670:page-1:0001",
+            "hash": "42a02964183e8910090aade642dba6be2c6a5853d07146538ffae49d2475a88a"
+          }
+        ],
+        "chain": {
+          "sequence": 82,
+          "entryHash": "3a70bbe2a2f53106df4830718e434207363b41c3044ef0f1a50b2bb88adcfd89"
+        }
+      }
+    },
+    {
+      "id": "acme-035",
+      "category": "lookup",
+      "questionHash": "c4756cf5fad842d5646ee5e174cd550399ceb64cebcf0b1a352c3669592bcd9d",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7196952402591705,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 2,
+        "totalFacts": 2,
+        "reason": "Matched 2/2 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-7:0001",
+          "location": "row:7",
+          "hash": "4b5ed3d09c40a6a876cff15dd038d77556ea6d2e37a7f7bf9d2cdb4adb817f32"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 438,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 32,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 403.9340999999986,
+            "tokens": {
+              "input": 576,
+              "output": 51,
+              "total": 627
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 12,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002124,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 462,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-055",
+      "category": "cloud",
+      "questionHash": "491e12bf274b26082497b0e8b015a6a1b123ab8d44aae3a55ca20018bf7dc0e8",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0.5,
+      "retrievalQuality": 0.7727089524269104,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 1055,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 30,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 844.296199999997,
+            "tokens": {
+              "input": 900,
+              "output": 105,
+              "total": 1005
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 65.64449999999488,
+            "tokens": {
+              "input": 778,
+              "output": 2,
+              "total": 780
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.003026,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 913,
+        "estimatedCloudInputTokens": 510,
+        "projectedHandoffCostUsd": 0.00222
+      },
+      "receipt": {
+        "runId": "591d8ae8-3be9-4ee2-9766-0122f386bde9",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "2ad0ab3f1c271a8c9b6cefa6b396396c068caf36fb2ef0d63b2501b5b1c8b156",
+        "chunks": [
+          {
+            "chunkId": "f23f89eb78e5:page-1:0001",
+            "hash": "fe5accda9a7ae6df47fdd12d2d0e2e577af9cba79ef08ff09881b6428a4edf7a"
+          },
+          {
+            "chunkId": "14fe3fa0276a:page-1:0001",
+            "hash": "d592edc289838114e6441dd38985009cdd54f484f8d025cc4f24b960c6895437"
+          }
+        ],
+        "chain": {
+          "sequence": 83,
+          "entryHash": "abd87857c7abe42a42717f36ced26a75053e2a207800f4e61af4043d5baab0f4"
+        }
+      }
+    },
+    {
+      "id": "acme-060",
+      "category": "cloud",
+      "questionHash": "b1a1cb1206b062f1f23d3b109c4418c7c67f4a7df8d0fc640690dbe4012592f3",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0.5,
+      "retrievalQuality": 0.6721101999282837,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 2162,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 24,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 1959.914499999999,
+            "tokens": {
+              "input": 739,
+              "output": 266,
+              "total": 1005
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 64.36109999999462,
+            "tokens": {
+              "input": 726,
+              "output": 2,
+              "total": 728
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002694,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 747,
+        "estimatedCloudInputTokens": 511,
+        "projectedHandoffCostUsd": 0.002222
+      },
+      "receipt": {
+        "runId": "ca6d35da-1e79-4094-9e76-9207a2412c3f",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "29bd5ad10f14f746ebd62d4f9c8cbcaabe1665b8f7506e1744d1623e9da587e9",
+        "chunks": [
+          {
+            "chunkId": "ede292c5393b:page-1:0001",
+            "hash": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade"
+          },
+          {
+            "chunkId": "f8a6e63e6544:page-1:0001",
+            "hash": "71cb03da410d86326effea6109fa2aee5bebfada277882971345b5bc81a1fcfb"
+          }
+        ],
+        "chain": {
+          "sequence": 84,
+          "entryHash": "647a13af1a9572519c3e7fc2200014b09cf9dbccb5d31d194a021a80e44db519"
+        }
+      }
+    },
+    {
+      "id": "acme-019",
+      "category": "lookup",
+      "questionHash": "b1cb546bf56b39b2839dd57dcbf94a84023ad3a88451cda82d619f0be4934489",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6728899776935577,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/returns.md",
+          "chunkId": "227cbd0a3670:page-1:0001",
+          "location": "page:1",
+          "hash": "42a02964183e8910090aade642dba6be2c6a5853d07146538ffae49d2475a88a"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 449,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 26,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 420.6567000000068,
+            "tokens": {
+              "input": 739,
+              "output": 52,
+              "total": 791
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002772,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 786,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-054",
+      "category": "cloud",
+      "questionHash": "c62dd8d70118bf752ed602960445655e7338fbe8b95d94014932aa4add582e49",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 0,
+      "retrievalQuality": 0.6942241489887238,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 940,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 26,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 742.8162000000011,
+            "tokens": {
+              "input": 711,
+              "output": 95,
+              "total": 806
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 52.902799999996205,
+            "tokens": {
+              "input": 704,
+              "output": 2,
+              "total": 706
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002602,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 701,
+        "estimatedCloudInputTokens": 463,
+        "projectedHandoffCostUsd": 0.002126
+      },
+      "receipt": {
+        "runId": "95f3d798-c1fc-4547-8ea9-bb0678aac608",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "7fefcf14e71b784d94d386289b23a33e0a7b7bd8f96fc304c6ac4ad5c618d4c0",
+        "chunks": [
+          {
+            "chunkId": "a6985a84f61b:page-1:0001",
+            "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+          },
+          {
+            "chunkId": "aef32b872e1d:page-1:0001",
+            "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+          }
+        ],
+        "chain": {
+          "sequence": 85,
+          "entryHash": "259c27f29f29bfa79f970cc90ac70f51cf039efb9cf8785ec59795e89f1366b8"
+        }
+      }
+    },
+    {
+      "id": "acme-021",
+      "category": "lookup",
+      "questionHash": "52fa48edf6fad9dc456b965b964cffa230a4d6f8bb8e73304c23ae878207e4dc",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6780239641666412,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/service.md",
+          "chunkId": "ede292c5393b:page-1:0001",
+          "location": "page:1",
+          "hash": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 416,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 21,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 392.1953999999969,
+            "tokens": {
+              "input": 686,
+              "output": 48,
+              "total": 734
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002512,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 656,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-004",
+      "category": "lookup",
+      "questionHash": "d0e1fa26dfce47e287ecdc0f2c38e602c88d94c417bf51a8003acf3a3ee0931e",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.773513600230217,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 432,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 31,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 399.7865999999922,
+            "tokens": {
+              "input": 698,
+              "output": 49,
+              "total": 747
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00253,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 665,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-002",
+      "category": "lookup",
+      "questionHash": "f5a88b5405ce03bf13b0cd628a136d7fcc736c5303e40297c474a5bf7cae81c8",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7912111580371857,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 442,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 31,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 409.392399999997,
+            "tokens": {
+              "input": 692,
+              "output": 50,
+              "total": 742
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00253,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 665,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-022",
+      "category": "lookup",
+      "questionHash": "97b1cdc64d4c94a55f0f2457bcf2fc5af1eccba3efcb228abfd4dbd59a9e4850",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.710951417684555,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 3,
+        "totalFacts": 3,
+        "reason": "Matched 3/3 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/service.md",
+          "chunkId": "ede292c5393b:page-1:0001",
+          "location": "page:1",
+          "hash": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 626,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 32,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 592.0901000000013,
+            "tokens": {
+              "input": 710,
+              "output": 76,
+              "total": 786
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002628,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 714,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-052",
+      "category": "multi_document",
+      "questionHash": "bd0d054ce1f0d299721f4d405b03747aa36f502ef160089883f480600e9dbb00",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6961663365364075,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0.6666666666666666,
+        "citationAccuracy": 0.5,
+        "citationRecall": 0.5,
+        "matchedFacts": 2,
+        "totalFacts": 3,
+        "reason": "Matched 2/3 required facts; 1/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/security.md",
+          "chunkId": "f8a6e63e6544:page-1:0001",
+          "location": "page:1",
+          "hash": "71cb03da410d86326effea6109fa2aee5bebfada277882971345b5bc81a1fcfb"
+        },
+        {
+          "file": "policies/service.md",
+          "chunkId": "ede292c5393b:page-1:0001",
+          "location": "page:1",
+          "hash": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 625,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 31,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 590.9876000000077,
+            "tokens": {
+              "input": 696,
+              "output": 74,
+              "total": 770
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002532,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 666,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-034",
+      "category": "lookup",
+      "questionHash": "e34b8b552b726680e004ea7231258df88d50da267da5153746715f431d65d729",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6874418556690216,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-3:0001",
+          "location": "row:3",
+          "hash": "81ea6f4f97d0d9cf49db80b87f17f276cb66cb600f4ed82d68eab8f88653aca8"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 488,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 35,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 451.23450000000594,
+            "tokens": {
+              "input": 571,
+              "output": 55,
+              "total": 626
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 12,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00213,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 465,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-006",
+      "category": "lookup",
+      "questionHash": "78e73989b9be561a241ed602063cf6b410ecd6c98614f1848dc456de58e80dab",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7724159061908722,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 436,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 32,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 401.76320000000123,
+            "tokens": {
+              "input": 725,
+              "output": 51,
+              "total": 776
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 0,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00265,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 725,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-045",
+      "category": "multi_document",
+      "questionHash": "e72c7a0d322d6ccb62c74f97377e2ef3269145496c9f60592c9df3cf76c8acfa",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7073984444141388,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 0,
+        "totalFacts": 2,
+        "reason": "Matched 0/2 required facts; 2/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        },
+        {
+          "file": "policies/discounts.md",
+          "chunkId": "26ae7e5dcb07:page-1:0001",
+          "location": "page:1",
+          "hash": "a1241714015154feb02adb54ccbfdbb4832d55282c7e81592d259d60974b9f86"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 627,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 23,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 601.5515000000014,
+            "tokens": {
+              "input": 773,
+              "output": 77,
+              "total": 850
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002712,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 756,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-015",
+      "category": "lookup",
+      "questionHash": "f10b385a76b2044e67d404ce1c6911c60fdac8dc8f51db1c1e128e16b80f5ee4",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6978515982627869,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 439,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 21,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 416.63189999999304,
+            "tokens": {
+              "input": 694,
+              "output": 50,
+              "total": 744
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002534,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 667,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-010",
+      "category": "lookup",
+      "questionHash": "a2761428d4fddf9d96c0d7cf4353625da6aae3f110ef1ffc3240581c06a92603",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7112925052642822,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 502,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 26,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 473.949099999998,
+            "tokens": {
+              "input": 694,
+              "output": 59,
+              "total": 753
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002534,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 667,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-008",
+      "category": "lookup",
+      "questionHash": "9789ff891f80a93c93a441352a0b522fda938ec30ec845ba072fc27c09264b8f",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7045046389102936,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 454,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 28,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 423.56759999999485,
+            "tokens": {
+              "input": 764,
+              "output": 51,
+              "total": 815
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002692,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 746,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-016",
+      "category": "lookup",
+      "questionHash": "3f53d2f24b016b7c6c17199d24ef052cfae982587414026a97bc8cf5f719b6d4",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.781267374753952,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/returns.md",
+          "chunkId": "227cbd0a3670:page-1:0001",
+          "location": "page:1",
+          "hash": "42a02964183e8910090aade642dba6be2c6a5853d07146538ffae49d2475a88a"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 439,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 41,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 396.06600000000617,
+            "tokens": {
+              "input": 689,
+              "output": 48,
+              "total": 737
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 0,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002706,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 753,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-005",
+      "category": "lookup",
+      "questionHash": "bc8545527f2434555d9bc38c7d060d9de6b1e903c61eb05c423436d18966fd7e",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7117455005645752,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 405,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 19,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 382.9942999999912,
+            "tokens": {
+              "input": 693,
+              "output": 49,
+              "total": 742
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002536,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 668,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-024",
+      "category": "lookup",
+      "questionHash": "5feb4719b81aa6ba2327f48dd9803d8cfa65b8ba4f7629664a1ab3d6b480d812",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6581902801990509,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/shipping.md",
+          "chunkId": "57b7c78b3fcb:page-1:0001",
+          "location": "page:1",
+          "hash": "1951caf02c0e3541be78118da565cf449c17d51c6f4bf97729a88f9e6eac28ca"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 449,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 28,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 419.03809999999066,
+            "tokens": {
+              "input": 705,
+              "output": 54,
+              "total": 759
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002544,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 672,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-044",
+      "category": "multi_document",
+      "questionHash": "c1221f227dd2dd23e552fe38e91f5e1b2393217c87f6366c6e52590998df5dde",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7268906235694885,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0,
+        "citationAccuracy": 1,
+        "citationRecall": 0.5,
+        "matchedFacts": 0,
+        "totalFacts": 2,
+        "reason": "Matched 0/2 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 489,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 32,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 454.1843999999983,
+            "tokens": {
+              "input": 773,
+              "output": 56,
+              "total": 829
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002712,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 756,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-037",
+      "category": "multi_document",
+      "questionHash": "8e10fbc3e844322699a76298b4925d824bc018420e62af43ccfcf6bae9164771",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7717853933572769,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 4,
+        "totalFacts": 4,
+        "reason": "Matched 4/4 required facts; 2/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        },
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 784,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 35,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 747.0485000000044,
+            "tokens": {
+              "input": 697,
+              "output": 97,
+              "total": 794
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002522,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 661,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-038",
+      "category": "multi_document",
+      "questionHash": "78be4defd3600088abeb2d84fd3a626e04ab50c173d4c1250bb41d0443b9f5f5",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.761674702167511,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 4,
+        "totalFacts": 4,
+        "reason": "Matched 4/4 required facts; 2/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af200.md",
+          "chunkId": "a6985a84f61b:page-1:0001",
+          "location": "page:1",
+          "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+        },
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 759,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 30,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 726.7007999999914,
+            "tokens": {
+              "input": 726,
+              "output": 96,
+              "total": 822
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 0,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002654,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 727,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-059",
+      "category": "cloud",
+      "questionHash": "f5d3367b2315d8b8086c35a38fdbb5a71a738b3a8aad5195f56f7c750eee757f",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6754946112632751,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 0.25,
+        "citationRecall": 0.5,
+        "matchedFacts": 3,
+        "totalFacts": 3,
+        "reason": "Matched 3/3 required facts; 1/4 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/security.md",
+          "chunkId": "f8a6e63e6544:page-1:0001",
+          "location": "page:1",
+          "hash": "71cb03da410d86326effea6109fa2aee5bebfada277882971345b5bc81a1fcfb"
+        },
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-4:0001",
+          "location": "row:4",
+          "hash": "53d0c69ff042154ab4a13f16579f46fc816c90db2711d1c25079a3d230ca545f"
+        },
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-10:0001",
+          "location": "row:10",
+          "hash": "af904e0cd29b1e0614ac5549383645fdf1e423b7013d2bfc78c07ff636c66e8d"
+        },
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-3:0001",
+          "location": "row:3",
+          "hash": "81ea6f4f97d0d9cf49db80b87f17f276cb66cb600f4ed82d68eab8f88653aca8"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 1136,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 31,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 1102.8276000000042,
+            "tokens": {
+              "input": 620,
+              "output": 147,
+              "total": 767
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002356,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 578,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-014",
+      "category": "lookup",
+      "questionHash": "61e9fa2e2e196fbeac8766f6ff92a8b09a77f877e99ffd693d26399247ffb229",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7739011198282242,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 434,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 27,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 405.52459999998973,
+            "tokens": {
+              "input": 698,
+              "output": 50,
+              "total": 748
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002528,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 664,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-028",
+      "category": "lookup",
+      "questionHash": "1ac3252242db220e4369e7ad314190123193c97fbdc97e98dc54ba3e4e50ab88",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7412746846675873,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "hr/handbook.md",
+          "chunkId": "14fe3fa0276a:page-1:0001",
+          "location": "page:1",
+          "hash": "d592edc289838114e6441dd38985009cdd54f484f8d025cc4f24b960c6895437"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 466,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 32,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 432.1085999999923,
+            "tokens": {
+              "input": 789,
+              "output": 53,
+              "total": 842
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002794,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 797,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-030",
+      "category": "lookup",
+      "questionHash": "176fd29beeb2cf88f2bc22a79bd1afaa6f13a1cdd27cdd0db300b2a2d8a3012a",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6700240969657898,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "hr/handbook.md",
+          "chunkId": "14fe3fa0276a:page-1:0001",
+          "location": "page:1",
+          "hash": "d592edc289838114e6441dd38985009cdd54f484f8d025cc4f24b960c6895437"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 469,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 34,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 433.92020000000775,
+            "tokens": {
+              "input": 727,
+              "output": 52,
+              "total": 779
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00274,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 770,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-039",
+      "category": "multi_document",
+      "questionHash": "026e6e7c9264b231d4abc1d5d7b9dc600e3e753139622f7b1f15e0bb5b927393",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7221377789974213,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 2,
+        "totalFacts": 2,
+        "reason": "Matched 2/2 required facts; 2/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af100.md",
+          "chunkId": "aef32b872e1d:page-1:0001",
+          "location": "page:1",
+          "hash": "ab4aa9b8692e7a28fc773f9d23b3515c34defb4bdcdb707995fc9e7fbe25617d"
+        },
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 737,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 24,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 710.9977999999974,
+            "tokens": {
+              "input": 693,
+              "output": 91,
+              "total": 784
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002528,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 664,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-013",
+      "category": "lookup",
+      "questionHash": "215c3fa438411a8dbfd6f4c858c74934da561e04df172517fb70b4fc01fcc4e4",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6950336992740631,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "products/af300.md",
+          "chunkId": "28f8c0c885c0:page-1:0001",
+          "location": "page:1",
+          "hash": "5365b917f3c5fbcd4bc135af344fe7f81737f24caa5a93e8804acba25a7fb209"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 460,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 25,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 433.1255999999994,
+            "tokens": {
+              "input": 764,
+              "output": 52,
+              "total": 816
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002692,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 746,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-042",
+      "category": "multi_document",
+      "questionHash": "e35c15ebe4fdf0c864020512506017e82bbe5bb73d60b1874827c34ff94ddd49",
+      "status": "deferred_cloud",
+      "route": "deferred_cloud",
+      "confidence": 1,
+      "retrievalQuality": 0.6690812408924103,
+      "scoring": {
+        "answerAccuracy": null,
+        "citationAccuracy": null,
+        "citationRecall": null,
+        "scored": false,
+        "reason": "Cloud answer deferred; excluded from the scored denominator."
+      },
+      "citations": [],
+      "metrics": {
+        "latencyMs": 1176,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 36,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 931.9792000000016,
+            "tokens": {
+              "input": 756,
+              "output": 113,
+              "total": 869
+            }
+          },
+          {
+            "stage": "guard_outbound",
+            "modelId": "llama-guard3:8b",
+            "latencyMs": 75.21070000001055,
+            "tokens": {
+              "input": 672,
+              "output": 2,
+              "total": 674
+            },
+            "safe": true,
+            "classification": "safe",
+            "reason": "Llama Guard classified the content safe"
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": true,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002708,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 754,
+        "estimatedCloudInputTokens": 431,
+        "projectedHandoffCostUsd": 0.002062
+      },
+      "receipt": {
+        "runId": "7994eaa2-8ad2-445a-8d17-8318cd8216ad",
+        "verified": true,
+        "status": "deferred",
+        "inputHash": "7da24b33c1d4a0dd2e8af55f16ae56bce87fb6a8863cb060f16047b45fa9549a",
+        "chunks": [
+          {
+            "chunkId": "a6985a84f61b:page-1:0001",
+            "hash": "8b1f1369125d6319eadfe02d5bfc7ef3a27e2fdf52f717a8d2fbea930561e112"
+          },
+          {
+            "chunkId": "57b7c78b3fcb:page-1:0001",
+            "hash": "1951caf02c0e3541be78118da565cf449c17d51c6f4bf97729a88f9e6eac28ca"
+          }
+        ],
+        "chain": {
+          "sequence": 86,
+          "entryHash": "6845ebf27c9bef9696f8907581d163c25def2521d5f22d9c92270522305b8df5"
+        }
+      }
+    },
+    {
+      "id": "acme-018",
+      "category": "lookup",
+      "questionHash": "e6ea6aba1956e9b401d1c1a7005ffca1361bbc84cf25bb77eb21dac64a29ece5",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6760035753250122,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0,
+        "citationAccuracy": 0,
+        "citationRecall": 0,
+        "matchedFacts": 0,
+        "totalFacts": 2,
+        "reason": "Matched 0/2 required facts; 0/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-8:0001",
+          "location": "row:8",
+          "hash": "856efa95414d35868c40a937249c71a61ffb5f25773331690c18cc06e65feb85"
+        },
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-3:0001",
+          "location": "row:3",
+          "hash": "81ea6f4f97d0d9cf49db80b87f17f276cb66cb600f4ed82d68eab8f88653aca8"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 690,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 34,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 653.4272000000055,
+            "tokens": {
+              "input": 580,
+              "output": 82,
+              "total": 662
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 12,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002132,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 466,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-050",
+      "category": "multi_document",
+      "questionHash": "0fdcc8c93ba0c02e17633ba61d7e72a5e9e0645389f0dbbe999f5962b015be12",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7592866271734238,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 2,
+        "totalFacts": 2,
+        "reason": "Matched 2/2 required facts; 2/2 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "sales/northshore.md",
+          "chunkId": "f23f89eb78e5:page-1:0001",
+          "location": "page:1",
+          "hash": "fe5accda9a7ae6df47fdd12d2d0e2e577af9cba79ef08ff09881b6428a4edf7a"
+        },
+        {
+          "file": "sales/forecast.md",
+          "chunkId": "22ab0ca5fb75:page-1:0001",
+          "location": "page:1",
+          "hash": "d4bf4a421ddadc9893111e32fac5d7d7d2ce4227acabe6d4ce7eefbfa21e55fe"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 770,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 30,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 737.0915000000095,
+            "tokens": {
+              "input": 779,
+              "output": 92,
+              "total": 871
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 3,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002762,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 781,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-033",
+      "category": "lookup",
+      "questionHash": "df4aacf4fc2af413c6292af7e0e35d38d42d758f9d19e1359eb11a34c9847ec2",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.751197949051857,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "sales/northshore.md",
+          "chunkId": "f23f89eb78e5:page-1:0001",
+          "location": "page:1",
+          "hash": "fe5accda9a7ae6df47fdd12d2d0e2e577af9cba79ef08ff09881b6428a4edf7a"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 446,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 32,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 412.2112000000052,
+            "tokens": {
+              "input": 829,
+              "output": 51,
+              "total": 880
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 9,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002798,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 799,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-048",
+      "category": "multi_document",
+      "questionHash": "f3bf8890942d0ba6fa111fb9e35cc3432dc4d54398b0d042395d82b6b58054a1",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.6022690236568451,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 0.5,
+        "citationAccuracy": 1,
+        "citationRecall": 0.5,
+        "matchedFacts": 1,
+        "totalFacts": 2,
+        "reason": "Matched 1/2 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "support/tickets.csv",
+          "chunkId": "ee3778284af7:row-2:0001",
+          "location": "row:2",
+          "hash": "3d874120110771f43b2aa94f84c7e229e50402fb1723d3927e88a6d66bb85d18"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 612,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 29,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 580.8386000000028,
+            "tokens": {
+              "input": 584,
+              "output": 75,
+              "total": 659
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 12,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.00214,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 470,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    },
+    {
+      "id": "acme-026",
+      "category": "lookup",
+      "questionHash": "808066221716123a0d4f3d0d0fc8cee44174f42ecfd111ecb9f9022174b6b443",
+      "status": "ok",
+      "route": "local",
+      "confidence": 1,
+      "retrievalQuality": 0.7044863700866699,
+      "scoring": {
+        "scored": true,
+        "answerAccuracy": 1,
+        "citationAccuracy": 1,
+        "citationRecall": 1,
+        "matchedFacts": 1,
+        "totalFacts": 1,
+        "reason": "Matched 1/1 required facts; 1/1 citations match reference chunks."
+      },
+      "citations": [
+        {
+          "file": "policies/security.md",
+          "chunkId": "f8a6e63e6544:page-1:0001",
+          "location": "page:1",
+          "hash": "71cb03da410d86326effea6109fa2aee5bebfada277882971345b5bc81a1fcfb"
+        }
+      ],
+      "metrics": {
+        "latencyMs": 441,
+        "stages": [
+          {
+            "stage": "retrieval",
+            "modelId": "nomic-embed-text:v1.5",
+            "latencyMs": 19,
+            "tokens": {
+              "input": 0,
+              "output": 0,
+              "total": 0
+            }
+          },
+          {
+            "stage": "local_answer",
+            "modelId": "llama3.1:8b",
+            "latencyMs": 420.38850000000093,
+            "tokens": {
+              "input": 785,
+              "output": 50,
+              "total": 835
+            }
+          }
+        ],
+        "tokensSentToCloud": 0,
+        "outboundChunks": 0,
+        "piiItemsRedacted": 6,
+        "guardBlocks": 0,
+        "receiptVerified": false,
+        "actualCostUsd": 0,
+        "allCloudCostUsdAssumption": 0.002812,
+        "estimatedCloudOutputTokens": 200,
+        "estimatedAllCloudInputTokens": 806,
+        "estimatedCloudInputTokens": 0,
+        "projectedHandoffCostUsd": 0
+      },
+      "receipt": null
+    }
+  ],
+  "limitations": [
+    "Answer accuracy is deterministic required-fact coverage, not an expert or model-graded quality score.",
+    "Citation accuracy is precision against expected source chunk IDs; source coverage is reported separately as citation recall.",
+    "Deferred cloud answers and execution errors are excluded from scored accuracy, with coverage and counts shown.",
+    "Offline latency measures local processing and handoff preparation, not unavailable cloud completion.",
+    "PII redaction counts are placeholder occurrences processed per query, not unique people or unique records.",
+    "Cost figures per 1,000 queries are assumptions, not measured all-cloud bills. Known cloud cost sums only provider-reported charges; missing charges and uncertain failed-request charges are counted separately, never replaced by estimates or treated as a complete bill."
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-27T19-56-02-876Z",
+  "timestamp": "2026-10-27T19:56:02.881Z",
+  "sourceCommit": "bddd4d894d443289b362d2077e16904cfd88c85d",
+  "baseline": {
+    "name": "Finkd published interim benchmark, different task suites",
+    "medianLatencyMs": 1300,
+    "handoffRate": 0.296
+  },
+  "pricing": {
+    "currency": "USD",
+    "assumption": true,
+    "label": "Illustrative pricing assumptions, not verified Muse Spark list prices",
+    "museInputPerMillionUsd": 2,
+    "museOutputPerMillionUsd": 6,
+    "expectedOutputTokens": 200,
+    "localPerQueryUsd": 0.0002,
+    "queriesPerComparison": 1000,
+    "tokenEstimator": "ceil(character count / 4); actual provider usage is recorded separately",
+    "notes": [
+      "All-cloud sends every query and the full top-k redacted retrieval context to Muse Spark.",
+      "Handoff sends only selected chunks when a safe handoff is needed.",
+      "Projected cost includes deferred handoffs and is not an observed invoice.",
+      "The local allowance is an illustrative electricity and hardware allocation, not a measurement.",
+      "Update these assumptions before making a purchasing decision."
+    ]
+  },
+  "configProvenance": {
+    "methodSha256": "bd7d29675f60c2ec13615f7297d7049f43b18c01ef7640a34f1c42cd93cf9a7e",
+    "pricingSha256": "2f168257d209264a73ebfe52bd3963920c1bdbffdf7e343c0bb6606b447cdb03"
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "completed_offline",
+      "file": "round-1-2026-10-27T19-56-02-876Z.json",
+      "sha256": "ba4fb87d9c59297d330016ce8855101453df62f848589ddc9a14d309f228d858"
+    },
+    {
+      "round": 2,
+      "status": "completed_offline",
+      "file": "round-2-2026-10-27T19-56-02-876Z.json",
+      "sha256": "372e9faa541db1c15448b43937a9b899b2e8ca79eb8200339abe60c2840a2b97"
+    },
+    {
+      "round": 3,
+      "status": "completed",
+      "file": "round-3-2026-10-27T19-56-02-876Z.json",
+      "sha256": "b192bc5a9a82a2d2bff8cd94272bb266b2b7a2de79c28b6b983f91c20ab5e887"
+    },
+    {
+      "round": 4,
+      "status": "completed_offline",
+      "file": "round-4-2026-10-27T19-56-02-876Z.json",
+      "sha256": "d93cc99f68451cf32f3339c83a683aa458da0b96ffaa98e88a67e15baed35612"
+    },
+    {
+      "round": 5,
+      "status": "completed_with_legacy_coverage",
+      "file": "round-5-2026-10-27T19-56-02-876Z.json",
+      "sha256": "e74ffdc53325f0bc94786acf3c5372e29744f3fc73f9f82b55b4d382df7477d3"
+    }
+  ],
+  "historical": {
+    "status": "historical_interim",
+    "file": "benchmark-reference-2026-10-27T19-56-02-876Z.json",
+    "sha256": "905f45574e3572e7d5aa522838a08d3ceb9fcfc514d7cb26561878e97fbaaf69"
+  }
+}
