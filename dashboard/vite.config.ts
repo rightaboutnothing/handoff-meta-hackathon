@@ -1,16 +1,20 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { createLocalLiveMiddleware } from "./server/local-live.mjs";
+import { createCompanyMiddleware } from "./server/company-data.mjs";
 
 function localLiveApi(): Plugin {
   const middleware = createLocalLiveMiddleware();
+  const companyMiddleware = createCompanyMiddleware();
   return {
     name: "handoff-local-live-api",
     configureServer(server) {
       server.middlewares.use(middleware);
+      server.middlewares.use(companyMiddleware);
     },
     configurePreviewServer(server) {
       server.middlewares.use(middleware);
+      server.middlewares.use(companyMiddleware);
     },
   };
 }

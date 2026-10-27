@@ -6,6 +6,7 @@ import { usePlayback } from "./hooks/usePlayback";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { Stage } from "./components/Stage";
 import { StepsView } from "./components/StepsView";
+import { CompanyData } from "./components/CompanyData";
 import type { BenchmarkData, DemoScenario, HandoffEvent, PairingId } from "./types";
 
 type ViewMode = "characters" | "steps";
@@ -31,6 +32,7 @@ function IconButton({ label, onClick, children, active = false }: { label: strin
 }
 
 export default function App() {
+  const [workspace, setWorkspace] = useState<'company' | 'theatre'>(captureScenario || previewParams.has('scenario') || previewParams.has('presentation') ? 'theatre' : 'company');
   const reduced = useMotionPreference() ?? false;
   const [benchmark, setBenchmark] = useState<BenchmarkData | null>(null);
   const [dataError, setDataError] = useState("");
@@ -59,7 +61,7 @@ export default function App() {
       })
       .then((data: BenchmarkData) => setBenchmark(data))
       .catch((error: Error) => setDataError(error.message));
-    fetch("/api/status")
+    fetch("/api/company/status")
       .then((response) => response.json())
       .then((data) => setMetaAccess(data.metaAccess === "live" ? "live" : "paused"))
       .catch(() => setMetaAccess("paused"));
@@ -178,6 +180,7 @@ export default function App() {
   };
 
   const startPresentation = () => {
+    setWorkspace('theatre');
     setPresentation(true);
     setRunMode("demo");
     setRuntimeScenario(null);
@@ -203,7 +206,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion={reduced ? "always" : "never"}><div className="app-shell">
       <header className="app-header">
-        <div className="header-brand"><Wordmark /><p>Local first. Cloud only when it is safe and needed.</p></div>
+        <div className="header-brand"><Wordmark /><p>The local-first private AI gateway.</p></div>
         <div className="header-actions">
           <button type="button" className={`status-pill ${metaAccess}`} onClick={() => setTraceOpen(true)}><span />Meta access: {metaAccess === "live" ? "Live" : "Paused"}</button>
           <IconButton label={dark ? "Use light theme" : "Use dark theme"} onClick={() => setDark(!dark)}>{dark ? "☀" : "◐"}</IconButton>
@@ -212,6 +215,8 @@ export default function App() {
       </header>
 
       <main>
+        <nav className="workspace-tabs" aria-label="Workspace"><button type="button" onClick={() => setWorkspace('company')} className={workspace === 'company' ? 'active' : ''} aria-pressed={workspace === 'company'}>Company data</button><button type="button" onClick={() => setWorkspace('theatre')} className={workspace === 'theatre' ? 'active' : ''} aria-pressed={workspace === 'theatre'}>Decision theatre & benchmarks</button></nav>
+        {workspace === 'company' ? <CompanyData /> : <>
         <section className="input-panel" aria-label="Handoff prompt controls">
           <div className="input-panel-top">
             <div className="segmented" aria-label="Run mode">
@@ -269,6 +274,7 @@ export default function App() {
         </button>
 
         <ResultsPanel data={benchmark} activePairing={pairingId} onSelectPairing={setPairingId} />
+        </>}
       </main>
 
       <footer className="dashboard-footer"><Wordmark /><p>Built during the Meta Global AI Developer Hackathon.</p><span>Seed {benchmark.seed}</span></footer>
