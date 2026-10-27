@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { ingestFolder, getIndexStatus } from '../src/rag/ingest.mjs';
 import { askRag } from '../src/rag/gateway.mjs';
 import { warmUpGateway, metaAccessEnabled } from '../src/server/gateway-models.mjs';
-import { verifyReceipt } from '../src/rag/receipts.mjs';
+import { verifyReceipt, verifyReceiptChain } from '../src/rag/receipts.mjs';
 
 const args = process.argv.slice(2);
 const command = args.shift();
@@ -29,6 +29,10 @@ try {
     const files = await writeRagReports(result);
     console.log(JSON.stringify({ summary: result.summary, comparison: result.comparison, fingerprint: result.fingerprint, files }, null, 2));
   } else if (command === 'status') console.log(JSON.stringify(await getIndexStatus({ dataDir }), null, 2));
+  else if (command === 'verify-receipts') {
+    const result = await verifyReceiptChain({ dataDir });
+    console.log(JSON.stringify(result, null, 2)); if (!result.valid) process.exitCode = 1;
+  }
   else if (command === 'verify-receipt') {
     const receipt = JSON.parse(await readFile(args[0], 'utf8'));
     const verified = await verifyReceipt(receipt, { dataDir });

@@ -9,6 +9,7 @@
     "handoff": "node bin/handoff.mjs",
     "demo:build": "node scripts/generate-company-demo.mjs",
     "test:rag": "node --test tests/*.test.mjs",
+    "test:gateway-rounds": "node scripts/run-gateway-rounds.mjs",
     "dashboard": "npm --prefix dashboard run dev",
     "dashboard:build": "npm --prefix dashboard run build",
     "dashboard:check": "npm --prefix dashboard run check",

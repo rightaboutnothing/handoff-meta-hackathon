@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { ragConfig, localChat, guardText, callMuse, metaAccessEnabled } from '../server/gateway-models.mjs';
 import { retrieve } from './ingest.mjs';
 import { createPrivacyVault, countPlaceholders, assertNoResidualPii } from './privacy.mjs';
-import { signReceipt, verifyReceipt, appendReceipt, sha256 } from './receipts.mjs';
+import { signReceipt, verifyReceipt, appendReceipt, recordOutboundPayload, sha256 } from './receipts.mjs';
 
 export const estimateTokens = text => Math.ceil(String(text).length / 4);
 const logDirectory = fileURLToPath(new URL('../../.logs/gateway/', import.meta.url));
@@ -59,7 +59,8 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
   const outputPrice = prices.museOutputPerMillionUsd;
   const price = (input, output) => (input * inputPrice + output * outputPrice) / 1e6;
   metric.estimatedCloudOutputTokens = prices.expectedOutputTokens;
-  metric.allCloudCostUsdAssumption = price(estimateTokens(redacted.text + context) + 140, prices.expectedOutputTokens);
+  metric.estimatedAllCloudInputTokens = estimateTokens(redacted.text + context) + 140;
+  metric.allCloudCostUsdAssumption = price(metric.estimatedAllCloudInputTokens, prices.expectedOutputTokens);
   metric.estimatedCloudInputTokens = 0;
   metric.projectedHandoffCostUsd = 0;
   let receipt, outbound = { question: '', chunks: [] }, answer = parsed.answer, route = 'local', status = 'ok', citationChunks = validCitations;
@@ -87,14 +88,16 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
     stages.push({ stage: 'guard_outbound', ...outboundGuard, text: undefined });
     if (!outboundGuard.safe) {
       metric.guardBlocks += 1; status = 'blocked_local'; route = 'blocked_local'; answer = 'The local safety boundary blocked this request. Nothing was sent to Muse Spark.'; citationChunks = [];
+      metric.projectedHandoffCostUsd = 0;
       outbound = { question: '', chunks: [] };
       await emit('blocked', 2, 'Guard kept the request on this machine', 'guard', { route: 'blocked_local', reason: outboundGuard.reason });
     } else {
       const canSend = !offlineMeta && metaAccessEnabled();
+      await recordOutboundPayload({ runId, input: cloudInput, outbound }, { dataDir });
       await emit('decision', 5, canSend ? 'Only the minimum redacted evidence can be handed off' : 'Muse Spark is paused, this safe handoff is deferred', 'guard', { route: canSend ? 'cloud' : 'deferred_cloud', reason });
       const payload = { version: 1, runId, timestamp: new Date().toISOString(), modelId: ragConfig.cloudModel, status: canSend ? 'prepared' : 'deferred', inputHash: sha256(cloudInput), chunks: outbound.chunks.map(chunk => ({ chunkId: chunk.id, hash: chunk.hash })), estimatedInputTokens: estimateTokens(cloudInput), actualChunksSent: 0, guardOutbound: 'safe', methodVersion: ragConfig.methodVersion };
       receipt = await signReceipt(payload, { dataDir });
-      await appendReceipt(receipt, { dataDir });
+      receipt = await appendReceipt(receipt, { dataDir });
       if (!canSend) {
         status = 'deferred_cloud'; answer = 'A safe handoff is needed, but Meta access is paused. The cloud answer is deferred and no request was sent.'; citationChunks = [];
       } else {
@@ -113,12 +116,12 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
           if (!inboundGuard.safe) { metric.guardBlocks += 1; route = 'blocked_local'; status = 'blocked_local'; answer = 'The incoming answer was blocked locally by Llama Guard.'; citationChunks = []; }
           else { route = 'cloud'; answer = cloudParsed.answer; citationChunks = chunks.filter(chunk => outbound.chunks.some(sent => sent.id === chunk.chunkId) && cloudParsed.citations.includes(chunk.chunkId)); }
           receipt = await signReceipt({ ...payload, status: inboundGuard.safe ? 'completed' : 'inbound_blocked', actualChunksSent: outbound.chunks.length, responseHash: sha256(cloud.text), guardInbound: inboundGuard.safe ? 'safe' : 'unsafe', responseId: cloud.responseId, tokens: cloud.tokens }, { dataDir });
-          await appendReceipt(receipt, { dataDir });
+          receipt = await appendReceipt(receipt, { dataDir });
         } catch (error) {
           status = 'deferred_cloud'; answer = 'The cloud request failed. This item remains deferred for a later retry.'; citationChunks = [];
           metric.cloudCostUnknown = true; metric.actualCostUsd = null; metric.cloudDeliveryUnknown = true;
           receipt = await signReceipt({ ...payload, status: 'request_failed', actualChunksSent: null, attemptedChunks: outbound.chunks.length, delivery: 'unknown' }, { dataDir });
-          await appendReceipt(receipt, { dataDir });
+          receipt = await appendReceipt(receipt, { dataDir });
         }
       }
       metric.receiptVerified = await verifyReceipt(receipt, { dataDir });
