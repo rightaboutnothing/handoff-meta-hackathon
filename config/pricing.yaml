@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "format": "JSON subset of YAML 1.2; parsed without an additional dependency",
+  "currency": "USD",
+  "assumptions": true,
+  "label": "Illustrative planning assumptions, not verified provider invoice prices",
+  "recordedAt": "2026-10-28",
+  "tokenEstimate": "Expected tokens: ceil(characters/4). Reservation: UTF-8 bytes plus 256 framing tokens, maximum output and conservative thinking allowance. No cloud token-count request in Tier 0.",
+  "maxOutputTokens": 384,
+  "expectedOutputTokens": 200,
+  "expectedReasoningTokens": 256,
+  "reasoningEffort": "medium",
+  "temperature": 0,
+  "seed": 20261027,
+  "localAllocationUsdPerQuery": 0.0002,
+  "clouds": {
+    "muse-spark": {
+      "modelId": "muse-spark-1.3",
+      "inputUsdPerMillion": 2,
+      "outputUsdPerMillion": 6,
+      "maxReasoningTokensReserved": 65536,
+      "maximumInputTokens": 131072,
+      "reservationNote": "Conservative additional 65,536 thinking tokens; provider compatibility does not expose a separate thinking cap. Answer cap remains 384. Retain reservation when usage is absent."
+    },
+    "gemini": {
+      "modelId": "gemini-3.1-flash-lite",
+      "inputUsdPerMillion": 0.3,
+      "outputUsdPerMillion": 2.5,
+      "maxReasoningTokensReserved": 65536,
+      "maximumInputTokens": 1048576,
+      "reservationNote": "Conservatively reserve the model's entire 65,536 output-token ceiling in addition to the 384 answer cap for internal thinking. No thinking traces are requested.",
+      "selectionReason": "Stable exact ID; later Gemini 3.5 Flash-Lite and 3.6+ models ignore temperature. This pin preserves the requested temperature=0 setting.",
+      "modelSource": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite",
+      "apiSource": "https://ai.google.dev/api/generate-content",
+      "samplingDeprecationSource": "https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.6"
+    }
+  },
+  "budgetSemantics": "CLOUD_BUDGET_USD caps usage priced at these explicit assumptions plus all outstanding worst-case reservations. Actual provider invoice cost is unknown unless a response exposes a monetary cost; never relabel metered estimates as an invoice. Every dispatched failed/unknown attempt keeps its reservation."
+}

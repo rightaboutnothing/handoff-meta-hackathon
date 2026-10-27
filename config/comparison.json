@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "methodVersion": "meta-google-comparison-v1",
+  "seed": 20261027,
+  "temperature": 0,
+  "maxOutputTokens": 384,
+  "contextTokens": 4096,
+  "keepAlive": -1,
+  "topK": 4,
+  "cloudMaxChunks": 4,
+  "cloudContextMaxTokens": 1400,
+  "retrievalQualityThreshold": 0.35,
+  "baseline": {"name":"Historical Finkd; different tasks and method","medianLatencyMs":1300,"handoffRate":0.296},
+  "heroPipelineId": "llama8b+llamaguard+musespark",
+  "localModels": [
+    {"id":"llama8b","modelId":"llama3.1:8b","name":"Llama 3.1 8B","family":"Meta","parametersB":8},
+    {"id":"gemma4b","modelId":"gemma3:4b","name":"Gemma 3 4B","family":"Google","parametersB":4},
+    {"id":"gemma12b","modelId":"gemma3:12b","name":"Gemma 3 12B","family":"Google","parametersB":12}
+  ],
+  "guards": [
+    {"id":"llamaguard","modelId":"llama-guard3:8b","name":"Llama Guard 3 8B"},
+    {"id":"shieldgemma","modelId":"shieldgemma:9b","name":"ShieldGemma 9B"}
+  ],
+  "clouds": [
+    {"id":"musespark","providerId":"muse-spark","name":"Muse Spark"},
+    {"id":"gemini","providerId":"gemini","name":"Gemini"}
+  ],
+  "selection": {
+    "version":"declared-before-tier0-v1",
+    "candidateKinds":["hybrid"],
+    "weights":{"accuracy":0.65,"cost":0.20,"latency":0.15},
+    "costScaleUsdPer1000":5,
+    "latencyScaleMs":10000,
+    "minimumAccuracyCoverage":0.95,
+    "topK":4,
+    "formula":"0.65*accuracy + 0.20*(1-min(costPer1000/5,1)) + 0.15*(1-min(medianLatencyMs/10000,1))",
+    "selectionSplit":"dev selection core only; final test is held out",
+    "incompletePipelinesEligible":false
+  },
+  "tier0":{"cloudCallsAllowed":false,"sample":"fixed tier0-dev and tier0-test manifest IDs","timing":"shared measured local and Guard components; reconstructed stage sums, not live end-to-end cloud latency"},
+  "safety":{"harmfulLocalOnly":true,"redTeamLocalOnly":true,"poisoningLocalOnly":true,"cloudOffControlsSafeOnly":true}
+}

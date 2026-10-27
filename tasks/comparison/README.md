@@ -1,0 +1,13 @@
+# Meta / Google comparison dataset
+
+This fixed-seed comparison corpus combines pinned public benchmark questions with explicitly synthetic advertising and company-data stress tests. Read `manifest.json` for exact counts, source revisions, hashes and IDs. The seed is `20261027`.
+
+Run `node scripts/build-comparison-dataset.mjs` to fetch pinned sources into ignored `.cache/comparison/` and rebuild the public ID manifest and items. `--offline` rebuilds only from an existing source cache. `--fetch-only` prepares the cache without rewriting committed files. Accepted gated GPQA content is fetched only when `HF_TOKEN` is present in `.env`; its raw CSV and hydrated questions never leave ignored cache. GPQA records in this directory contain row IDs and fetch references only.
+
+`devTrainIDs` are for fitting and threshold calibration. `selectionPoolIDs` are a separate dev holdout; `selectionCoreIDs` selects exactly 1,000 of those items for Tier 1 pipeline selection. `testIDs` are the final Tier 2 holdout. Unselected dev-selection rows remain reserve. Source and operation-template groups are disjoint across these partitions. `tier0.devIDs` and `tier0.testIDs` are balanced, 60-item smoke-test samples; their calibration scores must not be presented as full-scale results.
+
+The company corpus is the existing, clearly synthetic `demo_data/` folder, shared with retrieval in every partition. New company scenarios cover arithmetic, discounts, freight, inventory, maintenance, support timing and policy combinations. Their quantities and operations vary; no paraphrases are counted as new benchmark rows. All variations in one operation family stay together in one partition. Ad tasks similarly use held-out selection-operation families with independently generated fake accounts. These stress tests are not independent real-company records; confidence intervals should cluster by `groupId`.
+
+Every item is tagged by category and explicit safety metadata. StrongREJECT, red-team and poisoning records are local-only regardless of any model or guard output. Safe XSTest retains the source label. An additional conservative pattern marks explicitly risky IFEval instructions local-only. The runner must enforce both the category allowlist and the item safety flags before any direct cloud client.
+
+Sources and licences: MMLU-Pro (TIGER-Lab, MIT), IFEval (Google, Apache-2.0), XSTest (CC-BY-4.0), GPQA (CC-BY-4.0 plus accepted access terms and no public question-text policy), and the existing StrongREJECT sample (MIT). Generated company/ad/boundary probes are MIT and entirely fake. Full source attribution and pinned revisions occur on each item and in the manifest.

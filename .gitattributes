@@ -1,2 +1,8 @@
 demo_data/** text eol=lf
 results/*.json text eol=lf
+results/**/*.json text eol=lf
+tasks/comparison/** text eol=lf
+src/comparison/** text eol=lf
+src/server/comparison-models.mjs text eol=lf
+config/comparison.json text eol=lf
+config/pricing.yaml text eol=lf
