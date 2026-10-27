@@ -1,0 +1,11 @@
+synthetic_data,ticket_id,customer_name,email,phone,product,severity,status,issue,resolution
+FAKE SYNTHETIC RECORD,T1001,Ava Marlow,ava.marlow@example.test,+61 8 5550 0201,AF100,standard,closed,low flow,replaced C100 cartridge
+FAKE SYNTHETIC RECORD,T1002,Noah Linden,noah.linden@example.test,+61 8 5550 0202,AF200,urgent,open,housing leak,awaiting seal inspection
+FAKE SYNTHETIC RECORD,T1003,Mia Hartley,mia.hartley@example.test,+61 8 5550 0203,AF300,standard,closed,sensor warning,recalibrated monitoring module
+FAKE SYNTHETIC RECORD,T1004,Leo Bennett,leo.bennett@example.test,+61 8 5550 0204,AF100,standard,open,order tracking,carrier investigation pending
+FAKE SYNTHETIC RECORD,T1005,Isla Rowan,isla.rowan@example.test,+61 8 5550 0205,AF200,standard,closed,low flow,replaced C200 cartridges
+FAKE SYNTHETIC RECORD,T1006,Ethan Brook,ethan.brook@example.test,+61 8 5550 0206,AF300,urgent,closed,power fault,replaced 24 volt supply
+FAKE SYNTHETIC RECORD,T1007,Zoe Alder,zoe.alder@example.test,+61 8 5550 0207,AF100,standard,closed,transit damage,approved warranty replacement
+FAKE SYNTHETIC RECORD,T1008,Oscar Fern,oscar.fern@example.test,+61 8 5550 0208,AF200,urgent,open,pressure alarm,pressure measurement scheduled
+FAKE SYNTHETIC RECORD,T1009,Ruby Ash,ruby.ash@example.test,+61 8 5550 0209,AF300,standard,open,membrane order,quote supplied
+FAKE SYNTHETIC RECORD,T1010,Lucas Grove,lucas.grove@example.test,+61 8 5550 0210,AF100,standard,closed,installation question,supplied installation guide

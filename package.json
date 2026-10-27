@@ -1,8 +1,14 @@
 {
-  "name": "hackathon-project",
+  "name": "handoff-private-gateway",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
+  "bin": { "handoff": "./bin/handoff.mjs" },
+  "engines": { "node": ">=24" },
   "scripts": {
+    "handoff": "node bin/handoff.mjs",
+    "demo:build": "node scripts/generate-company-demo.mjs",
+    "test:rag": "node --test tests/*.test.mjs",
     "dashboard": "npm --prefix dashboard run dev",
     "dashboard:build": "npm --prefix dashboard run build",
     "dashboard:check": "npm --prefix dashboard run check",
@@ -21,8 +27,12 @@
     "test:routing-confidence": "node scripts/test-routing-confidence.mjs"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.2",
     "csv-parse": "^7.0.3",
     "dotenv": "^18.0.9",
-    "openai": "^6.0.0"
+    "mammoth": "^1.13.0",
+    "openai": "^6.0.0",
+    "pdf-parse": "^2.4.5",
+    "sqlite-vec": "^0.1.9"
   }
 }

@@ -1,0 +1,23 @@
+{
+  "methodVersion": "private-gateway-rag-v1",
+  "seed": 20261027,
+  "localModel": "llama3.1:8b",
+  "guardModel": "llama-guard3:8b",
+  "cloudModel": "muse-spark-1.3",
+  "metaAccess": "paused",
+  "embeddingModel": "nomic-embed-text:v1.5",
+  "topK": 4,
+  "cloudMaxChunks": 2,
+  "cloudContextMaxTokens": 1400,
+  "confidenceThreshold": 0.8,
+  "retrievalQualityThreshold": 0.35,
+  "maxOutputTokens": 384,
+  "reasoningEffort": "medium",
+  "keepAlive": -1,
+  "temperature": 0,
+  "baseline": {
+    "name": "Finkd published interim benchmark, different task suites",
+    "medianLatencyMs": 1300,
+    "handoffRate": 0.296
+  }
+}

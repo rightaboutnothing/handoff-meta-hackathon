@@ -1,6 +1,29 @@
 # Handoff
 
-Handoff is a local-first AI router. A local Ollama model acts as the first responder, decides whether it can answer safely, and hands complex tasks to a hosted specialist. Every run records the pairing, model IDs, routing decision, outputs, token usage, latency, and estimated API cost.
+Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
+
+## Private company data
+
+The gateway indexes text, Markdown, PDF, CSV and Word files into a local SQLite vector store. Ingest redacts recognized PII before embedding. An encrypted local mapping restores placeholders only on this machine. Llama answers with file and chunk citations. Low confidence, weak retrieval or invalid citations triggers the boundary: minimum redacted chunks, local Llama Guard, Muse Spark, inbound Llama Guard, then local restoration. A signed Ed25519 receipt binds the exact redacted chunk hashes and input hash.
+
+Meta access remains paused. No Meta call is made unless access is explicitly confirmed and live mode is selected. Offline runs retain proposed redacted handoffs as deferred, signed records with zero chunks actually sent. Only the clearly synthetic demo data is committed. Put real company data outside this repository or in ignored `.private-data/`.
+
+```powershell
+npm install
+npm link
+ollama pull nomic-embed-text:v1.5
+ollama pull llama3.1:8b
+ollama pull llama-guard3:8b
+handoff ingest demo_data
+handoff ask "What is the warranty on the AF-100?" --offline-meta
+handoff eval-rag --paired --offline-meta
+```
+
+`npm run handoff -- <command>` is available without installing the command link. Use `--data-dir` to isolate an index and its local keys. Ingest supports `--embeddings-fallback` to use a local sentence-transformer instead of Ollama. Switching embedding models requires re-ingestion, because vectors from different models cannot be mixed.
+
+The Company data dashboard view uses the same gateway and displays source citations, redacted proposed or sent text, verified receipts and the cost comparison. Pricing assumptions live in `config/rag-pricing.json`. The measured report is `results/rag-summary.md`. The published Finkd baseline is 1.3 seconds median latency and 29.6% handoffs on different task suites; the paired no-retrieval control provides the directly comparable retrieval experiment.
+
+Rules-based PII detection is not a universal anonymizer. Names are discovered from labeled fields and remembered local mappings; review proposed handoffs before enabling cloud access for real documents. The local map and signing keys stay in ignored `.handoff/`. Redacted business context can still contain confidential business facts. The north star is a goal, not a claim that enabling cloud routing sends no content.
 
 ## Pairings
 
@@ -18,7 +41,7 @@ Handoff is a local-first AI router. A local Ollama model acts as the first respo
 
 ## Setup
 
-Requirements: Node.js 18+, npm, and Ollama.
+Requirements: Node.js 24+, npm, and Ollama.
 
 ```powershell
 git clone https://github.com/rightaboutnothing/handoff-meta-hackathon.git

@@ -1,6 +1,8 @@
 node_modules/
 .logs/
 .cache/
+.handoff/
+.private-data/
 dashboard/dist/
 dashboard/*.tsbuildinfo
 dashboard/vite.config.js

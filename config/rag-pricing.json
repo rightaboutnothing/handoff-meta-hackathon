@@ -1,0 +1,18 @@
+{
+  "currency": "USD",
+  "assumption": true,
+  "label": "Illustrative pricing assumptions, not verified Muse Spark list prices",
+  "museInputPerMillionUsd": 2,
+  "museOutputPerMillionUsd": 6,
+  "expectedOutputTokens": 200,
+  "localPerQueryUsd": 0.0002,
+  "queriesPerComparison": 1000,
+  "tokenEstimator": "ceil(character count / 4); actual provider usage is recorded separately",
+  "notes": [
+    "All-cloud sends every query and the full top-k redacted retrieval context to Muse Spark.",
+    "Handoff sends only selected chunks when a safe handoff is needed.",
+    "Projected cost includes deferred handoffs and is not an observed invoice.",
+    "The local allowance is an illustrative electricity and hardware allocation, not a measurement.",
+    "Update these assumptions before making a purchasing decision."
+  ]
+}

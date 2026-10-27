@@ -1,0 +1,70 @@
+{
+  "synthetic": true,
+  "seed": 20261027,
+  "company": "Acme Filtration Pty Ltd (fictional)",
+  "questionCount": 60,
+  "categories": {
+    "lookup": 36,
+    "multi_document": 16,
+    "cloud": 8
+  },
+  "evaluationSha256": "cb673478154eed624f80924c3d7c8d51a4b87b57e71c879f8be8b15e92e12503",
+  "files": [
+    {
+      "file": "products/af100.md",
+      "sha256": "655023fd0d1a0effaa895767e4796c32dedf4d0669eeae03d7264c93ac193dfa"
+    },
+    {
+      "file": "products/af200.md",
+      "sha256": "fd2dd353532c345ccfa35c7f6fd66f396cc183ed7a59f328178f4fe96cf5bbe2"
+    },
+    {
+      "file": "products/af300.md",
+      "sha256": "d29ac478006a8e796b5ab0c41cd11450fd7f347520f96ee1a93619d87bca6cdb"
+    },
+    {
+      "file": "policies/returns.md",
+      "sha256": "28c712db8a73ea129153dd8f6efba6cdab25e31971c17793dcffb4b12faa3f61"
+    },
+    {
+      "file": "policies/service.md",
+      "sha256": "6102e4f07268229057b8d9b9da1042052fdd9d38086db905a4abe9af1564f366"
+    },
+    {
+      "file": "policies/shipping.md",
+      "sha256": "e7cfe80d75736a57cd9f8a7f6c1a11e8547e04f2fdeec74d823c3605939fc2cc"
+    },
+    {
+      "file": "policies/discounts.md",
+      "sha256": "eef32d648dc561c46154e3144d312b01813aefacef57e488cc00bc5eca9c18b1"
+    },
+    {
+      "file": "policies/security.md",
+      "sha256": "e928f6c3e59bbaeec2a4ec5055bc26bd005c5083f656bb5d7c942e6e254f21ad"
+    },
+    {
+      "file": "hr/handbook.md",
+      "sha256": "54b9dc645257849d657af8258864b0b4adcdce5e982c9fec6bccc95a3edbdd56"
+    },
+    {
+      "file": "sales/northshore.md",
+      "sha256": "fbf7a487ac75cddfffb12b289f7ad1b01d3c1b75e8b00c8dddf315f1757934ce"
+    },
+    {
+      "file": "sales/forecast.md",
+      "sha256": "5859083f90cd918c1f2c161622fa72eb77ffd2895bb9d517b5b8adfa3f99e3f5"
+    },
+    {
+      "file": "operations/stock.md",
+      "sha256": "10ba289b3a15894638d6ac6c8a8e04c7cec0681e53bd91df1fd29fabd5529add"
+    },
+    {
+      "file": "README.md",
+      "sha256": "9b184137a4ddb9ed92476f08a74ad8a3f991de2e69eec0ce1f94c9c6e3ade71d"
+    },
+    {
+      "file": "support/tickets.csv",
+      "sha256": "0b867c433dfe3e33577c5f9e2b95ae6fb8ae3b36c38a9130593d9233e33b455c"
+    }
+  ]
+}
