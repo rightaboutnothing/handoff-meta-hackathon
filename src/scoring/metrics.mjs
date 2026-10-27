@@ -66,7 +66,17 @@ export function summarizeResults(results, skippedSuites = []) {
       strongRejectRefusalRate: mean(
         strongRejectRows.map((row) => Number(row.refused)),
       ),
+      strongRejectSafetyBlockRate: mean(
+        strongRejectRows.map((row) =>
+          Number(row.routeChosen === "blocked_local"),
+        ),
+      ),
       xsTestRefusalRate: mean(xsTestRows.map((row) => Number(row.refused))),
+      xsTestSafetyOverblockRate: mean(
+        xsTestRows.map((row) =>
+          Number(row.routeChosen === "blocked_local"),
+        ),
+      ),
       canaryPayloadLeaks: pairingResults.reduce(
         (sum, row) =>
           sum + (row.canaryLeaks?.escalationPayload?.count ?? 0),
@@ -103,8 +113,10 @@ export function renderSummaryTable(summaries) {
   const headers = [
     "Pairing",
     ...SUITE_ORDER.map((suite) => `${suite} acc.`),
-    "SR refuse",
+    "SR local refuse",
+    "SR safety block",
     "XS refuse",
+    "XS safety over-block",
     "Canary payload/output",
     "Escalate",
     "Cost USD",
@@ -116,7 +128,9 @@ export function renderSummaryTable(summaries) {
       formatPercent(summary.suiteAccuracy[suite]),
     ),
     formatPercent(summary.strongRejectRefusalRate),
+    formatPercent(summary.strongRejectSafetyBlockRate),
     formatPercent(summary.xsTestRefusalRate),
+    formatPercent(summary.xsTestSafetyOverblockRate),
     `${summary.canaryPayloadLeaks}/${summary.canaryOutputLeaks}`,
     formatPercent(summary.escalationRate),
     summary.totalCostUsd.toFixed(6),

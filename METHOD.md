@@ -81,15 +81,23 @@ The task runner preserves the same latency method used above:
 - `OLLAMA_KEEP_ALIVE=-1`, compact 150-token JSON routing, and shared medium cloud reasoning;
 - sequential execution in fixed suite order for comparable local-model residency.
 
-The 50-item full runner appends one terminal result after every pairing/task item and resumes using the stable `pairing + taskId` key. Handoff and grader failures each receive up to three retries with 2, 4, and 8 second backoff; an exhausted item is logged and the run continues. A hidden PowerShell supervisor may restart the process up to ten times, while the runner lock prevents concurrent copies. Progress and resumable evidence stay under `.logs/benchmark-full-50-seed-20261027/`. On completion, the runner writes the aggregate-only `results/summary.md`, commits it, and pushes `main`; gated GPQA text remains solely in ignored `.cache/` and `.logs/` files.
+Before any cloud escalation, the pairing's local model runs a second compact JSON safety screen with `{classification, confidence, reason}`. A `safe` result requires at least 0.8 confidence. Harmful, low-confidence, malformed, or failed classifications fail closed: the local model produces the refusal, the route is `blocked_local`, and neither the task nor its grade is sent to a cloud model.
 
-Every answer is graded by `openai/gpt-6.1-sol` through OpenRouter. The grader function accepts only suite, prompt, rubric/reference, and candidate answer, so the pairing and producing model are unavailable to it. It returns `{score, reason}`. Refusal rates are additionally measured for StrongREJECT (desired refusal) and XSTest (undesired over-refusal).
+StrongREJECT is always local-only, independently of the first routing decision or pairing. Every item receives the local safety screen, a local response/refusal, and a deterministic local grade combining safety blocking and refusal. StrongREJECT prompts never go to Muse Spark, Grok, or the OpenRouter grader. This boundary is required by provider acceptable-use policies and by observed operational evidence: the Meta key became restricted after legacy StrongREJECT prompts had been sent to Muse Spark. This is a temporal observation, not a claim about Meta's undisclosed enforcement logic.
+
+XSTest remains a safe-prompt suite. Its safety screen is forced even when the first responder would answer locally, so the report includes both ordinary over-refusal and a specific safe-prompt safety over-block rate.
+
+The 50-item full runner appends one terminal result after every pairing/task item and resumes using the stable `pairing + taskId` key. Handoff and grader failures each receive up to three retries with 2, 4, and 8 second backoff; an exhausted item is logged and the run continues. Meta 403 terminal results are instead marked `pending_rerun` and excluded from scoring. A hidden PowerShell supervisor may restart the process up to ten times, while the runner lock prevents concurrent copies. Progress and resumable evidence stay under `.logs/benchmark-full-50-seed-20261027/`. On completion, the runner writes the aggregate-only `results/summary.md`, commits it, and pushes `main`; gated GPQA text remains solely in ignored `.cache/` and `.logs/` files.
+
+`--offline-meta` disables all work that could require the Meta escalation route. It can run Llamarok and Gemmok normally plus StrongREJECT local-only work for Finkd and Gemmuse. Deferred Finkd/Gemmuse items remain pending until Meta access is explicitly confirmed restored.
+
+Ordinary safe answers are graded by `openai/gpt-6.1-sol` through OpenRouter. The grader function accepts only suite, prompt, rubric/reference, and candidate answer, so the pairing and producing model are unavailable to it. StrongREJECT and every `blocked_local` result use the deterministic local safety grader instead, ensuring content classified harmful is never copied into a grading API.
 
 Task-result JSONL records route choice, confidence, every model ID, tokens, per-step and total Handoff latency, cost, blind grade, refusal classification, and both canary leak channels. Provider-reported usage cost is used when supplied; otherwise the record uses the configured token-price estimate and labels its cost source. Summary cost includes Handoff calls and the blind grader. Local hardware/electricity remains excluded.
 
 ### Three-item dry run — 27 October 2026
 
-After accepted GPQA access was configured, the requested dry run executed three items from all six suites across all four pairings: 72/72 task results succeeded, including 12 GPQA results, with two warm-ups logged separately. The hydrated GPQA questions remained only in ignored `.cache/gpqa.jsonl`. The full 20-item run has not been started.
+After accepted GPQA access was configured, the original pre-safety-screen dry run executed three items from all six suites across all four pairings: 72/72 task results succeeded, including 12 GPQA results, with two warm-ups logged separately. The hydrated GPQA questions remained only in ignored `.cache/gpqa.jsonl`. These historical figures do not include the safety screen and are not comparable with the resumed method.
 
 | Pairing | IFEval | GPQA | MMLU-Pro | StrongREJECT | XSTest | Ad privacy | SR refuse | XS refuse | Canary payload/output | Escalate | Total cost | Median Handoff latency |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -99,3 +107,7 @@ After accepted GPQA access was configured, the requested dry run executed three 
 | Gemmok | 100.0% | 66.7% | 93.3% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 0/0 | 55.6% | $0.079274 | 6,648 ms |
 
 These are tiny-sample smoke-test figures, not leaderboard claims. The ignored evidence files are `.logs/benchmark-dry-3-1793048375715-results.jsonl` and `.logs/benchmark-dry-3-1793048375715-trace.jsonl`. No sampled ad task escalated and no canary appeared in final output in this run.
+
+### Paused full-run migration
+
+The full run was paused after 404 raw task-result checkpoints. Raw JSONL is retained unchanged. Under safety method `safety-screen-v1`, 16 terminal Meta 403 XSTest results are `pending_rerun`; all 50 legacy Finkd StrongREJECT results are excluded and scheduled for local-only rescoring because all 50 reached Muse at least once; and all 50 legacy Finkd XSTest results are rerun for a consistent safety-over-block metric. This leaves 304 effective saved results, 596 offline-Meta-eligible pending items, and 300 Finkd/Gemmuse items deferred until Meta access is restored.

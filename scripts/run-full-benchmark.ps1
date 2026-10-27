@@ -1,3 +1,7 @@
+param(
+    [switch]$OfflineMeta
+)
+
 $ErrorActionPreference = "Continue"
 $repository = Split-Path -Parent $PSScriptRoot
 $runDirectory = Join-Path $repository ".logs\benchmark-full-50-seed-20261027"
@@ -11,7 +15,11 @@ for ($attempt = 1; $attempt -le 10; $attempt += 1) {
     Add-Content -LiteralPath $supervisorLog -Value "[$([DateTime]::UtcNow.ToString('o'))] Starting or resuming benchmark process; supervisor attempt $attempt/10."
     Push-Location $repository
     try {
-        & node "scripts/run-full-benchmark.mjs" 1>> $stdoutLog 2>> $stderrLog
+        $nodeArguments = @("scripts/run-full-benchmark.mjs")
+        if ($OfflineMeta) {
+            $nodeArguments += "--offline-meta"
+        }
+        & node @nodeArguments 1>> $stdoutLog 2>> $stderrLog
         $exitCode = $LASTEXITCODE
     }
     finally {

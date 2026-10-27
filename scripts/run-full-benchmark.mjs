@@ -21,18 +21,27 @@ import {
 } from "../src/server/model-router.mjs";
 import { checkCanaryLeaks } from "../src/scoring/canary-check.mjs";
 import { GRADER_MODEL_ID, gradeAnswer } from "../src/scoring/grader.mjs";
+import { gradeLocallyForSafety } from "../src/scoring/local-safety-grader.mjs";
 import {
   SUITE_ORDER,
   looksLikeRefusal,
   renderSummaryTable,
   summarizeResults,
 } from "../src/scoring/metrics.mjs";
+import {
+  SAFETY_METHOD_VERSION,
+  buildEffectiveResults,
+  isOfflineMetaEligible,
+  pendingRerunReasons,
+  resultKey,
+} from "../src/scoring/resume-plan.mjs";
 
 const execFileAsync = promisify(execFile);
 const SEED = 20261027;
 const ITEMS_PER_SUITE = 50;
 const MAX_RETRIES = 3;
 const RETRY_DELAYS_MS = Object.freeze([2_000, 4_000, 8_000]);
+const offlineMeta = process.argv.includes("--offline-meta");
 const runDirectory = new URL(
   `../.logs/benchmark-full-${ITEMS_PER_SUITE}-seed-${SEED}/`,
   import.meta.url,
@@ -52,6 +61,7 @@ let lockHandle;
 const runSettings = Object.freeze({
   seed: SEED,
   mode: `full-${ITEMS_PER_SUITE}`,
+  methodVersion: SAFETY_METHOD_VERSION,
   itemsPerSuite: ITEMS_PER_SUITE,
   graderModelId: GRADER_MODEL_ID,
   pairingRunOrder: HANDOFF_RUN_ORDER,
@@ -59,6 +69,8 @@ const runSettings = Object.freeze({
   retryBackoffMs: RETRY_DELAYS_MS,
   checkpoint: "one task_result JSONL record after every finished pairing/task item",
   resumeKey: "pairing + taskId",
+  strongRejectCloudPolicy: "never_cloud_local_screen_and_local_grade",
+  xsTestSafetyPolicy: "force_safety_screen",
   ...BENCHMARK_SETTINGS,
 });
 
@@ -218,6 +230,7 @@ async function writeState(completedKeys, totalJobs, status = "running") {
         updatedAt: new Date().toISOString(),
         pid: process.pid,
         status,
+        executionMode: offlineMeta ? "offline-meta" : "online",
         completedItems: completedKeys.size,
         totalItems: totalJobs,
         settings: runSettings,
@@ -291,9 +304,10 @@ async function runBenchmark() {
   );
   if (
     startRecord &&
-    JSON.stringify(startRecord.settings) !== JSON.stringify(runSettings)
+    (startRecord.settings?.seed !== SEED ||
+      startRecord.settings?.itemsPerSuite !== ITEMS_PER_SUITE)
   ) {
-    throw new Error("Existing resumable run uses different settings.");
+    throw new Error("Existing resumable run uses a different seed or sample size.");
   }
   if (!startRecord) {
     await appendJsonl(resultsPath, {
@@ -303,32 +317,87 @@ async function runBenchmark() {
       totalJobs,
     });
   }
+  if (
+    !existingRecords.some(
+      (record) =>
+        record.recordType === "method_change" &&
+        record.methodVersion === SAFETY_METHOD_VERSION,
+    )
+  ) {
+    await appendJsonl(resultsPath, {
+      recordType: "method_change",
+      timestamp: new Date().toISOString(),
+      methodVersion: SAFETY_METHOD_VERSION,
+      settings: runSettings,
+      reason:
+        "Add local pre-escalation safety screen; StrongREJECT local-only; XSTest safety over-block measurement.",
+    });
+  }
+  await appendJsonl(resultsPath, {
+    recordType: "execution_started",
+    timestamp: new Date().toISOString(),
+    methodVersion: SAFETY_METHOD_VERSION,
+    executionMode: offlineMeta ? "offline-meta" : "online",
+  });
 
-  const allResults = existingRecords.filter(
+  const rawResults = existingRecords.filter(
     (record) => record.recordType === "task_result",
   );
+  const initialSelection = buildEffectiveResults(rawResults);
+  const effectiveByKey = new Map(
+    initialSelection.effectiveResults.map((result) => [resultKey(result), result]),
+  );
   const completedKeys = new Set(
-    allResults.map((result) => jobKey(result.pairing, result.taskId)),
+    initialSelection.effectiveResults.map((result) => resultKey(result)),
   );
   await writeState(completedKeys, totalJobs);
   await progress(
-    `Starting full benchmark: ${completedKeys.size}/${totalJobs} items already checkpointed; ${totalJobs - completedKeys.size} remaining.`,
+    `Starting ${offlineMeta ? "offline-meta" : "online"} safety-screen benchmark: ${completedKeys.size}/${totalJobs} effective items checkpointed; ${initialSelection.pendingReruns.length} prior results pending rerun.`,
   );
 
   async function saveResult(result) {
     await appendJsonl(resultsPath, result);
-    allResults.push(result);
-    completedKeys.add(jobKey(result.pairing, result.taskId));
+    rawResults.push(result);
+    const key = resultKey(result);
+    const pendingReasons = pendingRerunReasons(result);
+    if (pendingReasons.length > 0) {
+      effectiveByKey.delete(key);
+      completedKeys.delete(key);
+      await appendJsonl(resultsPath, {
+        recordType: "result_status_update",
+        timestamp: new Date().toISOString(),
+        pairing: result.pairing,
+        taskId: result.taskId,
+        suite: result.suite,
+        status: "pending_rerun",
+        reasons: pendingReasons,
+      });
+    } else {
+      effectiveByKey.set(key, result);
+      completedKeys.add(key);
+    }
     await writeState(completedKeys, totalJobs);
     await progress(
-      `[${completedKeys.size}/${totalJobs}] ${result.pairing}/${result.taskId} ${result.status}`,
+      `[${completedKeys.size}/${totalJobs}] ${result.pairing}/${result.taskId} ${pendingReasons.length > 0 ? "pending_rerun" : result.status}`,
       { error: result.status === "error" },
     );
   }
 
+  function isEligibleInThisExecution(pairing, task) {
+    if (!offlineMeta) return true;
+    return isOfflineMetaEligible({
+      suite: task.suite,
+      escalationRoute: HANDOFF_PAIRINGS[pairing].escalationRoute,
+    });
+  }
+
   for (const group of localGroups) {
     const groupHasPendingWork = group.pairings.some((pairing) =>
-      tasks.some((task) => !completedKeys.has(jobKey(pairing, task.id))),
+      tasks.some(
+        (task) =>
+          isEligibleInThisExecution(pairing, task) &&
+          !completedKeys.has(jobKey(pairing, task.id)),
+      ),
     );
     if (!groupHasPendingWork) continue;
 
@@ -353,7 +422,9 @@ async function runBenchmark() {
 
     for (const pairing of group.pairings) {
       const remaining = tasks.filter(
-        (task) => !completedKeys.has(jobKey(pairing, task.id)),
+        (task) =>
+          isEligibleInThisExecution(pairing, task) &&
+          !completedKeys.has(jobKey(pairing, task.id)),
       );
       if (remaining.length === 0) continue;
       await progress(
@@ -370,6 +441,10 @@ async function runBenchmark() {
                 logPath: traceFile,
                 captureEscalationPayload: true,
                 logContext: { taskId: task.id, suite: task.suite },
+                forceSafetyScreen:
+                  task.suite === "strongreject" || task.suite === "xstest",
+                localOnly: task.suite === "strongreject",
+                disabledEscalationRoutes: offlineMeta ? ["meta"] : [],
               }),
           );
         } catch (error) {
@@ -398,41 +473,55 @@ async function runBenchmark() {
         });
 
         let grader;
-        try {
-          grader = await retryOperation(
-            { operation: "grader", pairing, taskId: task.id },
-            () =>
-              gradeAnswer({
-                suite: task.suite,
-                prompt: task.prompt,
-                referenceAnswerOrRubric: task.reference_answer_or_rubric,
-                answer: handoff.outputText,
-              }),
-          );
-        } catch (error) {
-          await saveResult({
-            recordType: "task_result",
-            status: "error",
-            failedStage: "grader",
-            timestamp: new Date().toISOString(),
-            benchmarkMode: runSettings.mode,
-            settings: runSettings,
-            runId: handoff.runId,
-            pairing,
-            handoffName: handoff.handoffName,
-            taskId: task.id,
+        if (
+          task.suite === "strongreject" ||
+          handoff.routeChosen === "blocked_local"
+        ) {
+          grader = gradeLocallyForSafety({
             suite: task.suite,
+            answer: handoff.outputText,
+            safetyClassification: handoff.safetyClassification,
             routeChosen: handoff.routeChosen,
-            firstResponderModelId: handoff.firstResponderModelId,
-            finalModelId: handoff.finalModelId,
-            canaryLeaks,
-            steps: handoff.steps,
-            handoffTokens: handoff.tokens,
-            handoffLatencyMs: handoff.latencyMs,
-            handoffCostEstimateUsd: handoff.costEstimateUsd,
-            error: errorMessage(error),
           });
-          continue;
+        } else {
+          try {
+            grader = await retryOperation(
+              { operation: "grader", pairing, taskId: task.id },
+              () =>
+                gradeAnswer({
+                  suite: task.suite,
+                  prompt: task.prompt,
+                  referenceAnswerOrRubric: task.reference_answer_or_rubric,
+                  answer: handoff.outputText,
+                }),
+            );
+          } catch (error) {
+            await saveResult({
+              recordType: "task_result",
+              status: "error",
+              failedStage: "grader",
+              timestamp: new Date().toISOString(),
+              benchmarkMode: runSettings.mode,
+              settings: runSettings,
+              runId: handoff.runId,
+              pairing,
+              handoffName: handoff.handoffName,
+              taskId: task.id,
+              suite: task.suite,
+              routeChosen: handoff.routeChosen,
+              safetyClassification: handoff.safetyClassification,
+              safetyConfidence: handoff.safetyConfidence,
+              firstResponderModelId: handoff.firstResponderModelId,
+              finalModelId: handoff.finalModelId,
+              canaryLeaks,
+              steps: handoff.steps,
+              handoffTokens: handoff.tokens,
+              handoffLatencyMs: handoff.latencyMs,
+              handoffCostEstimateUsd: handoff.costEstimateUsd,
+              error: errorMessage(error),
+            });
+            continue;
+          }
         }
 
         await saveResult({
@@ -452,6 +541,9 @@ async function runBenchmark() {
           routeDecision: handoff.decision,
           routingConfidence: handoff.confidence,
           routingReason: handoff.decisionReason,
+          safetyClassification: handoff.safetyClassification,
+          safetyConfidence: handoff.safetyConfidence,
+          safetyReason: handoff.safetyReason,
           firstResponderModelId: handoff.firstResponderModelId,
           finalModelId: handoff.finalModelId,
           outputText: handoff.outputText,
@@ -470,24 +562,40 @@ async function runBenchmark() {
     }
   }
 
-  const summaries = summarizeResults(allResults);
+  const effectiveResults = [...effectiveByKey.values()];
+  const summaries = summarizeResults(effectiveResults);
   const summary = {
     generatedAt: new Date().toISOString(),
     settings: runSettings,
     resultsPath: resultsFile,
     tracePath: traceFile,
-    completedItems: allResults.length,
+    completedItems: effectiveResults.length,
+    executionMode: offlineMeta ? "offline-meta" : "online",
     totalJobs,
     summaries,
   };
   await writeFile(localSummaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
-  await progress(`Benchmark complete: ${allResults.length}/${totalJobs} item results.`);
+  await progress(
+    `Execution pass complete: ${effectiveResults.length}/${totalJobs} effective item results.`,
+  );
   await progress(`\n${renderSummaryTable(summaries)}`);
+
+  if (effectiveResults.length < totalJobs) {
+    await writeState(
+      completedKeys,
+      totalJobs,
+      offlineMeta ? "offline-meta-complete" : "incomplete",
+    );
+    await progress(
+      `${totalJobs - effectiveResults.length} items remain pending; final summary commit is deferred.`,
+    );
+    return;
+  }
 
   await mkdir(new URL("../results/", import.meta.url), { recursive: true });
   await writeFile(
     committedSummaryPath,
-    renderCommittedSummary(summaries, allResults, totalJobs),
+    renderCommittedSummary(summaries, effectiveResults, totalJobs),
     "utf8",
   );
   await progress("Wrote results/summary.md; committing and pushing main.");
