@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { createCloudPolicyRegistry, isCloudEligible } from '../src/comparison/policy.mjs';
 import { createCloudBudget } from '../src/comparison/budget.mjs';
-import { directCloud, loadPricing, estimateRequest, comparisonGuard, parseGuardResponse, llamaGuardPrompt, CLOUD_MODELS } from '../src/server/comparison-models.mjs';
+import { directCloud, loadPricing, estimateRequest, comparisonLocal, comparisonGuard, parseGuardResponse, llamaGuardPrompt, CLOUD_MODELS, COMPARISON_SETTINGS } from '../src/server/comparison-models.mjs';
 
 const item = { id: 'mock-safe-1', suite: 'mmlu-pro', category: 'knowledge', prompt: 'Say hello', safety: { kind: 'safe', cloudEligible: true } };
 const registry = createCloudPolicyRegistry([item]);
@@ -16,6 +16,24 @@ test.after(() => { if (previousBudget === undefined) delete process.env.CLOUD_BU
 const budget = async capUsd => createCloudBudget({ directory: await mkdtemp(path.join(os.tmpdir(), 'handoff-budget-')), capUsd });
 const fixtureUsage = { promptTokenCount: 12, candidatesTokenCount: 2, thoughtsTokenCount: 7, totalTokenCount: 21 };
 const fakeGoogle = async () => ({ ok: true, json: async () => ({ modelVersion: CLOUD_MODELS.gemini, responseId: 'mock-response', candidates: [{ content: { parts: [{ text: 'Hello' }, { text: 'private thinking', thought: true }] } }], usageMetadata: fixtureUsage }) });
+
+test('one execution config drives every local model and guard while pricing contains only forecasts', async t => {
+  const config = JSON.parse(await readFile(new URL('../config/comparison.json', import.meta.url), 'utf8'));
+  assert.deepEqual(COMPARISON_SETTINGS, { temperature: config.temperature, seed: config.seed, maxTokens: config.maxOutputTokens,
+    contextTokens: config.contextTokens, keepAlive: config.keepAlive, reasoningEffort: config.reasoningEffort, guardMaxTokens: config.guardMaxTokens });
+  assert.deepEqual(COMPARISON_SETTINGS, { temperature: 0, seed: 20261027, maxTokens: 384, contextTokens: 4096, keepAlive: -1, reasoningEffort: 'medium', guardMaxTokens: 40 });
+  for (const key of ['seed', 'temperature', 'maxOutputTokens', 'reasoningEffort']) assert.equal(Object.hasOwn(pricing, key), false);
+  const requests = [];
+  t.mock.method(globalThis, 'fetch', async (url, options) => { const body = JSON.parse(options.body); requests.push(body); return { ok: true, json: async () => ({ message: { content: 'No.' }, response: 'safe', prompt_eval_count: 1, eval_count: 1 }) }; });
+  for (const model of config.localModels) await comparisonLocal(model.modelId, [{ role: 'user', content: 'Mock input' }]);
+  for (const model of config.guards) await comparisonGuard(model.modelId, 'Mock input');
+  assert.equal(requests.length, config.localModels.length + config.guards.length);
+  for (const request of requests) {
+    assert.equal(request.options.temperature, config.temperature); assert.equal(request.options.seed, config.seed);
+    assert.equal(request.options.num_ctx, config.contextTokens); assert.equal(request.keep_alive, config.keepAlive);
+    assert.equal(request.options.num_predict, config.guards.some(model => model.modelId === request.model) ? config.guardMaxTokens : config.maxOutputTokens);
+  }
+});
 
 test('unsafe categories and registry forgery cannot reach either cloud, including controls', async () => {
   let networkCalls = 0;
@@ -109,7 +127,7 @@ test('Google uses direct API with same temperature/output cap and records invoic
     const body = JSON.parse(request.options.body);
     assert.equal(request.url, 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent');
     assert.equal(body.generationConfig.temperature, 0); assert.equal(body.generationConfig.seed, 20261027);
-    assert.equal(body.generationConfig.maxOutputTokens, 384); assert.equal(body.generationConfig.thinkingConfig.thinkingLevel, 'MEDIUM');
+    assert.equal(body.generationConfig.maxOutputTokens, COMPARISON_SETTINGS.maxTokens); assert.equal(body.generationConfig.thinkingConfig.thinkingLevel, COMPARISON_SETTINGS.reasoningEffort.toUpperCase());
     assert.equal(result.text, 'Hello'); assert.equal(result.providerReportedCostUsd, null);
     assert.equal(result.tokens.reasoning, 7); assert.equal(result.budget.reservedUsd, 0); assert(result.meteredCostUsd > 0);
   } finally { if (old === undefined) delete process.env.GEMINI_API_KEY; else process.env.GEMINI_API_KEY = old; }
@@ -135,7 +153,7 @@ test('Meta official Responses request uses explicit key, no retries, output_text
     assert.equal(options.maxRetries, 0); assert.equal(options.apiKey, 'unit-test-placeholder');
     assert.equal(options.baseURL, 'https://api.meta.ai/v1');
     assert.equal(request.model, 'muse-spark-1.3'); assert.equal(request.max_output_tokens, 384);
-    assert.equal(request.reasoning.effort, 'medium'); assert.equal(result.text, 'Hello'); assert.equal(result.modelVersion, 'muse-spark-1.3');
+    assert.equal(request.temperature, COMPARISON_SETTINGS.temperature); assert.equal(request.reasoning.effort, COMPARISON_SETTINGS.reasoningEffort); assert.equal(result.text, 'Hello'); assert.equal(result.modelVersion, 'muse-spark-1.3');
     assert.equal(result.settings.seedSupported, false); assert.equal(result.providerReportedCostUsd, null);
   } finally { names.forEach((name, i) => { if (old[i] === undefined) delete process.env[name]; else process.env[name] = old[i]; }); }
 });

@@ -6,12 +6,8 @@
   "label": "Illustrative planning assumptions, not verified provider invoice prices",
   "recordedAt": "2026-10-28",
   "tokenEstimate": "Expected tokens: ceil(characters/4). Reservation: UTF-8 bytes plus 256 framing tokens, maximum output and conservative thinking allowance. No cloud token-count request in Tier 0.",
-  "maxOutputTokens": 384,
   "expectedOutputTokens": 200,
   "expectedReasoningTokens": 256,
-  "reasoningEffort": "medium",
-  "temperature": 0,
-  "seed": 20261027,
   "localAllocationUsdPerQuery": 0.0002,
   "clouds": {
     "muse-spark": {

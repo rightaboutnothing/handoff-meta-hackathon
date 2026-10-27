@@ -8,9 +8,12 @@ import { assertCloudEligible } from '../comparison/policy.mjs';
 // Resolve .env against the project, regardless of the command's working directory.
 dotenv.config({ path: new URL('../../.env', import.meta.url), quiet: true });
 export const CLOUD_MODELS = Object.freeze({ 'muse-spark': 'muse-spark-1.3', gemini: 'gemini-3.1-flash-lite' });
-export const COMPARISON_SETTINGS = Object.freeze({ temperature: 0, seed: 20261027, maxTokens: 384, keepAlive: -1, reasoningEffort: 'medium', guardMaxTokens: 40 });
-const localModels = new Set(['llama3.1:8b', 'gemma3:4b', 'gemma3:12b']);
-const guards = new Set(['llama-guard3:8b', 'shieldgemma:9b']);
+const executionConfig = JSON.parse(await readFile(new URL('../../config/comparison.json', import.meta.url), 'utf8'));
+export const COMPARISON_SETTINGS = Object.freeze({ temperature: executionConfig.temperature, seed: executionConfig.seed,
+  maxTokens: executionConfig.maxOutputTokens, contextTokens: executionConfig.contextTokens, keepAlive: executionConfig.keepAlive,
+  reasoningEffort: executionConfig.reasoningEffort, guardMaxTokens: executionConfig.guardMaxTokens });
+const localModels = new Set(executionConfig.localModels.map(model => model.modelId));
+const guards = new Set(executionConfig.guards.map(model => model.modelId));
 const sha = text => createHash('sha256').update(text).digest('hex');
 export async function loadPricing() { return JSON.parse(await readFile(new URL('../../config/pricing.yaml', import.meta.url), 'utf8')); }
 export function estimateCloudCost(cloudId, { inputTokens = 0, outputTokens = 0, reasoningTokens = 0 }, pricing) {
@@ -53,7 +56,7 @@ async function ollama(endpoint, body) {
 export async function comparisonLocal(modelId, messages, { maxTokens = COMPARISON_SETTINGS.maxTokens, json = true } = {}) {
   if (!localModels.has(modelId)) throw new Error('Unregistered local comparison model');
   return ollama('chat', { model: modelId, messages, ...(json ? { format: 'json' } : {}),
-    options: { temperature: 0, seed: COMPARISON_SETTINGS.seed, num_predict: maxTokens, num_ctx: 4096 } });
+    options: { temperature: COMPARISON_SETTINGS.temperature, seed: COMPARISON_SETTINGS.seed, num_predict: maxTokens, num_ctx: COMPARISON_SETTINGS.contextTokens } });
 }
 
 // Exact category names from the installed Meta Llama Guard 3 template. Using raw
@@ -79,7 +82,7 @@ export async function comparisonGuard(guardId, input, answer) {
     const prompt = guardId === 'llama-guard3:8b' ? llamaGuardPrompt(input, answer) : null;
     const response = await ollama(prompt ? 'generate' : 'chat', { model: guardId,
       ...(prompt ? { prompt, raw: true } : { messages: [{ role: 'user', content: input }, ...(answer === undefined ? [] : [{ role: 'assistant', content: answer }])] }),
-      options: { temperature: 0, seed: COMPARISON_SETTINGS.seed, num_predict: COMPARISON_SETTINGS.guardMaxTokens, num_ctx: 4096 } });
+      options: { temperature: COMPARISON_SETTINGS.temperature, seed: COMPARISON_SETTINGS.seed, num_predict: COMPARISON_SETTINGS.guardMaxTokens, num_ctx: COMPARISON_SETTINGS.contextTokens } });
     return { ...response, ...parseGuardResponse(guardId, response.text), direction,
       policyProtocol: prompt ? 'Meta Llama Guard 3 User/Agent S1-S14 raw template' : 'Ollama ShieldGemma native template; four Google safety policies; Yes/No verdict',
       policyTemplateHash: prompt ? sha(llamaGuardPrompt('', answer === undefined ? undefined : '')) : null,
@@ -126,7 +129,7 @@ export async function directCloud({ cloudId, item, registry, input, budget, pric
     if (cloudId === 'muse-spark') {
       const clientOptions = { apiKey, baseURL: 'https://api.meta.ai/v1', maxRetries: 0, timeout: 120000 };
       const client = dependencies.createMetaClient?.(clientOptions) ?? new OpenAI(clientOptions);
-      const response = await client.responses.create({ model: CLOUD_MODELS[cloudId], input, temperature: 0,
+      const response = await client.responses.create({ model: CLOUD_MODELS[cloudId], input, temperature: COMPARISON_SETTINGS.temperature,
         reasoning: { effort: COMPARISON_SETTINGS.reasoningEffort }, max_output_tokens: maxTokens });
       text = response.output_text ?? ''; responseId = response.id; modelVersion = response.model ?? CLOUD_MODELS[cloudId];
       tokens = { input: response.usage?.input_tokens, output: response.usage?.output_tokens,
@@ -136,7 +139,7 @@ export async function directCloud({ cloudId, item, registry, input, budget, pric
       const response = await (dependencies.fetch ?? fetch)(`https://generativelanguage.googleapis.com/v1beta/models/${CLOUD_MODELS[cloudId]}:generateContent`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: input }] }], generationConfig: {
-          temperature: 0, seed: COMPARISON_SETTINGS.seed, maxOutputTokens: maxTokens, thinkingConfig: { thinkingLevel: 'MEDIUM', includeThoughts: false },
+          temperature: COMPARISON_SETTINGS.temperature, seed: COMPARISON_SETTINGS.seed, maxOutputTokens: maxTokens, thinkingConfig: { thinkingLevel: COMPARISON_SETTINGS.reasoningEffort.toUpperCase(), includeThoughts: false },
         } }), signal: AbortSignal.timeout(120000) });
       if (!response.ok) { const error = new Error(`Gemini returned HTTP ${response.status}`); error.status = response.status; throw error; }
       const body = await response.json();

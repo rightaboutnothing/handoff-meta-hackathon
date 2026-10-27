@@ -6,6 +6,8 @@
   "maxOutputTokens": 384,
   "contextTokens": 4096,
   "keepAlive": -1,
+  "reasoningEffort": "medium",
+  "guardMaxTokens": 40,
   "topK": 4,
   "cloudMaxChunks": 4,
   "cloudContextMaxTokens": 1400,

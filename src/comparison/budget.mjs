@@ -1,6 +1,7 @@
 import { mkdir, open, readFile, rename, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { acquireRunLock } from './run-lock.mjs';
 
 export class CloudBudgetError extends Error {
   constructor(message) { super(message); this.code = 'CLOUD_BUDGET_EXHAUSTED'; }
@@ -26,15 +27,7 @@ export function createCloudBudget({ directory, capUsd = Number(process.env.CLOUD
   const lock = `${file}.lock`;
   async function transaction(fn) {
     await mkdir(directory, { recursive: true });
-    let handle;
-    for (let attempt = 0; attempt < 300; attempt++) {
-      try { handle = await open(lock, 'wx'); break; }
-      catch (error) {
-        if (error.code !== 'EEXIST') throw error;
-        await new Promise(resolve => setTimeout(resolve, 20));
-      }
-    }
-    if (!handle) throw new CloudBudgetError('Budget checkpoint lock is busy; no cloud request dispatched');
+    const release = await acquireRunLock(lock, { attempts: 300, delayMs: 20 }).catch(() => { throw new CloudBudgetError('Budget checkpoint lock is busy; no cloud request dispatched'); });
     try {
       let state;
       try { state = JSON.parse(await readFile(file, 'utf8')); }
@@ -47,7 +40,7 @@ export function createCloudBudget({ directory, capUsd = Number(process.env.CLOUD
       finally { await output.close(); }
       await rename(temporary, file);
       return result;
-    } finally { await handle.close(); await unlink(lock); }
+    } finally { await release(); }
   }
   return {
     async reserve({ requestId = randomUUID(), cloudId, upperBoundUsd }) {

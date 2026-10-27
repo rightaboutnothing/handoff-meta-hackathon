@@ -189,7 +189,7 @@ async function inspectLedger(directory, { verifyPayloads = true, requireHead = t
   return { valid: breaks.length === 0, total: entries.length, verifiedSignatures, chained, legacyUnchained, legacyPrefixAnchored: legacyUnchained > 0 && chained > 0 && headVerified, payloadsVerified, payloadsMissing, headVerified, lastEntryHash: previousEntryHash, breaks, details, entries, expectedHead };
 }
 
-async function recoverPending(directory) {
+export async function recoverPending(directory) {
   const pendingFile = path.join(directory, "receipt-pending.json"), pending = await optionalJson(pendingFile);
   if (!pending) return;
   if (!await verifyReceipt(pending.head, { dataDir: directory }) || sha256(pending.line) !== pending.lineHash) throw new Error("Receipt recovery journal failed verification");
