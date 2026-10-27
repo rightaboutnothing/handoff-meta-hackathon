@@ -1,1 +1,2 @@
 demo_data/** text eol=lf
+results/*.json text eol=lf
