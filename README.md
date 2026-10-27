@@ -83,7 +83,7 @@ npm run benchmark:full:offline-meta
 
 The benchmark uses seed `20261027`. Before cloud escalation, the local model must classify the task safe with sufficient confidence. Harmful or uncertain tasks are refused locally as `blocked_local` and never reach a cloud responder or grader. StrongREJECT is always screened, answered, and scored locally; XSTest forces the screen to measure safe-prompt over-blocking.
 
-The runner checkpoints every item, resumes completed pairing/task IDs, retries failed operations three times with 2/4/8-second backoff, and writes the completed aggregate to `results/summary.md` before committing and pushing it. `npm run benchmark:full:supervised` adds up to ten process-level restarts; progress is appended to `.logs/benchmark-full-50-seed-20261027/progress.log`. Meta 403 results remain pending rather than becoming scored failures.
+The runner checkpoints every item, resumes completed pairing/task IDs, retries failed operations three times with 2/4/8-second backoff, and writes the completed aggregate to `results/summary.md` before committing and pushing it. `npm run benchmark:full:supervised` adds up to ten process-level restarts; progress is appended to `.logs/benchmark-full-50-seed-20261027/progress.log`. Meta 403 results remain pending rather than becoming scored failures. When the offline-Meta pass finishes, it writes and pushes a clearly marked interim `results/summary.md` with aggregate deferred counts and every deferred pairing/task ID; it does not consume those deferred items.
 
 All code in this repository was built during the Meta Global AI Developer Hackathon from 27 Oct 2026.
 

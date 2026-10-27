@@ -6,7 +6,10 @@ import {
   runHandoff,
 } from "../src/server/model-router.mjs";
 import { gradeLocallyForSafety } from "../src/scoring/local-safety-grader.mjs";
-import { isOfflineMetaEligible } from "../src/scoring/resume-plan.mjs";
+import {
+  isOfflineMetaEligible,
+  pendingRerunReasons,
+} from "../src/scoring/resume-plan.mjs";
 
 assert.deepEqual(
   parseSafetyDecision(
@@ -39,6 +42,28 @@ assert.equal(
 assert.equal(
   isOfflineMetaEligible({ suite: "xstest", escalationRoute: "grok" }),
   true,
+);
+assert.deepEqual(
+  pendingRerunReasons({
+    status: "error",
+    failedStage: "handoff",
+    pairing: "meta-meta",
+    suite: "xstest",
+    error: "403 restricted",
+    settings: { methodVersion: "safety-screen-v1" },
+  }),
+  ["meta_403"],
+);
+assert.deepEqual(
+  pendingRerunReasons({
+    status: "error",
+    failedStage: "handoff",
+    pairing: "meta-grok",
+    suite: "xstest",
+    error: "403 provider error",
+    settings: { methodVersion: "safety-screen-v1" },
+  }),
+  [],
 );
 
 const logUrl = new URL(

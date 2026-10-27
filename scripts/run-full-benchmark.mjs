@@ -262,7 +262,60 @@ function renderCommittedSummary(summaries, allResults, totalJobs) {
   ].join("\n");
 }
 
-async function commitAndPushSummary() {
+function renderInterimSummary(summaries, effectiveResults, totalJobs, deferred) {
+  const errors = effectiveResults.filter(
+    (result) => result.status === "error",
+  ).length;
+  const deferredGroups = new Map();
+  for (const item of deferred) {
+    const key = `${item.pairing}|${item.suite}`;
+    deferredGroups.set(key, (deferredGroups.get(key) ?? 0) + 1);
+  }
+  const deferredTable = [
+    "| Pairing | Suite | Deferred |",
+    "| --- | --- | ---: |",
+    ...[...deferredGroups.entries()].map(([key, count]) => {
+      const [pairing, suite] = key.split("|");
+      return `| ${HANDOFF_PAIRINGS[pairing].name} (\`${pairing}\`) | ${suite} | ${count} |`;
+    }),
+  ];
+  const exactDeferred = deferred.map(
+    (item) => `- \`${item.pairing}|${item.taskId}\` (${item.suite})`,
+  );
+
+  return [
+    "# Handoff benchmark — INTERIM offline-Meta results",
+    "",
+    "> **INTERIM:** Meta access is not restored. This report covers the completed offline-Meta pass and is not the final six-suite benchmark.",
+    "",
+    `Generated: ${new Date().toISOString()}`,
+    "",
+    `Seed: \`${SEED}\`. Effective results: ${effectiveResults.length}/${totalJobs}. Deferred Meta items: ${deferred.length}. Terminal item errors after retries: ${errors}.`,
+    "",
+    "This execution made zero Meta calls by construction: non-StrongREJECT Finkd/Gemmuse work was ineligible, and StrongREJECT was screened, answered, and graded locally.",
+    "",
+    "GPQA question text remained in Git-ignored local cache and is not included here.",
+    "",
+    "## Interim metrics",
+    "",
+    renderSummaryTable(summaries),
+    "",
+    "## Deferred until Meta access is confirmed restored",
+    "",
+    ...deferredTable,
+    "",
+    `<details><summary>Exact deferred pairing/task IDs (${deferred.length})</summary>`,
+    "",
+    ...exactDeferred,
+    "",
+    "</details>",
+    "",
+    "Total cost includes Handoff and applicable grader calls. Warm-up latency is excluded. Canary payload/output values are preserved as measured.",
+    "",
+  ].join("\n");
+}
+
+async function commitAndPushSummary(commitMessage) {
   await execFileAsync("git", ["add", "--", "results/summary.md"], {
     cwd: repositoryDirectory,
   });
@@ -280,7 +333,7 @@ async function commitAndPushSummary() {
   if (hasChanges) {
     await execFileAsync(
       "git",
-      ["commit", "-m", "Add full six-suite benchmark results"],
+      ["commit", "-m", commitMessage],
       { cwd: repositoryDirectory },
     );
   }
@@ -563,6 +616,14 @@ async function runBenchmark() {
   }
 
   const effectiveResults = [...effectiveByKey.values()];
+  const deferredItems = [];
+  for (const pairing of HANDOFF_RUN_ORDER) {
+    for (const task of tasks) {
+      if (!completedKeys.has(jobKey(pairing, task.id))) {
+        deferredItems.push({ pairing, suite: task.suite, taskId: task.id });
+      }
+    }
+  }
   const summaries = summarizeResults(effectiveResults);
   const summary = {
     generatedAt: new Date().toISOString(),
@@ -572,6 +633,7 @@ async function runBenchmark() {
     completedItems: effectiveResults.length,
     executionMode: offlineMeta ? "offline-meta" : "online",
     totalJobs,
+    deferredItems: deferredItems.length,
     summaries,
   };
   await writeFile(localSummaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
@@ -581,6 +643,24 @@ async function runBenchmark() {
   await progress(`\n${renderSummaryTable(summaries)}`);
 
   if (effectiveResults.length < totalJobs) {
+    if (offlineMeta) {
+      await mkdir(new URL("../results/", import.meta.url), { recursive: true });
+      await writeFile(
+        committedSummaryPath,
+        renderInterimSummary(
+          summaries,
+          effectiveResults,
+          totalJobs,
+          deferredItems,
+        ),
+        "utf8",
+      );
+      await progress(
+        `Wrote interim results/summary.md with ${deferredItems.length} exact deferred item IDs; committing and pushing main.`,
+      );
+      await commitAndPushSummary("Add interim offline-Meta benchmark results");
+      await progress("Committed and pushed interim offline-Meta summary to main.");
+    }
     await writeState(
       completedKeys,
       totalJobs,
@@ -599,7 +679,7 @@ async function runBenchmark() {
     "utf8",
   );
   await progress("Wrote results/summary.md; committing and pushing main.");
-  await commitAndPushSummary();
+  await commitAndPushSummary("Add full six-suite benchmark results");
   await progress("Committed and pushed results/summary.md to main.");
   await writeState(completedKeys, totalJobs, "complete");
 }

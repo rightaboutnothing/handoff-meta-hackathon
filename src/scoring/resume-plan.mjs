@@ -12,7 +12,12 @@ export function pendingRerunReasons(result) {
   const reasons = [];
   const isLegacy = result.settings?.methodVersion !== SAFETY_METHOD_VERSION;
 
-  if (result.status === "error" && /\b403\b/.test(String(result.error ?? ""))) {
+  const isMetaHandoff403 =
+    result.status === "error" &&
+    result.failedStage === "handoff" &&
+    ["meta-meta", "gemma-meta"].includes(result.pairing) &&
+    /\b403\b/.test(String(result.error ?? ""));
+  if (isMetaHandoff403) {
     reasons.push("meta_403");
   }
   if (isLegacy && result.suite === "strongreject") {
