@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { appendReceipt, recordOutboundPayload, sha256, signReceipt, verifyReceipt, verifyReceiptChain } from '../src/rag/receipts.mjs';
 import { createPrivacyVault } from '../src/rag/privacy.mjs';
 import { countSeededPii, privacySentinels, runRoundFour } from '../src/evaluation/round-four.mjs';
-import { runRoundFive } from '../src/evaluation/round-five.mjs';
+import { discoverReceiptLedgers, runRoundFive } from '../src/evaluation/round-five.mjs';
 
 async function workspace(t) {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'handoff-chain-test-'));
@@ -83,6 +83,15 @@ test('concurrent appends serialize rather than losing links', async t => {
   await Promise.all(receipts.map(receipt => appendReceipt(receipt, { dataDir })));
   const report = await verifyReceiptChain({ dataDir });
   assert.equal(report.valid, true); assert.equal(report.total, 3);
+});
+
+test('the full audit discovers a signed head even when its entire ledger file was deleted', async t => {
+  const dataDir = await workspace(t);
+  await appendReceipt(await simple('one', dataDir), { dataDir });
+  await unlink(path.join(dataDir, 'receipts.jsonl'));
+  assert.deepEqual(await discoverReceiptLedgers(dataDir), [dataDir]);
+  const report = await verifyReceiptChain({ dataDir });
+  assert.equal(report.valid, false); assert.ok(report.breaks.some(broken => broken.code === 'head_mismatch_or_truncation'));
 });
 
 test('a signed interrupted append is recovered before the next append, preserving completed entries', async t => {

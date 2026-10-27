@@ -10,7 +10,7 @@ export async function discoverReceiptLedgers(dataDir) {
   async function visit(directory, depth) {
     let entries;
     try { entries = await readdir(directory, { withFileTypes: true }); } catch (error) { if (error.code === 'ENOENT') return; throw error; }
-    if (entries.some(entry => entry.isFile() && entry.name === 'receipts.jsonl')) found.push(directory);
+    if (entries.some(entry => entry.isFile() && ['receipts.jsonl', 'receipt-head.json', 'receipt-pending.json'].includes(entry.name))) found.push(directory);
     if (depth < 8) for (const entry of entries) if (entry.isDirectory() && !['keys', 'payloads', 'privacy-demo', 'node_modules'].includes(entry.name)) await visit(path.join(directory, entry.name), depth + 1);
   }
   await visit(path.resolve(dataDir), 0);

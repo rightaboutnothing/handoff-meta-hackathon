@@ -149,7 +149,7 @@ export async function runRoundFour({ runId, timestamp = new Date().toISOString()
     privacyCheckPassed: payloads.length > 0 && payloads.length === receipts.length && receipts.every(item => item.receiptVerified && item.payloadHashVerified) && items.every(item => item.rawPiiLeaks === 0 && item.recognizedResidualPii.length === 0 && item.status !== 'error'),
   };
   const result = { round: 4, name: 'Seeded synthetic PII boundary test', runId, timestamp, completedAt: new Date().toISOString(),
-    status: summary.errors ? 'completed_with_errors' : summary.privacyCheckPassed ? 'completed_offline' : 'incomplete_privacy_coverage',
+    status: summary.errors ? 'completed_with_errors' : summary.rawPiiLeaks || summary.recognizedResidualPiiFindings ? 'privacy_leak_detected' : summary.privacyCheckPassed ? 'completed_offline' : 'incomplete_privacy_coverage',
     method: { ...method, fingerprint, warmUp: warm, index: { files: index.files, chunks: index.chunks, embeddingModel: index.embeddingModel, piiItemsRedacted: index.piiItemsRedacted, indexFingerprint: index.indexFingerprint } }, summary, items,
     network, ledgerRelativePath: path.relative(path.join(root, '.handoff'), dataDir).split(path.sep).join('/'),
     limitations: ['Only synthetic fake contacts were seeded. No real company data was used.', 'Offline mode verifies proposed redacted inputs against signed receipts. No request reached Meta, so cloud-delivered privacy verification is deferred.', 'Locally restored PII may appear in a local answer by design and is not a cloud leak.', 'Rules-based residual detection and known seeded-string checks do not establish universal anonymization.'],
