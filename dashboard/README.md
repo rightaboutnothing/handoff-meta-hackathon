@@ -13,7 +13,7 @@ npm run dashboard
 
 The dashboard opens at `http://127.0.0.1:4173`.
 
-The cloud character follows the selected pairing: Muse Spark for Finkd and Gemmuse, Grok 4.7 for Llamarok and Gemmok. The raw model IDs remain visible in the results and technical view.
+The current Ask flow uses local Llama, Llama Guard and **Muse Spark**. The current Benchmarks view compares every Meta/Google pipeline and local, cloud and Guard OFF controls independently. Earlier Grok results appear only under **Historical (retired)**; they are read-only evidence.
 
 ## Modes
 
@@ -26,6 +26,10 @@ The cloud character follows the selected pairing: Muse Spark for Finkd and Gemmu
 
 `scripts/sync-results.mjs` reads the committed `results/summary.md` and creates `public/benchmark-data.json` before development and production builds. Protected benchmark prompts are never read into dashboard data.
 
+The comparison views read `GET /api/company/comparison`. The server follows the confined `results/comparison-latest.json` pointer to `results/<directory>/report.json`, verifies its optional SHA256, and exposes sanitized aggregates only. No benchmark prompt, answer or source cache is returned. Without a published run, the comparison shows **Pending**. Tier 0 local measurements and assumed token costs remain separate from pending cloud quality and response latency.
+
+Savings lets you select a recorded pipeline and monthly query volume; prices and output/reasoning allowances are labelled assumptions. Benchmarks shows source-group confidence intervals, per-category measurements, calibration diagnostics and separate parameter-count plots for each local-only model. Model sizes are never averaged. An unchanged historical snapshot is not rewritten during builds.
+
 ## Checks
 
 ```powershell
@@ -33,6 +37,8 @@ npm run dashboard:check
 ```
 
 This compiles the production build and checks the bundle for API-key patterns, environment secret values, canary strings, GPQA question text, and StrongREJECT prompt text.
+
+It also checks missing-data rendering, comparison cost/metric bindings, retired-result isolation, confined report paths, hash integrity and aggregate sanitization without making model calls.
 
 ## Visual verification
 

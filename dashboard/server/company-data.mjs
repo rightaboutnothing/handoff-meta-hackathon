@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { readGatewayResults, sanitizePublicResult } from '../../src/evaluation/publish-results.mjs';
 import { runRoundFive } from '../../src/evaluation/round-five.mjs';
 import { readOutboundPayload, verifyReceiptPayload, verifyReceiptChain } from '../../src/rag/receipts.mjs';
+import { readComparisonResults } from './comparison-results.mjs';
 
 const repoRoot = fileURLToPath(new URL('../../', import.meta.url));
 const dataDir = path.join(repoRoot, '.handoff');
@@ -27,6 +28,7 @@ export function createCompanyMiddleware() {
     if (origin && !['http://127.0.0.1:4173', 'http://localhost:4173'].includes(origin)) return json(res, 403, { error: 'Local dashboard origin required' });
     try {
       if (req.url === '/api/company/results' && req.method === 'GET') return json(res, 200, await readGatewayResults());
+      if (req.url === '/api/company/comparison' && req.method === 'GET') return json(res, 200, await readComparisonResults());
       if (req.url === '/api/company/status' && req.method === 'GET') return json(res, 200, { index: await getIndexStatus({ dataDir }), metaAccess: metaAccessEnabled() ? 'live' : 'paused', models: { local: ragConfig.localModel, guard: ragConfig.guardModel, cloud: ragConfig.cloudModel }, pricing: JSON.parse(await readFile(new URL('../../config/rag-pricing.json', import.meta.url), 'utf8')) });
       if (req.method !== 'POST') return json(res, 405, { error: 'POST required' });
       if (busy) return json(res, 409, { error: 'A local ingest or question is already running' });

@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { useMotionPreference } from '../hooks/useMotionPreference';
 import { formatCount, formatLatency, formatMoney, formatPercent, getRound, type GatewayResults, type RoundOneArm } from '../gatewayTypes';
 import './GatewayBenchmarks.css';
+import { ComparisonBenchmarks } from './ComparisonBenchmarks';
+import type { ComparisonReport } from '../comparisonTypes';
 
 const suiteNames: Record<string, string> = {
   ifeval: 'IFEval', gpqa: 'GPQA', 'mmlu-pro': 'MMLU-Pro', strongreject: 'StrongREJECT', xstest: 'XSTest', 'ad-privacy': 'Ad privacy',
@@ -10,7 +12,7 @@ const cloudLabel = (model: string) => model === 'muse-spark-1.3' ? 'Muse Spark' 
 const percentagePoints = (value: number | null | undefined) => value == null || !Number.isFinite(value) ? 'Pending' : `${value > 0 ? '+' : ''}${value.toFixed(1)} pp`;
 const guardCalls = (arm: RoundOneArm | undefined) => arm ? Object.entries(arm.steps).filter(([key]) => key.toLowerCase().includes('guard')).reduce((total, [, step]) => total + step.count, 0) : null;
 
-export function GatewayBenchmarks({ data }: { data: GatewayResults | null }) {
+export function GatewayBenchmarks({ data, comparison = null }: { data: GatewayResults | null; comparison?: ComparisonReport | null }) {
   const reduced = useMotionPreference();
   const roundOne = getRound(data, 1), roundTwo = getRound(data, 2);
   const withGuard = roundOne?.summary.withGuard, withoutGuard = roundOne?.summary.withoutGuard;
@@ -23,6 +25,8 @@ export function GatewayBenchmarks({ data }: { data: GatewayResults | null }) {
   const enter = { initial: { opacity: 0, y: reduced ? 0 : 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: reduced ? 0 : 0.35 } };
 
   return <div className="gb-view">
+    <ComparisonBenchmarks report={comparison}/>
+    <details className="cmp-legacy"><summary>Earlier gateway testing rounds and historical evidence</summary>
     <motion.header className="gb-heading" {...enter}>
       <span className="gb-eyebrow">Benchmarks</span>
       <h1>Why Finkd is the private pipeline.</h1>
@@ -50,11 +54,12 @@ export function GatewayBenchmarks({ data }: { data: GatewayResults | null }) {
     </section>
 
     <section className="gb-history" aria-labelledby="gb-history-title">
-      <div className="gb-section-heading"><div><span className="gb-eyebrow">Historical pairings · interim coverage</span><h2 id="gb-history-title">The other paths we measured.</h2></div><span className="gb-source-state">{historical ? `${formatCount(historical.progress.completed)} / ${formatCount(historical.progress.total)} results` : 'Pending'}</span></div>
+      <div className="gb-section-heading"><div><span className="gb-eyebrow">Historical pairings · interim coverage</span><h2 id="gb-history-title">Historical (retired)</h2></div><span className="gb-source-state">{historical ? `${formatCount(historical.progress.completed)} / ${formatCount(historical.progress.total)} results` : 'Pending'}</span></div>
+      <p className="gb-measurement-note">This earlier four-pairing experiment is read-only. Llamarok and Gemmok used Grok, which is retired. Live comparisons above use direct Meta and Google APIs.</p>
       <p className="gb-history-warning">{historical?.coverage.warning ?? 'Historical pairing results are pending. The comparison will appear after the saved benchmark reference is available.'}</p>
       <div className="gb-table-scroll"><table className="gb-table gb-pairing-table"><caption className="gb-sr-only">Historical pairings with unequal benchmark coverage, not a fair ranking</caption><thead><tr><th scope="col">Pairing</th><th scope="col">Available-suite mean</th><th scope="col">Suite coverage</th><th scope="col">Handoff</th><th scope="col">Median latency</th><th scope="col">Recorded total cost</th></tr></thead><tbody>{pairings.length ? pairings.map(pairing => {
         const coverage = historical?.coverage.pairings.find(item => item.id === pairing.id);
-        return <tr key={pairing.id} className={pairing.id === 'meta-meta' ? 'gb-selected' : ''}><th scope="row"><span>{pairing.name}{pairing.id === 'meta-meta' && <i>Current pipeline</i>}</span><small>{pairing.localModel} <b>→</b> {cloudLabel(pairing.cloudModel)}</small></th><td>{formatPercent(pairing.accuracy / 100)}</td><td>{coverage ? `${formatCount(coverage.completedSuites.length)} / ${formatCount(coverage.completedSuites.length + coverage.missingSuites.length)}` : 'Pending'}<small>{coverage?.missingSuites.length ? `Pending: ${coverage.missingSuites.map(suite => suiteNames[suite] ?? suite).join(', ')}` : coverage ? 'All saved suites represented' : 'Coverage pending'}</small></td><td>{formatPercent(pairing.handoffRate / 100)}</td><td><span>{formatLatency(pairing.medianLatencyMs)}</span><div className="gb-latency-track" aria-hidden="true"><i style={{ width: maxHistoricalLatency > 0 ? `${pairing.medianLatencyMs / maxHistoricalLatency * 100}%` : '0%' }} /></div></td><td>{formatMoney(pairing.costUsd, 4)}</td></tr>;
+        return <tr key={pairing.id} className={pairing.id === 'meta-meta' ? 'gb-selected' : ''}><th scope="row"><span>{pairing.name}</span><small>{pairing.localModel} <b>→</b> {cloudLabel(pairing.cloudModel)}</small></th><td>{formatPercent(pairing.accuracy / 100)}</td><td>{coverage ? `${formatCount(coverage.completedSuites.length)} / ${formatCount(coverage.completedSuites.length + coverage.missingSuites.length)}` : 'Pending'}<small>{coverage?.missingSuites.length ? `Pending: ${coverage.missingSuites.map(suite => suiteNames[suite] ?? suite).join(', ')}` : coverage ? 'All saved suites represented' : 'Coverage pending'}</small></td><td>{formatPercent(pairing.handoffRate / 100)}</td><td><span>{formatLatency(pairing.medianLatencyMs)}</span><div className="gb-latency-track" aria-hidden="true"><i style={{ width: maxHistoricalLatency > 0 ? `${pairing.medianLatencyMs / maxHistoricalLatency * 100}%` : '0%' }} /></div></td><td>{formatMoney(pairing.costUsd, 4)}</td></tr>;
       }) : <tr><td colSpan={6} className="gb-pending">Pending historical pairing results</td></tr>}</tbody></table></div>
       <p className="gb-measurement-note">The mean uses only the available suite scores. A high score with missing suites does not imply better overall accuracy. Recorded total cost covers each saved slice, not a matched per-question cost. Bar lengths show saved medians; unequal coverage prevents a fair ranking.</p>
 
@@ -63,5 +68,6 @@ export function GatewayBenchmarks({ data }: { data: GatewayResults | null }) {
     </section>
 
     <footer className="gb-provenance"><span>Read from saved results JSON</span><code>{data?.manifest?.runId ?? 'Pending run'}</code>{data?.manifest?.sourceCommit && <span>Source commit <code>{data.manifest.sourceCommit.slice(0, 7)}</code></span>}</footer>
+    </details>
   </div>;
 }

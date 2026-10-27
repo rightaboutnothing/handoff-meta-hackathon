@@ -89,5 +89,10 @@ const payload = {
 };
 
 await mkdir(path.dirname(outputPath), { recursive: true });
-await writeFile(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
-console.log(`Synced ${pairings.length} pairings from results/summary.md`);
+let unchanged = false;
+try {
+  const previous = JSON.parse(await readFile(outputPath, 'utf8'));
+  unchanged = JSON.stringify({ ...previous, generatedAt: null }) === JSON.stringify({ ...payload, generatedAt: null });
+} catch (error) { if (error.code !== 'ENOENT') throw error; }
+if (!unchanged) await writeFile(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+console.log(unchanged ? 'Historical pairing snapshot unchanged; kept read-only.' : `Synced ${pairings.length} pairings from results/summary.md`);

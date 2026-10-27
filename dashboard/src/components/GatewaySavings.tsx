@@ -3,10 +3,15 @@ import { motion } from 'framer-motion';
 import { useMotionPreference } from '../hooks/useMotionPreference';
 import { getRound, formatCount, formatLatency, formatMoney, formatPercent, type GatewayResults } from '../gatewayTypes';
 import './GatewaySavings.css';
+import { ComparisonSavings } from './ComparisonSavings';
+import type { ComparisonReport } from '../comparisonTypes';
 
 const usable = (value: number | null | undefined): value is number => typeof value === 'number' && Number.isFinite(value);
 
-export function GatewaySavings({ data }: { data: GatewayResults | null }) {
+export function GatewaySavings({ data, comparison = null }: { data: GatewayResults | null; comparison?: ComparisonReport | null }) {
+  return <><ComparisonSavings report={comparison}/><details className="cmp-legacy"><summary>Earlier company-data cost evidence</summary><LegacySavings data={data}/></details></>;
+}
+function LegacySavings({ data }: { data: GatewayResults | null }) {
   const round = getRound(data, 2);
   const measured = round?.summary;
   const pricing = data?.pricing;

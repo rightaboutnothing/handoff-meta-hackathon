@@ -57,6 +57,7 @@ try {
 const protectedFiles = [
   path.join(repoRoot, "tasks", "strongreject.jsonl"),
   path.join(repoRoot, ".cache", "gpqa.jsonl"),
+  path.join(repoRoot, ".cache", "comparison", "gpqa-diamond.jsonl"),
 ];
 
 for (const source of protectedFiles) {
