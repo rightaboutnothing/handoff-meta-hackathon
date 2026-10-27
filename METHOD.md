@@ -1,6 +1,110 @@
 # Handoff benchmark method
 
-This document records the benchmark procedure used to compare Handoff pairings. The goal is to measure the same routing workload fairly across local and cloud combinations without hiding model-loading or network assumptions.
+The current method is the Meta versus Google comparison below. Earlier sections are retained after it as historical evidence and do not authorize new calls to retired Grok or OpenRouter routes. The goal is to compare the same private-gateway workload fairly without hiding model size, loading, missing cloud answers or pricing assumptions.
+
+## Meta versus Google comparison harness
+
+The versioned contract is [`config/comparison.json`](config/comparison.json), the complete sampling contract is [`tasks/comparison/manifest.json`](tasks/comparison/manifest.json), and planning rates are [`config/pricing.yaml`](config/pricing.yaml). All use seed **20261027**. Comparison result JSON and the summary belong under `results/<timestamp>/`; [`results/comparison-latest.json`](results/comparison-latest.json) selects `report.json` and `summary.md`. New comparison results are **pending** until the measured run finishes. Historical Finkd's **1.3s median / 29.6% handoff** remains a descriptive baseline from different tasks and safety settings, not a matched control.
+
+### Registered models and 23 pipelines
+
+Only local Ollama and the direct Meta and Google endpoints are used. Keys are loaded server-side from the project `.env`: `MODEL_API_KEY` and `GEMINI_API_KEY`. No OpenRouter client or cloud grader participates. Embeddings use local `nomic-embed-text:v1.5`. Ollama model IDs are supplemented with installed digest/version evidence at run time.
+
+| Pipeline ID | Local model | Local Guard | Cloud model |
+| --- | --- | --- | --- |
+| `gemma4b+llamaguard+musespark` | `gemma3:4b` | `llama-guard3:8b` | `muse-spark-1.3` |
+| `gemma4b+llamaguard+gemini` | `gemma3:4b` | `llama-guard3:8b` | `gemini-3.1-flash-lite` |
+| `gemma4b+shieldgemma+musespark` | `gemma3:4b` | `shieldgemma:9b` | `muse-spark-1.3` |
+| `gemma4b+shieldgemma+gemini` | `gemma3:4b` | `shieldgemma:9b` | `gemini-3.1-flash-lite` |
+| **`llama8b+llamaguard+musespark` (Finkd)** | `llama3.1:8b` | `llama-guard3:8b` | `muse-spark-1.3` |
+| `llama8b+llamaguard+gemini` | `llama3.1:8b` | `llama-guard3:8b` | `gemini-3.1-flash-lite` |
+| `llama8b+shieldgemma+musespark` | `llama3.1:8b` | `shieldgemma:9b` | `muse-spark-1.3` |
+| `llama8b+shieldgemma+gemini` | `llama3.1:8b` | `shieldgemma:9b` | `gemini-3.1-flash-lite` |
+| `gemma12b+llamaguard+musespark` | `gemma3:12b` | `llama-guard3:8b` | `muse-spark-1.3` |
+| `gemma12b+llamaguard+gemini` | `gemma3:12b` | `llama-guard3:8b` | `gemini-3.1-flash-lite` |
+| `gemma12b+shieldgemma+musespark` | `gemma3:12b` | `shieldgemma:9b` | `muse-spark-1.3` |
+| `gemma12b+shieldgemma+gemini` | `gemma3:12b` | `shieldgemma:9b` | `gemini-3.1-flash-lite` |
+
+There are eleven additional controls: `gemma4b+local-only`, `llama8b+local-only`, `gemma12b+local-only`; `cloud-only+musespark` and `cloud-only+gemini`; and all six `<local>+guard-off+<cloud>` combinations. Cloud-only and Guard OFF controls accept trusted safe items only. A local-only control returns its local answer for scoring even when its confidence would have requested escalation. No guard or local generation is invented for controls that omit that component.
+
+Llama 8B is bracketed by Gemma 4B and Gemma 12B. Every pipeline and category is reported separately; different parameter counts are never averaged into a model-family score. Size-versus-score and size-versus-latency charts use the recorded 4B, 8B and 12B counts. Cross-provider pairs remain visible. Historical Llamarok and Gemmok results are read-only in the dashboard's **Historical (retired)** section, outside the live comparison matrix.
+
+Muse Spark uses the official OpenAI SDK, `https://api.meta.ai/v1`, `responses.create`, explicit `apiKey`, `muse-spark-1.3`, and `output_text`. Gemini calls `generativelanguage.googleapis.com` directly with the exact ID `gemini-3.1-flash-lite`. This Gemini pin preserves the requested temperature setting: newer Gemini 3.5 Flash-Lite and Gemini 3.6+ ignore temperature. Sources: [Gemini 3.1 Flash-Lite model](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite), [generation API](https://ai.google.dev/api/generate-content), and [sampling changes](https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.6). This is a comparison of the pinned versions, not a claim about every current Google model.
+
+### Dataset, provenance and fixed splits
+
+The committed manifest contains **7,743 items**: 4,000 MMLU-Pro, 541 IFEval, 198 GPQA IDs, 250 safe XSTest, 1,000 synthetic ad exports, 1,644 synthetic company questions, 50 StrongREJECT, 30 local red-team and 30 local poisoning probes. Categories are reasoning, knowledge, instruction-following, safety-boundary, privacy, company-data single-doc and company-data multi-doc. MMLU-Pro subject metadata determines reasoning versus knowledge tags. Potentially harmful instruction-following cases are explicitly local-only.
+
+Source revisions, licences, corpus file hashes and item IDs are committed. GPQA rows are IDs and fetch references only. Accepted gated text is hydrated under ignored `.cache/comparison/`; missing content is marked unavailable rather than replaced by a made-up question. Neither reports nor dashboard bundles contain GPQA question text. Existing gated access and licence obligations still apply.
+
+| Split | Items | Permitted use |
+| --- | ---: | --- |
+| Dev training | 820 | Fit each local model's wrongness classifier and routing threshold |
+| Dev selection pool | 1,613 | Contains the fixed 1,000-item Tier 1 selection core; unused reserve remains dev-only |
+| Held-out test | 5,310 | Tier 2 final reporting; never threshold fitting or pipeline selection |
+| Tier 0 smoke slice | 60 dev-training + 60 test | Identical fixed IDs per local model; diagnostic calibration only |
+
+Source/template groups stay disjoint across dev training, dev selection and test. The same 14-file synthetic company corpus is intentionally available to retrieval in every split, while operation families are held out. Additional company questions vary numerical scenarios and operations; they are parameterized stress tests, not independent new business records or benchmark paraphrases. The expansion targets the earlier **60.1% multi-document fact coverage**, without assuming calibration will solve it. Group-aware intervals and separate multi-document errors expose that limitation.
+
+### Fair prompts, retrieval, model residency and hardware
+
+All answer-producing pipelines use the same question, category-aware formatting instructions, redaction, fixed retrieved context and a **384-token** answer cap. Generation requests **temperature 0**, seed **20261027**, local context **4096**, and `keep_alive: -1`. Both cloud providers request medium reasoning; local Guard output is capped at 40 tokens. Meta Responses has no seed parameter; Google receives the seed but does not promise deterministic output. Providers can interpret reasoning settings differently, so matching labels do not establish equal internal computation.
+
+Retrieval is computed locally once for an item, takes the top four chunks, and applies the same deterministic redacted-context selection and **1,400-token context cap** for local and cloud answers. `cloudMaxChunks: 4` prevents a provider-specific context advantage. Cloud-only uses that same context. This is a comparison-harness setting; the production RAG gateway's separate configuration is preserved. Only the question and these selected chunks can reach a cloud endpoint. Raw dataset exports and the full company corpus cannot.
+
+Warm each local model before its benchmark group and each Guard before its measured component group; record the warm-up separately and exclude its time. Run local model groups in the committed order **Gemma 4B, Llama 8B, Gemma 12B** and retain item/Guard order in the run record. Configure `OLLAMA_KEEP_ALIVE=-1` and restart Ollama. Shared 12GB-class GPU memory can still evict models, so measured per-call load times remain evidence; warm-up does not guarantee residency.
+
+Every run records CPU name and logical cores, RAM, GPU/VRAM and driver when discoverable, OS, Ollama version, installed model digests and actual model IDs/versions. Missing hardware fields stay null. The workstation is described as **SMB-class hardware**; its measured latency is not a universal model speed or a cloud-hosted throughput claim.
+
+### Per-model calibrated handoff
+
+Fit one regularized logistic wrongness classifier for each local model. Its target is whether the local answer fails its deterministic reference/rubric (`score < 1`). Features are available at answer time only: self-confidence, retrieval score, actual retrieved source-document count, citation count and grounding against retrieved chunks, the local `needsCloud` indication, and category indicators. Expected answers, expected source IDs and test labels never enter the features.
+
+Standardization and model fitting use dev-training rows only. Five folds, reduced when there are fewer independent groups, keep source/template groups together. Select the local-acceptance threshold on group-held-out dev predictions: maximize accepted coverage while observed accepted wrong rate is at most 10%. Then refit the classifier on all available dev-training labels. With insufficient groups, accept no local answers until a threshold can be supported. Unsupported scoring labels remain missing; training coverage is reported.
+
+Held-out reporting compares calibrated wrongness with `1 - self-confidence`: AUROC, ten-bin expected calibration error, Brier score, accepted wrong rate and local coverage. A single-class test slice has **null AUROC**, not a guessed 0.5. Multi-document accepted wrong rate and accepted coverage are reported together. Escalating every multi-document item is abstention, not an improvement in answer generation. Test outcomes do not update the classifier or threshold. Tier 0's small slice is a smoke test; it cannot establish a reliable deployment calibration.
+
+### Safety, privacy and receipts
+
+The cloud client itself enforces a category allowlist plus an immutable registry snapshot of trusted item IDs, prompt hashes and safety metadata. An item must be explicitly safe and cloud-eligible, in an allowed category, unmodified from that registry and free of local-only/harmful/red-team/poisoning flags. StrongREJECT, harmful instructions, red-team and poisoning probes are local-only regardless of a Guard's decision. This check also applies to cloud-only and Guard OFF controls. Unit tests fail if any such item can reach a cloud client.
+
+Llama Guard evaluates outbound User and inbound Agent messages with the Meta S1–S14 template. ShieldGemma uses its own native policy/template and Yes/No protocol; the policies are not identical, so differences are measured rather than presented as a shared taxonomy. Only a valid safe verdict passes; malformed or unavailable Guard results fail closed and availability errors remain visible. Outbound-blocked routes are `blocked_local`. Inbound decisions require a real cloud answer and are pending offline.
+
+Recognized PII and canaries are redacted locally before a cloud payload is compiled, and residual private-field patterns are checked again in the cloud client. Logs count PII, outbound and final-output leaks without sanitizing away measured failures. Placeholder restoration happens only locally. Receipt hashes bind the exact selected redacted chunks and compiled input, while signatures and the local chain are verified separately. A prepared/deferred receipt records no actual transmission. Receipts prove integrity relative to the local signing key; they do not independently prove remote delivery, billing, safety or factual correctness.
+
+### Tiered execution, checkpoints and budget
+
+Run the free dry run with `handoff compare --tier 0` or `npm run comparison:tier0`. **Tier 0 dispatches zero cloud requests**, including token-count and grading requests. It uses fixed 60 dev-training plus 60 test IDs per local model, reuses measured local/Guard components across pipelines, and estimates cloud input/output/reasoning tokens. Its per-pipeline latency is a reconstructed sum of measured shared stages, not an independent live pipeline run. Cloud completion latency, cloud answer accuracy and inbound safety are pending. It prints the planning cost table, writes the timestamped report and **stops before Tier 1**.
+
+Tier 1 requires `CLOUD_BUDGET_USD > 0`, runs every eligible pipeline/control on the same **1,000-item dev-selection core**, and measures live cloud work permitted by policy and access status. The 820 dev-training items remain the calibration source. Tier 2 uses only the four highest-ranked eligible hybrid pipelines on the **5,310 held-out test items**. Controls do not compete for the four slots. Tier 0 test diagnostics never tune thresholds or ranking weights.
+
+The predeclared selection formula is:
+
+```text
+0.65 * accuracy
++ 0.20 * (1 - min(costPer1000Usd / 5, 1))
++ 0.15 * (1 - min(medianLatencyMs / 10000, 1))
+```
+
+Only complete hybrid results with at least **95% scoring coverage** and measured latency/cost qualify. Cost uses complete provider-reported actual USD where available, otherwise complete usage-priced metered USD with that source explicitly labeled. Missing cost cannot become a free pipeline. Ties are deterministic by pipeline ID. Per-category accuracy, cost and latency winners are separate point estimates; overlapping confidence intervals do not establish a significant winner. Google wins and Meta wins use the same rule.
+
+Every completed item is checkpointed and a resumed run skips finished pipeline/item IDs. Execution/configuration/dataset fingerprints must match; do not change settings or code during a measured run. Retry eligible failed attempts up to three times with backoff, retain failed-attempt evidence and continue other items; budget exhaustion hard-stops dispatch rather than bypassing the cap. A new cloud attempt needs a new durable reservation.
+
+Before dispatch, the cross-process budget ledger reserves conservative input framing, the maximum answer cap and the configured **65,536-token thinking allowance**. Expected planning tokens use `ceil(characters/4)`, 200 output tokens and 256 reasoning tokens; reservation inputs instead use UTF-8 byte length plus 256 framing tokens. After reported usage, settle at the configured usage-priced amount, or a higher reported monetary charge. Failed attempts with unknown delivery/usage retain their full reservation. The cap covers settled usage-priced spend plus outstanding reservations, using disclosed assumptions; it is not a provider invoice guarantee. SDK automatic retries are disabled so each attempt is visible and reserved. Conservative reservations can stop a run even when expected spend looks smaller.
+
+Meta access remains **paused**. Muse Spark work is routed, redacted and costed as deferred without dispatch. Live Meta requests additionally require the separately confirmed server gates `META_ACCESS_STATUS=live` and `HANDOFF_META_ACCESS_CONFIRMED=true`; neither a positive budget nor enabling Gemini changes those gates. A pipeline with pending Muse Spark completion remains **INCOMPLETE** and is not ranked as if its available local answers represented the whole workload.
+
+### Scoring, uncertainty and cost interpretation
+
+Scoring is deterministic and local: exact leading option for MMLU-Pro/GPQA; required fact strings with explicit alternatives and numeric boundaries for company answers; aggregate campaign identity/spend/conversion/CPA checks with a privacy-leak penalty for synthetic ad tasks; and an explicitly supported verifiable-rule subset for IFEval. Unsupported IFEval language/tokenizer rules stay pending unless another checked constraint definitively fails. This is not the official full IFEval evaluator. Citation precision includes fabricated citations in the denominator, with expected-source recall separate. Recognizable refusal wording and Guard classifications are separate safety indicators, not a semantic proof of harmlessness.
+
+Report every pipeline and category separately: accuracy, fact coverage, citation precision, local-answer/handoff rates, median/p95 latency, Guard latency, tokens sent, provider actual USD, metered USD, cost per 1,000 versus cloud-only, PII counts, outbound/inbound decisions, false refusals, leaks and verified receipts. Missing/deferred/error cloud answers are excluded from scored denominators and their coverage is explicit. A safe prompt blocked locally is a scored failure. Unrun inbound checks remain pending rather than zero. Tier 0 actual transfers/spend are zero; proposed tokens and projected costs remain distinct.
+
+Uncertainty uses a seeded **400-replicate source-group bootstrap** within a pipeline and category, retaining synthetic operation families together. Estimates include 95% percentile intervals, sample/group counts and coverage. Intervals are null when fewer than two independent groups or an undefined statistic prevent estimation. Small slices and repeated synthetic families limit precision; a bootstrap interval cannot turn them into independent company observations. AUROC bootstrap samples with only one class are undefined. Accuracy comparisons with differing coverage cannot be read as fair full-workload rankings.
+
+`config/pricing.yaml` is labeled **illustrative assumptions, not verified invoices**: Muse Spark $2/million input and $6/million output tokens; Gemini $0.30/million input and $2.50/million output tokens; $0.0002/query local allocation. Reasoning-token usage follows each provider's usage schema without double-counting Meta output tokens. Provider-reported monetary cost stays null when absent; Google usage-priced metered cost is never relabeled actual billed USD. Compare each cloud choice with its own matched cloud-only context/workload, label local allocation and projected versus measured cost, and keep missing/deferred outcomes visible. No keys, real company data or GPQA question text enter committed results.
+
+## Historical four-pair latency experiment
 
 ## Task
 

@@ -12,7 +12,12 @@ const option = name => { const i = args.indexOf(name); return i >= 0 ? args[i + 
 const dataDir = path.resolve(option('--data-dir') || '.handoff');
 const offlineMeta = args.includes('--offline-meta') || !args.includes('--live-meta') || !metaAccessEnabled();
 try {
-  if (command === 'ingest') {
+  if (command === 'compare') {
+    const { runComparison } = await import('../src/comparison/runner.mjs');
+    const report = await runComparison({tier:Number(option('--tier')??0),runId:option('--resume')??option('--run-id'),selectionRun:option('--selection-run'),dataDir});
+    console.table(report.costPlan.map(row=>({pipeline:row.pipelineId,handoffs:`${row.plannedHandoffs}/${row.sampleItems}`,assumedUsdPer1000:row.costPer1000Usd?.toFixed(4)??'pending'})));
+    console.log(`Cloud calls: ${report.cloudCalls}. Stopped after Tier ${report.tier}. results/${report.runId}/summary.md`);
+  } else if (command === 'ingest') {
     const folder = args[0];
     if (!folder || folder.startsWith('--')) throw new Error('Usage: handoff ingest <folder> [--data-dir <path>]');
     const result = await ingestFolder(path.resolve(folder), { dataDir, embeddingProvider: args.includes('--embeddings-fallback') ? 'sentence-transformers' : undefined });
