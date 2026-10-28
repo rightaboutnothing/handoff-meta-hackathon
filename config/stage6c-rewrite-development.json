@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "kind": "stage6c-authored-rewrite-development",
+  "seed": 20261029,
+  "fixtureCount": 12,
+  "manifestSha256": "38fd7a5517bc889b57e110c01b45430e81654cad21e9dc2664ea563b056349a8",
+  "iterations": [
+    {
+      "id": "development-v1",
+      "manifestSha256": "38fd7a5517bc889b57e110c01b45430e81654cad21e9dc2664ea563b056349a8",
+      "models": [
+        {
+          "lens": "meta",
+          "modelId": "llama3.2:3b",
+          "n": 12,
+          "usable": 2,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 3,
+          "reasonCounts": {
+            "PRIVATE_VALUE_SURVIVED": 1,
+            "LLM_PRIVATE_DATA_REMAINS": 9,
+            "NOT_GENERAL_QUESTION": 4,
+            "QUESTION_INTENT_LOST": 3
+          }
+        },
+        {
+          "lens": "google",
+          "modelId": "gemma3:4b",
+          "n": 12,
+          "usable": 1,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 2,
+          "reasonCounts": {
+            "LLM_PRIVATE_DATA_REMAINS": 10,
+            "PRIVATE_VALUE_SURVIVED": 2,
+            "NOT_GENERAL_QUESTION": 5,
+            "QUESTION_INTENT_LOST": 2,
+            "QUESTION_HAS_ENTITY_NAME": 2
+          }
+        }
+      ],
+      "network": {
+        "localRequests": 48,
+        "metadataRequests": 0,
+        "modelCalls": 48,
+        "externalRequests": 0,
+        "blockedExternalRequests": 0,
+        "blockedLocalRequests": 0,
+        "byModel": {
+          "llama3.2:3b": 24,
+          "gemma3:4b": 24
+        }
+      }
+    },
+    {
+      "id": "development-v2",
+      "manifestSha256": "38fd7a5517bc889b57e110c01b45430e81654cad21e9dc2664ea563b056349a8",
+      "models": [
+        {
+          "lens": "meta",
+          "modelId": "llama3.2:3b",
+          "n": 12,
+          "usable": 4,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 3,
+          "reasonCounts": {
+            "PRIVACY_LOCAL_INVALID_SPAN": 7,
+            "QUESTION_INTENT_LOST": 3
+          }
+        },
+        {
+          "lens": "google",
+          "modelId": "gemma3:4b",
+          "n": 12,
+          "usable": 8,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 2,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 2,
+            "QUESTION_HAS_ENTITY_NAME": 2
+          }
+        }
+      ],
+      "network": {
+        "localRequests": 48,
+        "metadataRequests": 0,
+        "modelCalls": 48,
+        "externalRequests": 0,
+        "blockedExternalRequests": 0,
+        "blockedLocalRequests": 0,
+        "byModel": {
+          "llama3.2:3b": 24,
+          "gemma3:4b": 24
+        }
+      }
+    },
+    {
+      "id": "development-v3",
+      "manifestSha256": "38fd7a5517bc889b57e110c01b45430e81654cad21e9dc2664ea563b056349a8",
+      "models": [
+        {
+          "lens": "meta",
+          "modelId": "llama3.2:3b",
+          "n": 12,
+          "usable": 9,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 3,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 3
+          }
+        },
+        {
+          "lens": "google",
+          "modelId": "gemma3:4b",
+          "n": 12,
+          "usable": 8,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 4,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 4,
+            "NOT_GENERAL_QUESTION": 1
+          }
+        }
+      ],
+      "network": {
+        "localRequests": 48,
+        "metadataRequests": 0,
+        "modelCalls": 48,
+        "externalRequests": 0,
+        "blockedExternalRequests": 0,
+        "blockedLocalRequests": 0,
+        "byModel": {
+          "llama3.2:3b": 24,
+          "gemma3:4b": 24
+        }
+      }
+    },
+    {
+      "id": "development-v4",
+      "manifestSha256": "38fd7a5517bc889b57e110c01b45430e81654cad21e9dc2664ea563b056349a8",
+      "models": [
+        {
+          "lens": "meta",
+          "modelId": "llama3.2:3b",
+          "n": 12,
+          "usable": 10,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 2,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 2
+          }
+        },
+        {
+          "lens": "google",
+          "modelId": "gemma3:4b",
+          "n": 12,
+          "usable": 9,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 3,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 3,
+            "NOT_GENERAL_QUESTION": 1
+          }
+        }
+      ],
+      "network": {
+        "localRequests": 48,
+        "metadataRequests": 0,
+        "modelCalls": 48,
+        "externalRequests": 0,
+        "blockedExternalRequests": 0,
+        "blockedLocalRequests": 0,
+        "byModel": {
+          "llama3.2:3b": 24,
+          "gemma3:4b": 24
+        }
+      }
+    },
+    {
+      "id": "development-v5-final",
+      "manifestSha256": "38fd7a5517bc889b57e110c01b45430e81654cad21e9dc2664ea563b056349a8",
+      "models": [
+        {
+          "lens": "meta",
+          "modelId": "llama3.2:3b",
+          "n": 12,
+          "usable": 10,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 2,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 2
+          }
+        },
+        {
+          "lens": "google",
+          "modelId": "gemma3:4b",
+          "n": 12,
+          "usable": 9,
+          "plantedNameEmailSurvivors": 0,
+          "intentFailures": 3,
+          "reasonCounts": {
+            "QUESTION_INTENT_LOST": 3,
+            "NOT_GENERAL_QUESTION": 1
+          }
+        }
+      ],
+      "network": {
+        "localRequests": 48,
+        "metadataRequests": 0,
+        "modelCalls": 48,
+        "externalRequests": 0,
+        "blockedExternalRequests": 0,
+        "blockedLocalRequests": 0,
+        "byModel": {
+          "llama3.2:3b": 24,
+          "gemma3:4b": 24
+        }
+      }
+    }
+  ],
+  "frozenEvaluationProbes": 0,
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "sourceSha256": "aa8cc8f927db8c7d38e35c8a459ceabcf7cc1b9924fb0dffaa021ba672c9b683",
+  "privateArtifacts": "STAGE6C_PRIVATE_ROOT/development-v*/; default ../Handoff-private/stage6c",
+  "notes": [
+    "All model development probes used separately authored cases. Prior Stage6b metadata informed the requested failure diagnosis; no frozen522+60 model probes were used for prompt selection or Guard threshold tuning.",
+    "Usability improved by task extraction and neutral role masking, literal-only candidate span extraction that cannot rewrite the question, and independent privacy/operation/topic/format checks.",
+    "Fixed neutral role markers are syntax-validated before being omitted from literal-entity inspection. No unknown marker or private value is excluded.",
+    "Intent checks are lexical heuristics with explicit aliases and constraints, not a semantic-equivalence certificate.",
+    "Survivor yardstick covers authored planted names/emails only, not all possible unseeded PII. Full frozen evaluation remains separate.",
+    "Additional two benign Meta dev pipeline probes investigated marker over-tagging and are retained under development-inspect; no frozen items or attacks were probed."
+  ]
+}

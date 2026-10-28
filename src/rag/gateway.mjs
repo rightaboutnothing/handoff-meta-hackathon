@@ -147,7 +147,7 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
     const privateItem={...cloudItem,content:JSON.stringify({question:question.trim(),evidence:chunks.map(chunk=>({chunkId:chunk.chunkId,text:vault.restore(chunk.text)}))})};
     const boundaryOptions={lens:'meta',dataDir:path.join(dataDir,'question-privacy'),shadowEvaluation:false,dependencies:dependencies.privacyDependencies??{}};
     const privacyBoundary=dependencies.questionBoundary?await dependencies.questionBoundary(privateItem,boundaryOptions):await screenQuestionOnly(await prepareQuestionOnly(privateItem,boundaryOptions),boundaryOptions);
-    metric.questionOnlyBoundary={method:'question-only-layered-privacy-v1',sourceHash:privacyBoundary.sourceHash,questionHash:privacyBoundary.questionHash,status:privacyBoundary.liveEligible?'PASS':privacyBoundary.injectionPending?'PENDING':'BLOCKED',blockedByLayer:privacyBoundary.blockedByLayer??[],stages:privacyBoundary.stages??[],injectionPending:privacyBoundary.injectionPending===true};
+    metric.questionOnlyBoundary={method:'question-only-layered-privacy-v2',sourceHash:privacyBoundary.sourceHash,questionHash:privacyBoundary.questionHash,status:privacyBoundary.liveEligible?'PASS':privacyBoundary.injectionPending?'PENDING':'BLOCKED',blockedByLayer:privacyBoundary.blockedByLayer??[],stages:privacyBoundary.stages??[],injectionPending:privacyBoundary.injectionPending===true};
     if(!privacyBoundary.liveEligible){
       metric.guardBlocks+=1;metric.projectedHandoffCostUsd=0;status='blocked_local';route='blocked_local';citationChunks=[];
       answer=privacyBoundary.injectionPending?'The private question boundary is pending local Prompt Guard weights. Nothing was sent.':'The private question boundary blocked this handoff. Nothing was sent.';
@@ -179,7 +179,7 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
         status = 'deferred_cloud'; answer = 'A safe handoff is needed, but Meta access is paused. The cloud answer is deferred and no request was sent.'; citationChunks = [];
       } else {
         await emit('handed_off', 5, 'Guard approved the redacted handoff to Muse Spark', 'guard', { route: 'cloud' });
-        await emit('thinking', 5, 'Muse Spark is considering the redacted evidence', 'cloud');
+          await emit('thinking', 5, 'Muse Spark is considering the generalized question', 'cloud');
         try {
           // The question trace UUID must never reset a multi-question spend cap.
           // Only operator environment or a trusted server caller selects a run.

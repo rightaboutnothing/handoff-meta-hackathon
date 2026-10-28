@@ -4,7 +4,7 @@ import {mkdtemp,readFile,writeFile,readdir,rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {createQuestionTokenVault} from '../src/privacy/token-vault.mjs';
-import {prepareQuestionOnly,screenQuestionOnly,buildQuestionOnlyPayload,assertQuestionOnlyRelease,rehydratePrepared,rehydrateIncomingAnswer,validateGeneralQuestion,makeInboundContext,prepareIncomingAnswer,finishIncomingAnswer,applyAnswerLocally} from '../src/privacy/question-boundary.mjs';
+import {prepareQuestionOnly,screenQuestionOnly,buildQuestionOnlyPayload,assertQuestionOnlyRelease,rehydratePrepared,rehydrateIncomingAnswer,validateGeneralQuestion,validateQuestionIntent,neutralizePrivateTask,extractPrivateTask,makeInboundContext,prepareIncomingAnswer,finishIncomingAnswer,applyAnswerLocally} from '../src/privacy/question-boundary.mjs';
 import {runPromptGuard,createPromptGuardMailbox} from '../src/privacy/prompt-guard.mjs';
 import {callMuse,screenForCloud} from '../src/server/gateway-models.mjs';
 import {createCloudPolicyRegistry} from '../src/comparison/policy.mjs';
@@ -142,8 +142,8 @@ test('application permits bind private mappings and the exact local restoration 
   for(const mutate of [prep=>{prep.privateValues.push({type:'PRIVATE',value:'a changed local value'});},prep=>{prep.vault.restore=text=>text;}]){const dependencies=privacyDependencies(),prep=await prepared(t),checked=await finishIncomingAnswer(await prepareIncomingAnswer(prep,'A general explanation.',{dependencies}),{dependencies});mutate(prep);await assert.rejects(applyAnswerLocally(prep,checked,{dependencies}),{code:'CHECKED_LOCAL_APPLICATION_REQUIRED'});}
 });
 
-test('Prompt Guard adapters remain pending without local weights and reject ambiguous/malformed model results',async()=>{
-  const missing=await runPromptGuard(['A harmless test.']);assert.equal(missing.status,'PENDING');assert.equal(missing.available,false);assert.equal(missing.detected,false);
+test('Prompt Guard adapters remain pending without local weights and reject ambiguous/malformed model results',async t=>{
+  const folder=await directory(t),missing=await runPromptGuard(['A harmless test.'],{modelDirectory:path.join(folder,'no-local-model')});assert.equal(missing.status,'PENDING');assert.equal(missing.available,false);assert.equal(missing.detected,false);
   const malformed=await runPromptGuard(['A harmless test.'],{predict:async()=>({status:'READY',localOnly:true,windows:1,maxScore:NaN})});assert.equal(malformed.status,'PENDING');
   const blocked=await runPromptGuard(['A harmless test.'],{variant:'22m',predict:async()=>({status:'READY',localOnly:true,windows:1,maxScore:.5})});assert.equal(blocked.status,'BLOCKED');assert.equal(blocked.detected,true);
 });

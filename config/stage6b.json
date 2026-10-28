@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "method": "question-only-layered-privacy-v1",
+  "method": "question-only-layered-privacy-v2",
   "seed": 20261027,
   "temperature": 0,
   "keepAlive": -1,
@@ -14,7 +14,9 @@
   "meta": {"rewriteModel": "llama3.2:3b", "guardModel": "llama-guard3:8b", "guardMaxTokens": 40},
   "google": {"rewriteModel": "gemma3:4b", "guardModel": "shieldgemma:2b", "guardMaxTokens": 192},
   "promptGuard": {
-    "status": "PENDING",
+    "status": "LOCAL_READY",
+    "primaryVariant": "86m",
+    "comparisonVariant": "22m",
     "threshold": 0.5,
     "maxWindowTokens": 512,
     "overlapTokens": 64,

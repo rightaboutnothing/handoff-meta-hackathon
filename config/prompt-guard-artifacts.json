@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "classification": "binary-benign-malicious",
+  "labelMapping": {"0": "BENIGN", "1": "MALICIOUS"},
+  "mappingSource": "https://github.com/meta-llama/PurpleLlama/blob/main/LlamaFirewall/src/llamafirewall/scanners/promptguard_utils.py",
+  "mappingRationale": "Meta LlamaFirewall get_jailbreak_score takes softmax(logits)[0, -1]. These exact binary Prompt Guard 2 snapshots have two classifier labels and omit semantic id2label; the final class is index 1. This fallback is limited to the asset hashes below. Unknown generic mappings fail closed.",
+  "threshold": 0.5,
+  "thresholdRationale": "Fixed binary argmax boundary retained from Stage 6b, before evaluation. It is not fitted to the frozen 522 corpus or 60-item country set, and is not a calibrated probability guarantee.",
+  "variants": {
+    "86m": {
+      "modelId": "meta-llama/Llama-Prompt-Guard-2-86M",
+      "revision": "a8ded8e697ce7c355e395a0df51f94adb4a2fd27",
+      "files": {
+        "config.json": "cd54ac39a1f2c3c5146bd5295b34038f8b4d9069e2f844450da014a523bb7653",
+        "tokenizer.json": "3e7e96867c2acdd575f0862c74822e05d1d15b93d9d9a4a2144b1ce83ae3339f",
+        "tokenizer_config.json": "fa09cf22b9d723377f95706967f789ca1a8267e1412385705e1ed51ce0559189",
+        "special_tokens_map.json": "9463f61e1b109a8eb4688b829260d7c6b1e6dff04c98ff7269bb89e2b92369b9",
+        "model.safetensors": "e72017dbbe89c1232dcbc4a74ce0c389db5b468c42afd05850347b2a8c5f6b09"
+      }
+    },
+    "22m": {
+      "modelId": "meta-llama/Llama-Prompt-Guard-2-22M",
+      "revision": "11614a155199674a0a95e6602d6ab0417b790ed0",
+      "files": {
+        "config.json": "1dc4742d04507072cafffb7235dc5dba5af9ba126f7a9830b95ed7ec00fd9104",
+        "tokenizer.json": "6eb983352e73f1697b883a8c3f6b66bdfa336ab3d29dd3687f8316d0ff2789c1",
+        "tokenizer_config.json": "557b3d33d3f41b81ad769244e506549e98a1857d41dd58160aacd4d98d710b5a",
+        "special_tokens_map.json": "9463f61e1b109a8eb4688b829260d7c6b1e6dff04c98ff7269bb89e2b92369b9",
+        "model.safetensors": "5120e30bcd536ce285345d9ec104bea6bd6e8f94365b99a340c764f417ea5fa1"
+      }
+    }
+  }
+}
