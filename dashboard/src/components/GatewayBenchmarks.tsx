@@ -6,6 +6,7 @@ import { ComparisonBenchmarks } from './ComparisonBenchmarks';
 import type { ComparisonReport } from '../comparisonTypes';
 import {Stage4Results} from './Stage4Results';
 import type {Stage4Report} from '../stage4Types';
+import type {Stage5GuardReport} from '../stage5Types';
 
 const suiteNames: Record<string, string> = {
   ifeval: 'IFEval', gpqa: 'GPQA', 'mmlu-pro': 'MMLU-Pro', strongreject: 'StrongREJECT', xstest: 'XSTest', 'ad-privacy': 'Ad privacy',
@@ -14,7 +15,7 @@ const cloudLabel = (model: string) => model === 'muse-spark-1.3' ? 'Muse Spark' 
 const percentagePoints = (value: number | null | undefined) => value == null || !Number.isFinite(value) ? 'Pending' : `${value > 0 ? '+' : ''}${value.toFixed(1)} pp`;
 const guardCalls = (arm: RoundOneArm | undefined) => arm ? Object.entries(arm.steps).filter(([key]) => key.toLowerCase().includes('guard')).reduce((total, [, step]) => total + step.count, 0) : null;
 
-export function GatewayBenchmarks({ data, comparison = null, stage4 }: { data: GatewayResults | null; comparison?: ComparisonReport | null; stage4?: Stage4Report | null }) {
+export function GatewayBenchmarks({ data, comparison = null, stage4, stage5, routingEnabled }: { data: GatewayResults | null; comparison?: ComparisonReport | null; stage4?: Stage4Report | null; stage5?: Stage5GuardReport | null; routingEnabled?: boolean | null }) {
   const reduced = useMotionPreference();
   const roundOne = getRound(data, 1), roundTwo = getRound(data, 2);
   const withGuard = roundOne?.summary.withGuard, withoutGuard = roundOne?.summary.withoutGuard;
@@ -27,7 +28,7 @@ export function GatewayBenchmarks({ data, comparison = null, stage4 }: { data: G
   const enter = { initial: { opacity: 0, y: reduced ? 0 : 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: reduced ? 0 : 0.35 } };
 
   return <div className="gb-view">
-    {stage4===undefined?<ComparisonBenchmarks report={comparison}/>:<><Stage4Results report={stage4}/><details className="cmp-legacy"><summary>Earlier model matrix and Tier 0 cost audit</summary><ComparisonBenchmarks report={comparison}/></details></>}
+    {stage4===undefined?<ComparisonBenchmarks report={comparison}/>:<><Stage4Results report={stage4} stage5={stage5} routingEnabled={routingEnabled}/><details className="cmp-legacy"><summary>Earlier model matrix and Tier 0 cost audit</summary><ComparisonBenchmarks report={comparison}/></details></>}
     <details className="cmp-legacy"><summary>Earlier gateway testing rounds and historical evidence</summary>
     <motion.header className="gb-heading" {...enter}>
       <span className="gb-eyebrow">Benchmarks</span>

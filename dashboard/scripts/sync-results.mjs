@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadTraceSummary } from "./trace-summary.mjs";
 import { readStage4Results } from "../server/stage4-results.mjs";
+import { readStage5Results } from "../server/stage5-results.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dashboardRoot = path.resolve(here, "..");
@@ -104,6 +105,10 @@ const stage4=await readStage4Results(),stage4File=path.join(dashboardRoot,'publi
 const stage4Body=JSON.stringify(stage4,null,2)+'\n';
 let previousStage4;try{previousStage4=await readFile(stage4File,'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
 if(previousStage4!==stage4Body)await writeFile(stage4File,stage4Body,'utf8');
+const stage5=await readStage5Results(),stage5File=path.join(dashboardRoot,'public','stage5-results.json');
+const stage5Body=JSON.stringify(stage5,null,2)+'\n';
+let previousStage5;try{previousStage5=await readFile(stage5File,'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
+if(previousStage5!==stage5Body)await writeFile(stage5File,stage5Body,'utf8');
 if(stage4){
   const source=path.join(repoRoot,'results',stage4.runId,'charts'),destination=path.join(dashboardRoot,'public','stage4-charts');
   const chartFiles=['local-acceptance-quality.png','cloud-costs-by-slice.png','company-workload-savings.png','privacy-boundary.png','manifest.json'];

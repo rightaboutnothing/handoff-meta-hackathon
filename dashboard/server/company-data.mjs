@@ -10,6 +10,7 @@ import { runRoundFive } from '../../src/evaluation/round-five.mjs';
 import { readOutboundPayload, verifyReceiptPayload, verifyReceiptChain } from '../../src/rag/receipts.mjs';
 import { readComparisonResults } from './comparison-results.mjs';
 import { readStage4Results } from './stage4-results.mjs';
+import { readStage5Results } from './stage5-results.mjs';
 
 const repoRoot = fileURLToPath(new URL('../../', import.meta.url));
 const dataDir = path.join(repoRoot, '.handoff');
@@ -31,7 +32,8 @@ export function createCompanyMiddleware() {
       if (req.url === '/api/company/results' && req.method === 'GET') return json(res, 200, await readGatewayResults());
       if (req.url === '/api/company/comparison' && req.method === 'GET') return json(res, 200, await readComparisonResults());
       if (req.url === '/api/company/stage4' && req.method === 'GET') return json(res, 200, await readStage4Results());
-      if (req.url === '/api/company/status' && req.method === 'GET') return json(res, 200, { index: await getIndexStatus({ dataDir }), metaAccess: metaAccessEnabled() ? 'live' : 'paused', models: { local: ragConfig.localModel, guard: ragConfig.guardModel, cloud: ragConfig.cloudModel }, pricing: JSON.parse(await readFile(new URL('../../config/rag-pricing.json', import.meta.url), 'utf8')) });
+      if (req.url === '/api/company/stage5' && req.method === 'GET') return json(res, 200, await readStage5Results());
+      if (req.url === '/api/company/status' && req.method === 'GET') return json(res, 200, { index: await getIndexStatus({ dataDir }), metaAccess: metaAccessEnabled() ? 'live' : 'paused', routing: { lockedCompanyRoutingEnabled: ragConfig.lockedCompanyRoutingEnabled === true, localCompanyModel: ragConfig.lockedCompanyRoutingEnabled === true ? 'gemma3:12b' : ragConfig.localModel, otherSafeTasks: ragConfig.lockedCompanyRoutingEnabled === true ? 'guarded_escalation' : 'legacy_confidence_routing', futureCertified: false }, models: { local: ragConfig.lockedCompanyRoutingEnabled === true ? 'gemma3:12b' : ragConfig.localModel, guard: ragConfig.guardModel, cloud: ragConfig.cloudModel }, pricing: JSON.parse(await readFile(new URL('../../config/rag-pricing.json', import.meta.url), 'utf8')) });
       if (req.method !== 'POST') return json(res, 405, { error: 'POST required' });
       if (busy) return json(res, 409, { error: 'A local ingest or question is already running' });
       busy = true;
