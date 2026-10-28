@@ -2,6 +2,23 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
+## Stage 5: measured Guard screening and an opt-in company route
+
+Local `llama-guard3:8b` screened all **11** deferred business proposals after redaction: **11 safe / would release, 0 blocked, 0 errors**. This was a dry run: **zero cloud calls and $0 cloud spend**. The [per-item report](results/2026-10-28-stage5-guard/summary.md) distinguishes 3 company-document proposals from 8 synthetic ad exports. No new PII replacements were needed: the earlier ad preparation had already removed **16 private field groups containing 40 scalar values**. Exact would-send payloads remain in ignored local storage; only IDs, hashes and measurements are published. Inbound Guard checks remain pending because no cloud answer was generated.
+
+`config/rag.json` now has **`lockedCompanyRoutingEnabled: false`**. Off preserves the previous Llama answer route. An operator can opt in by changing this server-side setting to `true` and restarting the dashboard/server. The opt-in route uses **Gemma 12B for company-document questions**, the exact Stage 3 policy hash and company risk threshold **0.03753558978644436**, plus valid claim citations, complete sources, valid structured output and the 768-token truncation gate. Other safe questions abstain and prepare a minimal, draft-free handoff through redaction and local Guard. Llama 8B and Gemma 4B policies remain abstentions; no threshold was retuned. The flag does not restore Meta access or authorize spending. Browser requests cannot select the model, safety category or routing flag.
+
+Every cloud handoff, with the flag on or off, requires a one-use Guard permit bound to the exact redacted payload. Unsafe, invalid and unavailable verdicts fail closed. Harmful, red-team and poisoning benchmark items remain structurally local-only even if Guard would pass them. Guard verdicts, receipts and PII maps stay local. The **3.66% upper error bound covers the fixed accepted dev frame only**, with a separate AUDIT-only bound of 15.8%; future company traffic remains uncertified.
+
+```powershell
+# Local Guard only; no cloud model calls. Requires the retained Stage 3 inputs.
+npm run guard:stage5
+npm run test:rag
+npm run dashboard:check
+```
+
+The dashboard's Trust / Privacy boundary view reads the hashed [Stage 5 aggregate](results/2026-10-28-stage5-guard/report.json). It shows screened, would-release, blocked and redaction counts, the live server flag state, and each saved decision. Other models and cohorts stay pending rather than inheriting these eleven screens.
+
 ## Current demo results: use the right model for the workload
 
 The frozen 60-question comparison recommends **Gemma 12B for company-document questions**, using the locked company policy and every citation, completeness and truncation gate. It accepts **13/16** company questions locally, all thirteen with full automated rubric credit; the Wilson IID sensitivity interval is **77.2–100%**. Llama 8B and Gemma 4B continue to abstain. Other safe questions remain handoff candidates for Guard, redaction and Muse Spark or Gemini. Adversarial questions stay local. This is a deployment recommendation; the live Ask configuration has not been switched automatically.
@@ -26,7 +43,7 @@ Cloud-fee projections use the actual saved provider-specific offline input count
 
 Within company-document and other questions, the saved mix stays fixed; arithmetic overlaps the single/multiple-document slices. The remaining mix includes the synthetic ad exports, instructions, knowledge, GPQA and safety items. Unsafe items have zero cloud fees in both arms.
 
-Privacy covers **24 business-data queries: 16 company-document questions + 8 fake ad-account exports**. Gemma 12B answered 13 fully locally; 11 became deferred pre-Guard proposals. Three proposed payloads contain minimum redacted context and eight are context-free. All contain **no local draft**. **Zero queries reached any cloud**, and new Guard decisions remain pending. Every dataset is synthetic. “Question-only” means no draft; relevant redacted evidence can still accompany the question.
+Privacy covers **24 business-data queries: 16 company-document questions + 8 fake ad-account exports**. Gemma 12B answered 13 fully locally; 11 became deferred pre-Guard proposals in the historical Stage 4 report. Three proposed payloads contain minimum redacted context and eight are context-free. All contain **no local draft**. **Zero queries reached any cloud**. Stage 5 above records the subsequent eleven local Guard passes without changing this frozen Stage 4 report. Every dataset is synthetic. “Question-only” means no draft; relevant redacted evidence can still accompany the question.
 
 ![Projected cloud fee savings as company-document workload share increases](results/2026-10-28-stage4-slice-report/charts/company-workload-savings.png)
 

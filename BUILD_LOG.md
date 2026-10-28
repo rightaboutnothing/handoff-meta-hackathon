@@ -37,6 +37,12 @@ The table combines previously valid saved checkpoints with the completed offline
 
 The full interim report, including all 300 deferred pairing/task IDs, is in [results/summary.md](results/summary.md). GPQA question text remains only in the Git-ignored local cache.
 
+## 28 October 2026: Stage 5 Guard boundary and opt-in live recommendation
+
+Committed the locked runtime and local Guard runner as `e477496`. The routing flag defaults off. Opt-in uses Gemma 12B for company-document questions at the unchanged Stage 3 threshold, with citation/completeness/truncation gates; other safe questions abstain. All handoffs require redaction and a one-use Guard pass bound to the exact payload. Trusted adversarial items stay local in either flag state. Meta access remains paused.
+
+Local Llama Guard screened the [eleven saved business proposals](results/2026-10-28-stage5-guard/summary.md): **11 safe / would release, 0 blocked, 0 errors**, with **zero cloud calls and $0 spend**. New PII replacements were zero because the saved wires were already minimized; upstream removal of sixteen private field groups / forty values was verified separately. Exact would-send payloads remain ignored and local. The privacy view now shows measured screens and the server's flag state for the matching Gemma 12B cohort; other scopes remain pending. The fixed-dev 3.66% certificate caveat remains visible; inbound Guard screening is pending. All **331 unit tests** passed before measurement; no API keys or GPQA text were printed or committed.
+
 ## 28 October 2026: Stage 4 slice reporting and submission assets
 
 Built the [single saved-results report](results/2026-10-28-stage4-slice-report/summary.md), shared dashboard view and four [1920×1080 PNG exports](results/2026-10-28-stage4-slice-report/charts/manifest.json) from Stage 3's locked decisions. No new inference, Guard screen, cloud call or paid tier ran; cloud spend was $0. Company single/multiple-document slices, overlapping arithmetic, MMLU-Pro, GPQA and other questions retain explicit sample sizes and separate models/cohorts.
