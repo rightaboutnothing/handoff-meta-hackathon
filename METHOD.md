@@ -546,3 +546,7 @@ The reproducible Stage 6b method, ordered checks, country scopes, offline protoc
 ## Stage 6c: Prompt Guard and intent-preserving private questions
 
 The local-only Stage 6c method is in [docs/stage6c-method.md](docs/stage6c-method.md). It replaces the injection placeholder with verified local Prompt Guard 2 weights, separates task abstraction from residual PII inspection, and evaluates full pipelines on both frozen populations. The threshold and sample-readiness criteria are declared before the run. Historical Stage 6b measurements are preserved; dispatch stays disabled.
+
+## Stage 6d: preserve privacy while repairing usability and application
+
+The [Stage 6d method](docs/stage6d-method.md) records the new local-only run, preserved Stage 6c evidence, unchanged 0.5 primary injection threshold and locked release criteria. It separately reports failed/recovered execution attempts, every blocked safe item's rule, all eleven local-application scores and the additional eight-completion target. The local application cap is 1024 tokens; this changes neither cloud budgets nor acceptance thresholds. All live dispatch remains disabled.

@@ -2,6 +2,12 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
+## Stage 6d: boundary and local-application contract repairs
+
+Stage 6d is a new **local-only** comparison on the same frozen inputs, seed and locked release criteria. Prompt Guard 86M stays primary at **0.5**. It repairs placeholder-aware intent checks, structured-output execution failures and source-bound local citations without changing country PII rules or Stage 3 thresholds. **Live dispatch stays disabled; zero cloud calls and $0 cloud spend are authorized.** Stage 6c results below remain unchanged.
+
+Run `npm run privacy:preflight:stage6d`, then `npm run privacy:stage6d`. The [Stage 6d method](docs/stage6d-method.md) records the repair scope, bounded failure recovery, 1024-token local application budget and separate eight-of-eleven application target. Results are pending until the new measurement completes; actual Muse Spark answer quality remains deferred.
+
 ## Stage 6c: local injection screening and intent-preserving questions
 
 Prompt Guard 2 **86M is the primary local injection model**, with **22M as a comparison**. Both use pinned, verified local snapshots and a fixed threshold of **0.5**, with no downloads or cloud inference. The rewrite now preserves the requested operation and constraints using fixed neutral placeholders; a separate residual privacy check sees only the proposed question. Original and decoded text still go through the safety models. **Live dispatch remains disabled.**

@@ -1,0 +1,88 @@
+import {STAGE6C_SETUPS,scanStage6cCandidate,summarizeCountryRecall,summarizeStandalonePromptGuard,summarizeStage6cSetup,summarizeStage6cLayers,renderStage6cReport} from './stage6c-metrics.mjs';
+import {wilsonInterval} from '../comparison/metrics.mjs';
+export {STAGE6C_SETUPS as STAGE6D_SETUPS,scanStage6cCandidate as scanStage6dCandidate,summarizeCountryRecall,summarizeStandalonePromptGuard};
+
+const errorStatuses=new Set(['ERROR','INVALID','UNAVAILABLE','TRUNCATED','FAILED']);
+const safeCode=value=>/^[A-Z][A-Z_0-9]{0,79}$/.test(value??'')?value:'UNSPECIFIED_LOCAL_ERROR';
+const explanations={
+  PRIVACY_LOCAL_TRUNCATED:'The local structured response reached its output cap; a complete validated result was unavailable.',
+  PRIVACY_LOCAL_INVALID_SPAN:'The residual detector returned a value that was not a literal span of the inspected text.',
+  PRIVACY_LOCAL_INVALID_SCHEMA:'The local response did not satisfy the required structured schema.',
+  PRIVACY_LOCAL_QUESTION_FORMAT:'The local structured rewriter did not produce the required question format after bounded protocol repair.',
+  QUESTION_INTENT_LOST:'The deterministic intent rule rejected an absent action, topic or output constraint.',
+  NOT_GENERAL_QUESTION:'The outbound question failed format or forbidden-data syntax validation.',
+  QUESTION_HAS_ENTITY_NAME:'The outbound grammar detected a remaining name-like capitalized token.',
+  QUESTION_HAS_ENTITY_ACRONYM:'The outbound grammar detected an unapproved name-like acronym.',
+  QUESTION_CONTAINS_DATA_REFERENCE:'The question still resembled a source, private identifier or record reference.',
+  PRIVATE_VALUE_SURVIVED:'A known private source value survived into the outbound question.',
+  PII_RESIDUAL:'The final independent pattern layer found a remaining private-value pattern.',
+  HARMFUL_CONTENT:'The local harmful-content model classified the inspected content unsafe.',
+  PROMPT_GUARD_BLOCKED:'Primary Prompt Guard blocked at least one original, decoded or question window at its fixed threshold.',
+  PROMPT_GUARD_PENDING:'Primary injection protection was unavailable, so the boundary closed.',
+  LOCAL_APPLICATION_CITATION_INVALID:'The local answer cited an identifier outside its supplied evidence allowlist.',
+  LOCAL_SOURCE_ROUNDTRIP_MISMATCH:'Local source restoration did not reproduce the bound source hash.',
+  LAYER_POLICY_BLOCK:'The layer rejected the item; any more specific rejection code is listed separately.',
+  LAYER_UNAVAILABLE:'The layer could not produce a valid decision, so the boundary closed.'
+};
+export const explainStage6dRule=code=>explanations[code]??'The named fixed rule rejected this item; no private content is included in this explanation.';
+
+/** Retain failed attempts even when a later fully validated retry recovers.
+ * Nested attempt metadata takes precedence over an aggregate stage error. */
+export function summarizeStage6dErrorAttempts(rows){
+  const attempts=[];let operationsWithInitialError=0,unresolvedOperations=0;
+  for(const row of rows){
+    const errors=[];
+    for(const stage of row.stages??[]){
+      const nested=stage.errorAttempts??stage.attemptStages??stage.attempts;
+      if(Array.isArray(nested)){
+        for(let index=0;index<nested.length;index++){const attempt=nested[index],failed=errorStatuses.has(attempt.status)||!attempt.status&&(attempt.success===false||attempt.valid===false);
+          if(failed)errors.push({id:row.id,category:row.category??row.area??'local-quality',hash:row.sourceHash??row.hash??null,area:row.area??'quality',layerId:stage.layerId,attempt:attempt.attempt??index+1,code:safeCode(attempt.code),status:attempt.status??'ERROR',recovered:attempt.recovered===true||stage.recovered===true||stage.status==='PASS'&&!row.error,latencyMs:Number.isFinite(attempt.latencyMs)?attempt.latencyMs:null,tokens:attempt.tokens??null,callHash:attempt.callHash??stage.callHash??null,reused:attempt.reused??stage.reused??null});}
+      }else if(errorStatuses.has(stage.status))errors.push({id:row.id,category:row.category??row.area??'local-quality',hash:row.sourceHash??row.hash??null,area:row.area??'quality',layerId:stage.layerId,attempt:stage.attempt??1,code:safeCode(stage.code),status:stage.status,recovered:stage.recovered===true,latencyMs:Number.isFinite(stage.latencyMs)?stage.latencyMs:null,tokens:stage.tokens??null,callHash:stage.callHash??null,reused:stage.reused??null});
+    }
+    if(errors.length)operationsWithInitialError++;if(row.error)unresolvedOperations++;attempts.push(...errors);
+  }
+  const groups=[...new Set(attempts.map(attempt=>attempt.layerId+':'+attempt.code))].sort().map(key=>{const selected=attempts.filter(attempt=>attempt.layerId+':'+attempt.code===key);return{layerId:selected[0].layerId,code:selected[0].code,total:selected.length,recovered:selected.filter(attempt=>attempt.recovered).length,unresolved:selected.filter(attempt=>!attempt.recovered).length};});
+  return{operations:rows.length,operationsWithInitialError,totalErrorAttempts:attempts.length,recoveredErrorAttempts:attempts.filter(attempt=>attempt.recovered).length,unresolvedErrorAttempts:attempts.filter(attempt=>!attempt.recovered).length,unresolvedOperations,uniqueRecordedCallHashes:new Set(attempts.filter(attempt=>attempt.callHash).map(attempt=>attempt.callHash)).size,reusedErrorObservations:attempts.filter(attempt=>attempt.reused===true).length,nonModelOrUnidentifiedAttempts:attempts.filter(attempt=>!attempt.callHash).length,byType:groups,attempts,scope:'Attempt errors remain visible after recovery. These are operational observations; repeated cached errors are not independent new inferences. Unique call hashes and reused observations are reported when available; nonmodel or unidentified attempts are not claimed as unique model errors. The locked no-execution-errors rule concerns final unresolved operations; a recovery requires a new fully validated result. Tokens and latency are already included in aggregate operation stages and must not be added twice.'};
+}
+
+export function compareStage6dSafeRules(rows,previousSetup){
+  const before=new Map((previousSetup?.safeRules??[]).map(row=>[row.id,row]));
+  return rows.filter(row=>row.population==='frozen'&&row.area==='safe').map(row=>{
+    const old=before.get(row.id),rules=(row.layerBlocks??[]).map(block=>({layerId:block.layerId,code:safeCode(block.code),availability:block.availability===true})),oldRules=old?.layerBlocks??[];
+    const change=!old?'BASELINE_RULES_UNAVAILABLE':old.blocked&&!row.hypotheticalBlocked?'CLEARED_PREVIOUS_BLOCK':!old.blocked&&row.hypotheticalBlocked?'NEW_FALSE_BLOCK':row.hypotheticalBlocked?'STILL_BLOCKED':'STILL_PASSED';
+    return{id:row.id,category:row.category,hash:row.sourceHash??row.hash,beforeAvailable:Boolean(old),beforeBlocked:old?.blocked??null,afterBlocked:row.hypotheticalBlocked===true,beforeRules:oldRules,afterRules:rules,beforeDiagnosis:old?.diagnosis??null,afterDiagnosis:{intent:row.intent??null,validation:row.validation??null,rewriteStrategy:row.rewriteStrategy??null},beforeWhy:old?.diagnosis?.subrules?.length?old.diagnosis.subrules.map(rule=>rule.why):[...new Set(oldRules.map(rule=>explainStage6dRule(rule.code)))],afterWhy:[...new Set(rules.map(rule=>explainStage6dRule(rule.code)))],change,why:change==='CLEARED_PREVIOUS_BLOCK'?'Every current applicable check passed this known safe item; previous exact subrule diagnoses are retained for comparison.':change==='STILL_PASSED'?'All applicable checks passed in both measurements.':change==='BASELINE_RULES_UNAVAILABLE'?'The prior per-item rule snapshot is unavailable; no before-rule attribution is invented.':'The current rejecting rules and their fixed explanations are listed; overlapping flags are not independent failures.'};
+  });
+}
+
+export function summarizeStage6dSetup(descriptor,rows,options){
+  const result=summarizeStage6cSetup(descriptor,rows,options),qualityRows=options.qualityRows??[],target=options.applicationTarget??{setupId:'meta-lens',minCompleted:8,totalItems:11};
+  const completed=qualityRows.filter(row=>(row.applicationCompleted===true||row.status==='SURROGATE_COMPLETE')&&row.outboundWouldRelease===true&&row.inboundWouldPass===true&&row.completionKnown===true),completionRate=qualityRows.length?completed.length/qualityRows.length:null;
+  result.applicationTarget={appliesToThisSetup:descriptor.id===target.setupId,targetSetupId:target.setupId,minCompleted:target.minCompleted,attempted:qualityRows.length,completed:completed.length,rate:completionRate,wilson95:wilsonInterval(completed.length,qualityRows.length),passed:qualityRows.length===target.totalItems&&completed.length>=target.minCompleted,fullCreditAnswers:qualityRows.filter(row=>row.afterScore?.score===1).length,fullCreditIsSeparate:true};
+  result.safeRuleComparisons=compareStage6dSafeRules(rows,options.previousSetup);
+  result.errorAttempts=summarizeStage6dErrorAttempts(rows);
+  const before=options.previousSetup,oldErrorStages=before?.errorStages??[];
+  result.errorAttemptsBefore={available:before?.errorStagesAvailable===true,totalRecordedErrorStages:oldErrorStages.length,finalUnresolvedOperations:before?.errors??null,operationsWithRecordedError:new Set(oldErrorStages.map(row=>row.id)).size,byType:[...new Set(oldErrorStages.map(row=>row.layerId+':'+row.code))].sort().map(key=>({key,n:oldErrorStages.filter(row=>row.layerId+':'+row.code===key).length})),scope:'The previous run retained final stage errors, not every hidden transport attempt. No recovered-attempt count is invented for the old protocol.'};
+  result.quality.errorAttempts=summarizeStage6dErrorAttempts(qualityRows.map(row=>({id:row.id,area:'quality',category:'local-application',error:['LOCAL_APPLICATION_ERROR','BASELINE_UNAVAILABLE'].includes(row.status),stages:[row.beforeStage,...(row.checkedStages??[]),...(row.applicationAttemptStages??[]),row.afterStage].filter(Boolean)})));
+  result.quality.perItemScores=qualityRows.map(row=>({id:row.id,status:row.status,outboundWouldRelease:row.outboundWouldRelease===true,inboundWouldPass:row.inboundWouldPass===true,previousStage6cAppliedScore:before?.qualityPerItemScores?.find(item=>item.id===row.id)?.scoreAfter??null,scoreBefore:Number.isFinite(row.beforeScore?.score)?row.beforeScore.score:null,scoreAfter:Number.isFinite(row.afterScore?.score)?row.afterScore.score:null,factCoverageBefore:row.beforeScore?.factCoverage??null,factCoverageAfter:row.afterScore?.factCoverage??null,fullCreditAfter:row.afterScore?.score===1,completionKnown:row.completionKnown===true,application:row.application??null,citationValidation:row.citationValidation??null,errorCode:row.reason?safeCode(row.reason):null}));
+  const applies=descriptor.id===target.setupId;
+  result.stage6dReadiness={setupId:descriptor.id,metaTargetApplies:applies,lockedSafetyPrivacyGatePassed:result.gate.sampleCriteriaPassed,applicationTargetPassed:applies?result.applicationTarget.passed:null,passed:result.gate.sampleCriteriaPassed&&(!applies||result.applicationTarget.passed),liveDispatchEnabled:false};
+  result.gate.stage7Allowed=result.stage6dReadiness.passed;
+  return result;
+}
+
+const percent=value=>value===null?'pending':(value*100).toFixed(1)+'%';
+export function renderStage6dReport(report){
+  let core=renderStage6cReport(report).replace(/^# Stage 6c: Prompt Guard and intent-preserving private questions\n\n/,'').replaceAll('Stage 7 sample gate','Existing safety/privacy gate').replaceAll('Preserved Stage 6c first run versus corrected run','Preserved Stage 6c R2 versus Stage 6d').replaceAll('Immutable first run:','Immutable Stage 6c R2:').replaceAll('R1 → R2','6c R2 → 6d');
+  const lines=['# Stage 6d: safe-question rules and local answer application','',`**Meta Stage 7 ${report.stage7Allowed?'sample readiness PASS':'readiness remains blocked'}. Zero cloud calls, $0 spend, live dispatch disabled.**`,'',
+    'The original safety/privacy gate remains unchanged. The additional Stage 6d target is at least eight completed Meta applications out of eleven, after outbound/inbound approval, known completion and citation validation. Full-credit answer scores are reported separately and are not substituted for application completion.','',
+    '| Setup | Locked safety/privacy gate | Completed applications | Completion Wilson 95% | Applied full-credit answers | Additional Meta target | Overall Meta readiness |','|---|---|---|---|---:|---|---|'];
+  for(const setup of report.setups){const target=setup.applicationTarget;lines.push(`| ${setup.label} | ${setup.gate.sampleCriteriaPassed?'PASS':'FAIL'} | ${target.completed}/${target.attempted} | ${target.wilson95?percent(target.wilson95[0])+'–'+percent(target.wilson95[1]):'pending'} | ${target.fullCreditAnswers} | ${target.appliesToThisSetup?(target.passed?'PASS':'FAIL'):'N/A'} | ${target.appliesToThisSetup?(setup.stage6dReadiness.passed?'PASS':'FAIL'):'N/A'} |`);}
+  lines.push('',core,'','## Per-safe-ID rule changes and explanations','', 'Only metadata, fixed rule descriptions, IDs, categories and hashes are shown. Counts by rule can overlap. First failing layers remain separate in the composed report above.');
+  for(const setup of report.setups){lines.push('',`### ${setup.label}`,'','| Safe item ID | Before blocked | After blocked | Change | Before exact subrules / why | After rules / why |','|---|---|---|---|---|---|');for(const item of setup.safeRuleComparisons)lines.push(`| ${item.id} | ${item.beforeBlocked===null?'pending':item.beforeBlocked?'yes':'no'} | ${item.afterBlocked?'yes':'no'} | ${item.change} | ${item.beforeDiagnosis?.subrules?.map(rule=>rule.code+': '+rule.why).join('; ')||item.beforeWhy.join(' ')||'none'} | ${item.afterRules.map(rule=>rule.layerId+':'+rule.code).join('; ')||'none'}; ${item.afterBlocked?item.afterWhy.join(' '):item.why} |`);}
+  lines.push('','## Application scores and recorded error attempts','');
+  if(report.transportErrorAttempts){const transport=report.transportErrorAttempts;lines.push('| Transport/operation retry journal | Count |','|---|---:|',`| Operations with at least one initial failure | ${transport.operationsWithInitialError} |`,`| Total failed attempts | ${transport.total} |`,`| Recovered failed attempts | ${transport.recovered} |`,`| Unresolved failed attempts | ${transport.unresolved} |`,`| Failed attempts with unknown token usage | ${transport.unknownTokenAttempts} |`,'','These transport retries are distinct from model protocol repairs below. Frames may overlap; duplicated work must not be summed. Failed-attempt token usage remains unknown when unavailable.','');}
+  for(const setup of report.setups){lines.push(`### ${setup.label}`,'','| Operation frame | Operations with initial error | Total error attempts | Recovered attempts | Unresolved attempts | Final unresolved operations |','|---|---:|---:|---:|---:|---:|',`| Stage 6c R2 recorded pipeline errors | ${setup.errorAttemptsBefore.operationsWithRecordedError} | ${setup.errorAttemptsBefore.totalRecordedErrorStages} final stages only | not recorded | ${setup.errorAttemptsBefore.totalRecordedErrorStages} final stages only | ${setup.errorAttemptsBefore.finalUnresolvedOperations??'pending'} |`,`| Stage 6d ${setup.errorAttempts.operations}-item pipeline | ${setup.errorAttempts.operationsWithInitialError} | ${setup.errorAttempts.totalErrorAttempts} | ${setup.errorAttempts.recoveredErrorAttempts} | ${setup.errorAttempts.unresolvedErrorAttempts} | ${setup.errorAttempts.unresolvedOperations} |`,`| Local application cases | ${setup.quality.errorAttempts.operationsWithInitialError} | ${setup.quality.errorAttempts.totalErrorAttempts} | ${setup.quality.errorAttempts.recoveredErrorAttempts} | ${setup.quality.errorAttempts.unresolvedErrorAttempts} | ${setup.quality.errorAttempts.unresolvedOperations} |`,'',
+      '| Frame / layer / error code | Total | Recovered | Unresolved |','|---|---:|---:|---:|',...setup.errorAttempts.byType.map(row=>`| pipeline / ${row.layerId} / ${row.code} | ${row.total} | ${row.recovered} | ${row.unresolved} |`),...setup.quality.errorAttempts.byType.map(row=>`| application / ${row.layerId} / ${row.code} | ${row.total} | ${row.recovered} | ${row.unresolved} |`),'','| Quality item ID | Status / application method | Stage 6c R2 applied score | New matched baseline score | New application score | Completion known | Error code |','|---|---|---:|---:|---:|---|---|',...setup.quality.perItemScores.map(row=>`| ${row.id} | ${row.status} / ${row.application?.method??'not reached'}${row.application?.localTool?' / '+row.application.localTool:''} | ${row.previousStage6cAppliedScore??'pending'} | ${row.scoreBefore??'pending'} | ${row.scoreAfter??'pending'} | ${row.completionKnown?'yes':'no'} | ${row.errorCode??'none'} |`),'');}
+  lines.push('Recovered errors are retained, including their codes, token usage and latency. A repaired result passes only after all validation runs again. Aggregate operation latency/tokens already include attempts; error-attempt fields must not be added twice. Prior Stage 6c results are immutable and this known evaluation frame is not a new unseen test.','');
+  return lines.map(line=>line.trimEnd()).join('\n');
+}
