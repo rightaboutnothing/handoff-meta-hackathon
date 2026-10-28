@@ -62,7 +62,7 @@ test('invented entity spans and invalid local results continue to fail closed',a
 });
 
 test('literal extraction replaces only actual spans and preserves the requested calculation',async t=>{
-  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount for cedar@example.invalid be calculated?'}),original=dependencies.localCall;
-  dependencies.localCall=async(...args)=>{const result=await original(...args);if(args[2].schema.properties.private_values)result.text=JSON.stringify({private_values:[{type:'email',value:'cedar@example.invalid'}]});return result;};
-  const result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});assert.equal(result.baseBlocked,false);assert.equal(result.question.includes('cedar@example.invalid'),false);assert.equal(result.question.includes('[EMAIL]'),true);assert.equal(result.intent.valid,true);
+  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount for unseen-person@example.invalid be calculated?'}),original=dependencies.localCall;
+  dependencies.localCall=async(...args)=>{const result=await original(...args);if(args[2].schema.properties.private_values)result.text=JSON.stringify({private_values:[{type:'email',value:'unseen-person@example.invalid'}]});return result;};
+  const result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});assert.equal(result.baseBlocked,false);assert.equal(result.question.includes('unseen-person@example.invalid'),false);assert.equal(result.question.includes('[EMAIL]'),true);assert.equal(result.intent.valid,true);
 });

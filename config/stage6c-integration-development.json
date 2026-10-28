@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "kind": "stage6c-deterministic-integration-development",
+  "seed": 20261029,
+  "proposalSha256": "494671c0a369597efee91e702d37e3a765c9aac449dd02ffad98962a6907b59a",
+  "status": "IMPLEMENTED_FROZEN",
+  "modelInferenceCalls": 0,
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "modelPromptsChanged": false,
+  "guardThresholdsChanged": false,
+  "modelCapsChanged": false,
+  "authoredRegressionCases": 18,
+  "additionalCompleteBusinessApplyCases": 1,
+  "additionalKnownValueGuardCases": 1,
+  "focusedTests": {
+    "total": 94,
+    "passed": 94
+  },
+  "fixClasses": [
+    {
+      "id": "mixed-identifiers",
+      "guardrails": [
+        "Do not simply allow digits in outgoing questions",
+        "Do not include a unique suffix in placeholders",
+        "Keep original and decoded source unchanged for local Prompt Guard and harmful-content checks",
+        "Retain mappings and values only in the local AES vault"
+      ]
+    },
+    {
+      "id": "intent-polysemy",
+      "guardrails": [
+        "Arithmetic mean and average must still require averaging",
+        "A topic overlap alone cannot replace a missing compute or compare operation",
+        "Keep explicit table, grouping, percentage and rounding constraints"
+      ]
+    },
+    {
+      "id": "implicit-selection",
+      "guardrails": [
+        "Require retained selection or applicable-value criterion",
+        "Do not make every question satisfy find",
+        "Disclose that the check remains lexical, not a semantic-equivalence certificate"
+      ]
+    },
+    {
+      "id": "opening-capitalization",
+      "guardrails": [
+        "Do not allow arbitrary capitalized words or proper names",
+        "Do not whitelist frozen item strings, public-title phrases or model outputs",
+        "Keep named values and unknown acronyms blocked"
+      ]
+    },
+    {
+      "id": "canary-category",
+      "guardrails": [
+        "A real canary literal can never be passed through merely because the word is a category",
+        "Keep encoded variants checked",
+        "Keep source-known values local and compare case-insensitively"
+      ]
+    }
+  ],
+  "regressionManifest": [
+    {
+      "id": "integration-id-source",
+      "kind": "neutralization",
+      "sha256": "c987697b7ab29228ef12b74d7704a1e8d9d61e3e0715826b061d323652fc8939"
+    },
+    {
+      "id": "integration-id-candidate",
+      "kind": "neutralization",
+      "sha256": "19d8a91751b0627cc79eed212dd90c9cd8d24bf94cbf76e3251fcea94ff433ec"
+    },
+    {
+      "id": "integration-id-no-index",
+      "kind": "negative",
+      "sha256": "00b74ae4751c6ab2bc99eb0df95cc46ff91c4911c46fe7bc943ce580817b3ed4"
+    },
+    {
+      "id": "integration-meaning-verb",
+      "kind": "intent",
+      "sha256": "bc98faa128e832105eff4303c9143f8fe075ca38e02e75a4de62bf18b482e7ca"
+    },
+    {
+      "id": "integration-mean-statistic",
+      "kind": "intent",
+      "sha256": "496ffe0d7d69b65f032e6ffd5aca672199c92693074da5b6c9a81d7c5f571063"
+    },
+    {
+      "id": "integration-mean-kept",
+      "kind": "intent",
+      "sha256": "ab6cb5e3f82606d74f158e60dafff77b547d7890b079e154594ec7760d3ece8c"
+    },
+    {
+      "id": "integration-message-noun",
+      "kind": "intent",
+      "sha256": "5aa21c13caa0223cd2854edff3beb9956f84564a61a074dc3456141c2bf6d8ce"
+    },
+    {
+      "id": "integration-reply-writing",
+      "kind": "intent",
+      "sha256": "a8bf9260118abbbec187ad414817a18ada78b4e1316028051bc5e8dcf0dafcdb"
+    },
+    {
+      "id": "integration-writing-dropped",
+      "kind": "intent",
+      "sha256": "148152f21833e97ac807cded533277b1f73dd0760b523b1db73c1a126f749b60"
+    },
+    {
+      "id": "integration-lookup-computation",
+      "kind": "intent",
+      "sha256": "aed0c5d0224a1b9e4e2d9e9f75f97d94055de4eceacad43b6b733eae204781db"
+    },
+    {
+      "id": "integration-selection-kept",
+      "kind": "intent",
+      "sha256": "50d73a3dbd2a3cfa62d86a908c030920042a98bf042f1382f03a42a1c19fb363"
+    },
+    {
+      "id": "integration-selection-dropped",
+      "kind": "intent",
+      "sha256": "e93375a188ed67479a18833a85ea3666083247f637a6b420509a4419f9b5e6d8"
+    },
+    {
+      "id": "integration-domain-operation-dropped",
+      "kind": "intent",
+      "sha256": "c6ebb17c6ede2d2da71eaf0a822c14340b468cd6718c25c93fc854fc0d01710b"
+    },
+    {
+      "id": "integration-table-dropped",
+      "kind": "intent",
+      "sha256": "1c044c390445010657ffcb0630188f402956dad3b095006aa748c25f2e86d6f2"
+    },
+    {
+      "id": "integration-opening-word",
+      "kind": "shape",
+      "sha256": "b87007e7cb7b5e3d69081723b5063203ba7778ada96d7fe79fd07fafb42c63a4"
+    },
+    {
+      "id": "integration-name-opening",
+      "kind": "shape",
+      "sha256": "9cf4c55ffbc15a3b84dcb88d81748f0e3c80bc7acf54b86679c2d942d27acc57"
+    },
+    {
+      "id": "integration-canary-category",
+      "kind": "shape",
+      "sha256": "0be68babc237f0898427e5bb115055fe35a55dd8f7265b5323b0d30d825b0be3"
+    },
+    {
+      "id": "integration-canary-value",
+      "kind": "neutralization",
+      "sha256": "aab41c644d746e2d3e6b7c7f1926b6ee7cbe49da732f5e9c4363482dbce339e3"
+    }
+  ],
+  "runtimeSha256": "a4f93bbf79569de0014ea312200da2d933c95dc38f26ea6a643e32d6b5515142",
+  "notes": [
+    "The prior frozen Stage6c run completed before these changes; no metrics from it are relabelled as corrected results.",
+    "Separate authored deterministic examples cover mixed source/candidate identifiers, semantic polysemy, lookup/writing aliases, finite opening functions, actual sentinel values and missing-domain-operation negatives.",
+    "The complete business JSON test uses the actual preparation, local Guard/injection hooks, checked guidance and AES-verified local-application functions with mocked model dependencies; no real send is possible.",
+    "Existing known literals and actual sentinel strings still fail the unredacted shape check or are neutralized before it. Unknown markers and arbitrary proper names remain blocked.",
+    "Identifier masking remains conservative, including mixed-letter/digit technical labels; intent checks remain lexical heuristics, not semantic certification."
+  ]
+}

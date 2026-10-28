@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {STAGE6C_SETUPS,scanStage6cCandidate,summarizeStage6cPrivacy,summarizeStage6cAttribution,summarizeStage6cSetup,summarizeStage6cLayers,summarizeStandalonePromptGuard,renderStage6cReport} from '../src/evaluation/stage6c-metrics.mjs';
 import {finishStage6cRow,incomingStage6cRow,publicStage6cLayer,stage6cLayerBlocks,stableStage6cMetadata,stage6cQualityGate} from '../src/evaluation/stage6c-runner.mjs';
-import {stage6cPrivateRoot,isStage6cSourceFile} from '../src/evaluation/stage6c-io.mjs';
+import {stage6cPrivateRoot,isStage6cSourceFile,loadPreviousStage6cReport} from '../src/evaluation/stage6c-io.mjs';
 import {installStage6bNetworkFence} from '../src/evaluation/stage6b-network.mjs';
 import {sha256} from '../src/rag/receipts.mjs';
 
@@ -94,6 +94,15 @@ test('source fingerprints exclude generated Python bytecode and retain source mo
 test('report renders independent populations, fixed thresholds, unavailable quality and layer attribution',()=>{
   const setup=summarizeStage6cSetup(STAGE6C_SETUPS[0],frame(),{criteria,qualityRows:Array.from({length:11},(_,i)=>({id:'quality-'+i,status:'SURROGATE_OUTPUT_BLOCKED'}))}),report={runId:'synthetic-run',source:{gitCommit:'f'.repeat(40)},settings:{seed:20261027},setups:[setup],promptGuardStandalone:[summarizeStandalonePromptGuard('86m',[row('a','attacks',{status:'PENDING',available:false,detected:false})],{threshold:.5})],findings:['A synthetic finding.'],caveats:['Synthetic PII.']},text=renderStage6cReport(report);
   assert.ok(text.startsWith('# Stage 6c:'));assert.equal(text.includes('\\n'),false);assert.match(text,/30\/50/);assert.match(text,/36\/60/);assert.match(text,/Fixed threshold/);assert.match(text,/False-block attribution/);assert.match(text,/First failing layer count/);assert.match(text,/0 \| 0 \| 0 \| 0/);assert.match(text,/Real cloud quality remains DEFERRED/);assert.match(text,/Live dispatch remains disabled/);
+  assert.equal(text.split('\n').some(line=>/[ \t]+$/.test(line)),false);
+});
+test('R2 rendering preserves a separately hashed R1 baseline without treating its metrics as rerun work',()=>{
+  const setup=summarizeStage6cSetup(STAGE6C_SETUPS[0],frame(),{criteria}),previous={directory:'synthetic-prior-run',sha256:'b'.repeat(64),sourceCommit:'c'.repeat(40),setups:[{id:setup.id,privacy:setup.privacy,metrics:setup.metrics,errors:10,qualityCompleted:0,qualityAttempted:11}]};
+  const text=renderStage6cReport({runId:'synthetic-r2',source:{gitCommit:'f'.repeat(40)},settings:{seed:20261027},setups:[setup],promptGuardStandalone:[],previousStage6c:previous,findings:[],caveats:[]});
+  assert.match(text,/Preserved Stage 6c first run versus corrected run/);assert.match(text,/synthetic-prior-run/);assert.match(text,/10 → 0/);assert.match(text,/not an unseen validation set/);assert.match(text,/No model calls, checkpoints or latency are reused/);assert.equal(text.split('\n').some(line=>/[ \t]+$/.test(line)),false);
+});
+test('previous report references cannot escape results or omit the immutable content hash',async()=>{
+  await assert.rejects(loadPreviousStage6cReport(process.cwd(),{directory:'../other',reportSha256:'a'.repeat(64)}),/INVALID/);await assert.rejects(loadPreviousStage6cReport(process.cwd(),{directory:'synthetic',reportSha256:'invalid'}),/INVALID/);assert.equal(await loadPreviousStage6cReport(process.cwd(),null),null);
 });
 test('network fence keeps attacks structurally unable to reach any cloud API',async t=>{
   let calls=0;t.mock.method(globalThis,'fetch',async()=>{calls++;return new Response('{}');});const fence=installStage6bNetworkFence();try{for(const url of ['https://api.meta.ai/v1/responses','https://generativelanguage.googleapis.com/','https://openrouter.ai/api/v1'])await assert.rejects(fetch(url),{code:'STAGE6B_NETWORK_DENIED'});assert.equal(calls,0);}finally{fence.restore();}
