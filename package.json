@@ -10,6 +10,7 @@
     "comparison:dataset": "node scripts/build-comparison-dataset.mjs",
     "comparison:tier0": "node scripts/run-comparison.mjs --tier 0",
     "comparison:cost-audit": "node scripts/revise-tier0-costs.mjs",
+    "comparison:stage1": "node scripts/run-stage1.mjs",
     "comparison:prepare-tokenizers": "node scripts/prepare-tokenizers.mjs",
     "test:comparison": "node --test tests/comparison-*.test.mjs",
     "demo:build": "node scripts/generate-company-demo.mjs",

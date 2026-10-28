@@ -3,7 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { callMuse, guardText, ragConfig } from '../src/server/gateway-models.mjs';
+import { callMuse, guardText, localChat, ragConfig } from '../src/server/gateway-models.mjs';
 import { askRag } from '../src/rag/gateway.mjs';
 import { sha256, verifyReceipt } from '../src/rag/receipts.mjs';
 
@@ -18,6 +18,22 @@ function liveFlags(t) {
 const ollamaResponse = text => new Response(JSON.stringify({
   message: { role: 'assistant', content: text }, prompt_eval_count: 12, eval_count: 2,
 }), { headers: { 'content-type': 'application/json' } });
+
+test('the actual local adapter forwards a citation allowlist schema to loopback Ollama', async t => {
+  const calls = [], schema = { type: 'object', properties: { answer: { type: 'string' }, citations: { type: 'array', items: { type: 'string', enum: ['allowed-chunk'] } } }, required: ['answer', 'citations'], additionalProperties: false };
+  t.mock.method(globalThis, 'fetch', async (url, request) => {
+    calls.push({ url: new URL(url), body: JSON.parse(request.body) });
+    return ollamaResponse('{"answer":"24 months","citations":["allowed-chunk"]}');
+  });
+  const result = await localChat(ragConfig.localModel, [{ role: 'user', content: 'Synthetic question.' }], { json: false, schema });
+  assert.equal(calls.length, 1);
+  assert.ok(['localhost', '127.0.0.1', '[::1]'].includes(calls[0].url.hostname));
+  assert.deepEqual(calls[0].body.format, schema);
+  assert.equal(calls[0].body.options.num_predict, ragConfig.maxOutputTokens);
+  assert.equal(result.settings.schema, true);
+  await assert.rejects(localChat(ragConfig.localModel, [], { schema: [] }), /schema must be an object/);
+  assert.equal(calls.length, 1);
+});
 
 test('the actual Guard adapter permits only an exact safe classification and uses loopback Ollama', async t => {
   const replies = ['safe', ' SAFE \n', 'safe\nS1', 'unsafe\nS1', 'This looks safe.', '{"safe":true}', ''];
@@ -101,7 +117,8 @@ test('an unsafe incoming cloud answer is withheld and its actual handoff gets a 
     dataDir, offlineMeta: false,
     dependencies: {
       retrieve: async () => ({ chunks: [chunk], quality: 0.95, latencyMs: 1, embeddingModel: 'synthetic-embedding' }),
-      localChat: async () => ({ modelId: 'synthetic-local', latencyMs: 1, tokens, text: JSON.stringify({ answer: 'Needs further reasoning.', confidence: 0.1, citations: [chunk.chunkId], needsCloud: true }) }),
+      localChat: async (_model, _messages, options) => ({ modelId: 'synthetic-local', latencyMs: 1, tokens,
+        text: JSON.stringify(options.schema?.properties?.confidence ? { confidence: 0.1, evidenceSupported: false, answerComplete: false, issues: ['incomplete_answer'] } : { answer: 'Needs further reasoning.', citations: [chunk.chunkId] }) }),
       guardText: async (...args) => {
         guardInputs.push(args);
         return { safe: guardInputs.length === 1, modelId: 'synthetic-guard', latencyMs: 1, tokens, reason: 'Synthetic boundary classification' };

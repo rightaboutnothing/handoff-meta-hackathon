@@ -13,18 +13,20 @@ export function metaAccessEnabled() {
   return process.env.META_ACCESS_STATUS === 'live' && process.env.HANDOFF_META_ACCESS_CONFIRMED === 'true';
 }
 
-export async function localChat(model, messages, { json = false, maxTokens = ragConfig.maxOutputTokens } = {}) {
+export async function localChat(model, messages, { json = false, maxTokens = ragConfig.maxOutputTokens, schema } = {}) {
+  if (schema !== undefined && (!schema || typeof schema !== 'object' || Array.isArray(schema))) throw new Error('Local structured output schema must be an object');
   const start = performance.now();
   const response = await fetch(`${localBase}/api/chat`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model, messages, stream: false, keep_alive: ragConfig.keepAlive,
-      ...(json ? { format: 'json' } : {}), options: { temperature: ragConfig.temperature, seed: ragConfig.seed, num_predict: maxTokens, num_ctx: 4096 } }),
+      ...(schema ? { format: schema } : json ? { format: 'json' } : {}), options: { temperature: ragConfig.temperature, seed: ragConfig.seed, num_predict: maxTokens, num_ctx: 4096 } }),
     signal: AbortSignal.timeout(180000),
   });
   if (!response.ok) throw new Error(`Local model ${model} returned HTTP ${response.status}`);
   const data = await response.json();
   return { text: data.message?.content ?? '', modelId: model, latencyMs: performance.now() - start,
-    tokens: { input: data.prompt_eval_count ?? 0, output: data.eval_count ?? 0, total: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0) } };
+    tokens: { input: data.prompt_eval_count ?? 0, output: data.eval_count ?? 0, total: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0) },
+    settings: { temperature: ragConfig.temperature, seed: ragConfig.seed, keepAlive: ragConfig.keepAlive, maxTokens, contextTokens: 4096, json, schema: Boolean(schema) } };
 }
 
 export async function guardText(question, answer) {

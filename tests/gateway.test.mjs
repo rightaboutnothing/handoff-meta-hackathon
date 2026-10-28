@@ -31,6 +31,14 @@ const modelResponse = (answer, confidence = 0.95, citations = ['chunk-001'], nee
   text: JSON.stringify({ answer, confidence, citations, needsCloud }),
 });
 
+// The local answer and self-check are separate responses with distinct schemas.
+const localSteps = (answer, confidence = 0.95, citations = ['chunk-001'], complete = true, inspect = () => {}) => async (_model, messages, options) => {
+  inspect(messages, options);
+  const check = Boolean(options.schema?.properties?.confidence);
+  return { modelId: 'test-local-model', latencyMs: check ? 3 : 2, tokens: { input: 30, output: 20, total: 50 },
+    text: JSON.stringify(check ? { confidence, evidenceSupported: complete, answerComplete: complete, issues: complete ? [] : ['incomplete_answer'] } : { answer, citations }) };
+};
+
 const guardResponse = safe => ({
   modelId: 'test-local-guard', latencyMs: 1, tokens: { input: 20, output: 1, total: 21 },
   safe, reason: safe ? 'Synthetic safe classification' : 'Synthetic blocked classification',
@@ -53,7 +61,7 @@ test('offline handoffs never call the cloud and produce a verifiable deferred re
     dataDir, offlineMeta: true,
     dependencies: {
       retrieve: retrieveFixture([chunk(1, 'Synthetic warranty lasts 24 months.')]),
-      localChat: async () => modelResponse('More reasoning is needed.', 0.2, ['chunk-001'], true),
+      localChat: localSteps('More reasoning is needed.', 0.2, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
       callMuse: async () => { cloudCalls += 1; throw new Error('Cloud calls are forbidden in this test'); },
     },
@@ -81,7 +89,7 @@ test('unsafe outbound content is blocked locally before any cloud call', async t
     dataDir, offlineMeta: false,
     dependencies: {
       retrieve: retrieveFixture([chunk(1, 'SYNTHETIC TEST EVIDENCE')]),
-      localChat: async () => modelResponse('Escalation required.', 0.1, ['chunk-001'], true),
+      localChat: localSteps('Escalation required.', 0.1, ['chunk-001'], false),
       guardText: async () => guardResponse(false),
       callMuse: async () => { cloudCalls += 1; throw new Error('Unsafe content reached cloud'); },
     },
@@ -106,11 +114,10 @@ test('local answers restore private placeholders and retain local source citatio
     dataDir,
     dependencies: {
       retrieve: retrieveFixture([chunk(1, redacted.text)]),
-      localChat: async (_modelId, messages) => {
+      localChat: localSteps(`${contact} owns the warranty process; the warranty is 24 months.`, 0.95, ['chunk-001'], true, messages => {
         assert.equal(messages[1].content.includes('Avery Chen'), false);
         assert.equal(messages[1].content.includes('avery@example.invalid'), false);
-        return modelResponse(`${contact} owns the warranty process; the warranty is 24 months.`);
-      },
+      }),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
       callMuse: async () => { cloudCalls += 1; throw new Error('A grounded local answer should stay local'); },
     },
@@ -123,6 +130,13 @@ test('local answers restore private placeholders and retain local source citatio
   assert.equal(result.citations.length, 1);
   assert.deepEqual(result.citations[0], { file: 'synthetic-1.md', chunkId: 'chunk-001', location: 'page:1', hash: sha256(redacted.text) });
   assert.equal(result.metrics.piiItemsRedacted, 2);
+  assert.deepEqual(result.metrics.stages.filter(stage => stage.stage.startsWith('local_')).map(stage => stage.stage), ['local_answer', 'local_self_check']);
+  assert.equal(result.metrics.localAnswerLatencyMs, 2);
+  assert.equal(result.metrics.localSelfCheckLatencyMs, 3);
+  assert.deepEqual(result.metrics.localTokens, { input: 60, output: 40, total: 100 });
+  assert.ok(result.events.findIndex(event => event.type === 'self_check') < result.events.findIndex(event => event.type === 'confidence'));
+  assert.equal(result.metrics.answerParseFailures, 0);
+  assert.equal(result.metrics.selfCheckParseFailures, 0);
 });
 
 test('the cloud payload contains at most two redacted chunks, no local filenames, and matching signed hashes', async t => {
@@ -137,7 +151,7 @@ test('the cloud payload contains at most two redacted chunks, no local filenames
     dataDir, offlineMeta: false,
     dependencies: {
       retrieve: retrieveFixture(chunks),
-      localChat: async () => modelResponse('More reasoning is needed.', 0.2, chunks.map(value => value.chunkId), true),
+      localChat: localSteps('More reasoning is needed.', 0.2, chunks.map(value => value.chunkId), false),
       guardText: async (...args) => { guardInputs.push(args); return guardResponse(true); },
       callMuse: async input => {
         cloudInputs.push(input);
@@ -171,7 +185,7 @@ test('local-only evaluations cannot call cloud models even if the guard would pe
     dataDir: await workspace(t), offlineMeta: false, localOnly: true,
     dependencies: {
       retrieve: retrieveFixture([chunk(1, 'SYNTHETIC TEST EVIDENCE')]),
-      localChat: async () => modelResponse('More reasoning is needed.', 0.2, ['chunk-001'], true),
+      localChat: localSteps('More reasoning is needed.', 0.2, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
       callMuse: async () => { cloudCalls += 1; throw new Error('Local-only evaluation reached cloud'); },
     },
@@ -190,11 +204,61 @@ test('a residual private value in retrieved evidence blocks outbound before clou
     dataDir: await workspace(t), offlineMeta: false,
     dependencies: {
       retrieve: retrieveFixture([chunk(1, 'Contact: accidentally-unredacted@example.invalid')]),
-      localChat: async () => modelResponse('More reasoning is needed.', 0.1, ['chunk-001'], true),
+      localChat: localSteps('More reasoning is needed.', 0.1, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
       callMuse: async () => { cloudCalls += 1; throw new Error('Unredacted evidence reached cloud'); },
     },
   }), /private data/);
   assert.equal(cloudCalls, 0);
   assert.equal(guardCalls, 0);
+});
+
+test('Company Ask separates constrained answering from self-check and preserves citation repair statistics', async t => {
+  const calls = [], local = localSteps('The warranty is 24 months.', 0.95, ['[CHUNK-001]'], true, (messages, options) => calls.push({ messages, options }));
+  const result = await askRag('What is the synthetic warranty?', {
+    dataDir: await workspace(t),
+    dependencies: {
+      retrieve: retrieveFixture([chunk(1, 'SYNTHETIC warranty: 24 months.')]), localChat: local,
+      guardText: async () => { throw new Error('Validated local answers do not escalate'); },
+      callMuse: async () => { throw new Error('Cloud is forbidden'); },
+    },
+  });
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls[0].options.schema.properties.citations.items.enum, ['chunk-001']);
+  assert.deepEqual(calls[0].options.schema.required, ['answer', 'citations']);
+  assert.equal(Object.hasOwn(calls[0].options.schema.properties, 'confidence'), false);
+  assert.equal(Object.hasOwn(calls[1].options.schema.properties, 'answer'), false);
+  assert.ok(calls[1].messages[1].content.includes('PROPOSED ANSWER:\nThe warranty is 24 months.'));
+  assert.equal(result.route, 'local');
+  assert.equal(result.citations[0].chunkId, 'chunk-001');
+  assert.equal(result.metrics.invalidCitationItems, 1);
+  assert.equal(result.metrics.invalidCitationIds, 1);
+  assert.equal(result.metrics.repairedCitationIds, 1);
+  assert.equal(result.metrics.rejectedCitationIds, 0);
+});
+
+test('invalid citations and malformed split contracts fail closed despite a confident self-check', async t => {
+  const validAnswer = { answer: 'The warranty is 24 months.', citations: ['chunk-001'] };
+  const validCheck = { confidence: 1, evidenceSupported: true, answerComplete: true, issues: [] };
+  for (const [answer, check, expected] of [
+    [{ ...validAnswer, citations: ['chunk-001', 'invented-source'] }, validCheck, 'citation'],
+    [validAnswer, { ...validCheck, decision: 'local' }, 'self-check'],
+    [{ ...validAnswer, confidence: 1, needsCloud: false }, validCheck, 'answer'],
+  ]) {
+    const result = await askRag('What is the synthetic warranty?', {
+      dataDir: await workspace(t), localOnly: true,
+      dependencies: {
+        retrieve: retrieveFixture([chunk(1, 'SYNTHETIC warranty: 24 months.')]),
+        localChat: async (_model, _messages, options) => ({ modelId: 'test-local', latencyMs: 1, tokens: { input: 5, output: 5, total: 10 }, text: JSON.stringify(options.schema?.properties?.confidence ? check : answer) }),
+        guardText: async () => { throw new Error('Local-only request must not create an outbound stage'); },
+        callMuse: async () => { throw new Error('Cloud is forbidden'); },
+      },
+    });
+    assert.equal(result.route, 'deferred_cloud');
+    assert.equal(result.metrics.tokensSentToCloud, 0);
+    assert.deepEqual(result.citations, []);
+    if (expected === 'citation') assert.equal(result.metrics.rejectedCitationIds, 1);
+    if (expected === 'self-check') assert.equal(result.metrics.selfCheckParseFailures, 1);
+    if (expected === 'answer') assert.equal(result.metrics.answerParseFailures, 1);
+  }
 });

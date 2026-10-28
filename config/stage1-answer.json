@@ -1,0 +1,22 @@
+{
+  "version": "stage1-answer-citations-v1",
+  "tier": 0,
+  "seed": 20261027,
+  "auditSeed": 20261028,
+  "models": ["llama3.1:8b", "gemma3:4b", "gemma3:12b"],
+  "answerMaxTokens": 384,
+  "selfCheckMaxTokens": 128,
+  "baselineRun": "2026-10-28-meta-google-tier0",
+  "controlRun": "2026-10-28-tier0-payload-costs",
+  "cohorts": [
+    {"id": "saved60", "variant": "structured", "items": 60},
+    {"id": "plain50", "variant": "plain", "items": 50}
+  ],
+  "retrieval": "Reuse exact saved redacted questions and context; no retrieval changes or new embeddings",
+  "calibration": "Use the original classifiers and exact thresholds; no training or selection",
+  "cloudCallsAllowed": false,
+  "routing": "Code combines the separate self-check, validated citations, unchanged retrieval signals and frozen calibrated wrongness",
+  "citationPolicy": "Retrieved IDs only; preserve pre-repair invalid counts; reject ambiguous/unknown IDs before scoring",
+  "missingBaseline": "Gemma 4B plain50 prior-method replay is generated locally and labelled as replayed, never as a previous saved run",
+  "stopAfter": "Stage 1; Stage 2 retrieval completeness requires a later instruction"
+}

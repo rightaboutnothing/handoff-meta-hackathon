@@ -55,12 +55,13 @@ async function ollama(endpoint, body) {
   if (!response.ok) throw new Error(`Local inference returned HTTP ${response.status}`);
   const data = await response.json();
   return { text: data.message?.content ?? data.response ?? '', modelId: body.model, latencyMs: performance.now() - started, tokens: tokenCounts(data),
-    settings: { ...COMPARISON_SETTINGS, maxTokens: body.options.num_predict, json: body.format === 'json' },
+    settings: { ...COMPARISON_SETTINGS, maxTokens: body.options.num_predict, json: body.format === 'json' || typeof body.format === 'object', schemaConstrained: Boolean(body.format && typeof body.format === 'object') },
     ollamaTiming: { totalDurationNs: data.total_duration, loadDurationNs: data.load_duration, promptDurationNs: data.prompt_eval_duration, evalDurationNs: data.eval_duration } };
 }
-export async function comparisonLocal(modelId, messages, { maxTokens = COMPARISON_SETTINGS.maxTokens, json = true } = {}) {
+export async function comparisonLocal(modelId, messages, { maxTokens = COMPARISON_SETTINGS.maxTokens, json = true, schema } = {}) {
   if (!localModels.has(modelId)) throw new Error('Unregistered local comparison model');
-  return ollama('chat', { model: modelId, messages, ...(json ? { format: 'json' } : {}),
+  if (schema !== undefined && (!schema || typeof schema !== 'object' || Array.isArray(schema))) throw new Error('Local output schema must be a JSON Schema object');
+  return ollama('chat', { model: modelId, messages, ...(schema ? { format: schema } : json ? { format: 'json' } : {}),
     options: { temperature: COMPARISON_SETTINGS.temperature, seed: COMPARISON_SETTINGS.seed, num_predict: maxTokens, num_ctx: COMPARISON_SETTINGS.contextTokens } });
 }
 
