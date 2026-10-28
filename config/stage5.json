@@ -1,0 +1,23 @@
+{
+  "version": "stage5-local-guard-dry-run-v1",
+  "sourceRun": "2026-10-28-stage3-dev-risk-calibration",
+  "sourceStage4Run": "2026-10-28-stage4-slice-report",
+  "runId": "2026-10-28-stage5-guard",
+  "population": "frozen-saved60",
+  "localModelId": "gemma3:12b",
+  "guardModelId": "llama-guard3:8b",
+  "expectedItems": 11,
+  "expectedCompanyDocuments": 3,
+  "expectedAdExports": 8,
+  "seed": 20261027,
+  "temperature": 0,
+  "guardMaxTokens": 40,
+  "contextTokens": 4096,
+  "keepAlive": -1,
+  "maxRetries": 3,
+  "retryBackoffMs": [1000, 2000, 4000],
+  "warmup": true,
+  "dryRun": true,
+  "cloudCallsAllowed": false,
+  "policyHash": "a1c9b90667b1f70bceaa4291e5660591c1edfec6223afdf41739828e8c2aad77"
+}

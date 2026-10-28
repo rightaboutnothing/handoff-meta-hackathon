@@ -16,7 +16,7 @@ function liveFlags(t) {
 }
 
 const ollamaResponse = text => new Response(JSON.stringify({
-  message: { role: 'assistant', content: text }, prompt_eval_count: 12, eval_count: 2,
+  message: { role: 'assistant', content: text }, response:text, prompt_eval_count: 12, eval_count: 2,
 }), { headers: { 'content-type': 'application/json' } });
 
 test('the actual local adapter forwards a citation allowlist schema to loopback Ollama', async t => {
@@ -37,6 +37,7 @@ test('the actual local adapter forwards a citation allowlist schema to loopback 
 
 test('the actual Guard adapter permits only an exact safe classification and uses loopback Ollama', async t => {
   const replies = ['safe', ' SAFE \n', 'safe\nS1', 'unsafe\nS1', 'This looks safe.', '{"safe":true}', ''];
+  const classifications=['safe','safe','invalid','unsafe','invalid','invalid','invalid'];
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, request) => {
     calls.push({ url: new URL(url), body: JSON.parse(request.body) });
@@ -45,19 +46,21 @@ test('the actual Guard adapter permits only an exact safe classification and use
   for (const [index] of replies.entries()) {
     const result = await guardText('Synthetic policy question.', 'Synthetic harmless answer.');
     assert.equal(result.safe, index < 2);
-    assert.equal(result.classification, index < 2 ? 'safe' : 'unsafe');
+    assert.equal(result.classification, classifications[index]);
     assert.equal(result.modelId, ragConfig.guardModel);
+    assert.deepEqual(result.safetyCategories,index===3?['S1']:[]);
   }
   for (const { url, body } of calls) {
     assert.ok(['localhost', '127.0.0.1', '[::1]'].includes(url.hostname));
-    assert.equal(url.pathname, '/api/chat');
+    assert.equal(url.pathname, '/api/generate');
     assert.equal(body.model, ragConfig.guardModel);
     assert.equal(body.keep_alive, ragConfig.keepAlive);
     assert.equal(body.options.num_predict, 40);
-    assert.deepEqual(body.messages, [
-      { role: 'user', content: 'Synthetic policy question.' },
-      { role: 'assistant', content: 'Synthetic harmless answer.' },
-    ]);
+    assert.equal(body.raw,true);
+    assert.match(body.prompt,/ONLY THE LAST Agent message/);
+    assert.match(body.prompt,/S14: Code Interpreter Abuse/);
+    assert.match(body.prompt,/User: Synthetic policy question\.\n\nAgent: Synthetic harmless answer\./);
+    assert.equal(body.options.num_ctx,4096);
   }
 });
 
