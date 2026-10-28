@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {stage6ProtectedText} from '../../src/evaluation/stage6-protected-text.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dashboardRoot = path.resolve(here, "..");
@@ -70,6 +71,11 @@ for (const source of protectedFiles) {
       }
     }
   } catch {}
+}
+
+const stage6Values=await stage6ProtectedText(repoRoot);
+for(const {file,text}of searchable){
+  if(stage6Values.some(value=>text.includes(value)))violations.push(`${path.relative(distRoot,file)} contains protected Stage 6 test text`);
 }
 
 if (violations.length) {

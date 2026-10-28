@@ -10,6 +10,8 @@ import type { ComparisonReport } from './comparisonTypes';
 import {Stage4Results} from './components/Stage4Results';
 import type {Stage4Report} from './stage4Types';
 import type {Stage5GuardReport} from './stage5Types';
+import {Stage6GuardStressResults} from './components/Stage6GuardStressResults';
+import type {Stage6GuardReport} from './stage6Types';
 import './Gateway.css';
 
 type View = 'ask' | 'savings' | 'trust' | 'benchmarks';
@@ -29,6 +31,7 @@ export default function GatewayApp() {
   const [comparison,setComparison]=useState<ComparisonReport|null>(null);
   const [stage4,setStage4]=useState<Stage4Report|null>(null);
   const [stage5,setStage5]=useState<Stage5GuardReport|null>(null),[lockedRouting,setLockedRouting]=useState<boolean|null>(null);
+  const [stage6,setStage6]=useState<Stage6GuardReport|null>(null);
   const [meta,setMeta]=useState<'paused'|'live'>('paused'),[dark,setDark]=useState(false);
   const refresh=async()=>{
     const results=await Promise.allSettled([
@@ -36,6 +39,7 @@ export default function GatewayApp() {
       fetch('/api/company/comparison').then(async response=>{if(!response.ok)throw new Error('Comparison results could not be loaded.');setComparison(await response.json());}),
       fetch('/api/company/stage4').then(async response=>{if(response.status===404)response=await fetch('/stage4-results.json');if(!response.ok)throw new Error('Slice results could not be loaded.');const value=await response.json();if(value&&value.kind!=='stage4-slice-report')throw new Error('Slice results format is unavailable.');setStage4(value);}),
       fetch('/api/company/stage5').then(async response=>{if(response.status===404)response=await fetch('/stage5-results.json');if(!response.ok)throw new Error('Guard screening results could not be loaded.');const value=await response.json();if(value&&value.kind!=='stage5-guard-report')throw new Error('Guard screening results format is unavailable.');setStage5(value);}),
+      fetch('/api/company/stage6').then(async response=>{if(response.status===404)response=await fetch('/stage6-results.json');if(!response.ok)throw new Error('Guard stress results could not be loaded.');const value=await response.json();if(value&&value.kind!=='stage6-guard-stress-report')throw new Error('Guard stress results format is unavailable.');setStage6(value);}),
       fetch('/api/company/status').then(async response=>{if(!response.ok)throw new Error('Routing status could not be loaded.');const value=await response.json();setMeta(value.metaAccess==='live'?'live':'paused');setLockedRouting(typeof value.routing?.lockedCompanyRoutingEnabled==='boolean'?value.routing.lockedCompanyRoutingEnabled:null);}),
     ]);
     const failed=results.find(result=>result.status==='rejected');setError(failed?.status==='rejected'?(failed.reason instanceof Error?failed.reason.message:'Results are unavailable.'):'');
@@ -45,7 +49,7 @@ export default function GatewayApp() {
   useEffect(()=>{const change=()=>{const id=location.hash.slice(1) as View;if(views.some(item=>item.id===id))setView(id);};addEventListener('hashchange',change);return()=>removeEventListener('hashchange',change);},[]);
   const rag=getRound(data,2),receipts=getRound(data,5);
   const isComparisonView=view==='benchmarks'||view==='savings';
-  const measuredTimestamp=isComparisonView||view==='trust'?(stage5?.timestamp??stage4?.timestamp):data?.manifest?.timestamp;
+  const measuredTimestamp=view==='trust'?(stage6?.timestamp??stage5?.timestamp??stage4?.timestamp):isComparisonView?stage4?.timestamp:data?.manifest?.timestamp;
   const navigate=(next:View)=>{setView(next);history.replaceState(null,'',`#${next}`);};
   return <MotionConfig reducedMotion={reduced?'always':'never'}><div className="gateway-shell min-h-screen">
     <header className="gw-header"><Wordmark/><span className="gw-product-label">The private AI gateway</span><div className="gw-header-actions"><span className={`gw-access ${meta}`}><i/>{meta==='live'?'Muse Spark connected':'Muse Spark paused'}</span><button className="gw-theme" onClick={()=>setDark(!dark)} aria-label={dark?'Use light theme':'Use dark theme'}>{dark?'☀':'◐'}</button></div></header>
@@ -59,7 +63,7 @@ export default function GatewayApp() {
       {error&&<div className="gw-error" role="alert">{error} <button onClick={refresh}>Retry</button></div>}
       <nav className="gw-navigation" aria-label="Gateway views">{views.map(item=><button key={item.id} onClick={()=>navigate(item.id)} className={view===item.id?'active':''} aria-current={view===item.id?'page':undefined}><span>{item.label}</span><small>{item.description}</small>{view===item.id&&<motion.i layoutId="gw-nav" transition={{duration:reduced?0:.2}}/>}</button>)}</nav>
       <div hidden={view!=='ask'}><GatewayAsk onNavigateTrust={()=>navigate('trust')}/></div>
-      <AnimatePresence mode="wait">{view!=='ask'&&<motion.div key={view} initial={{opacity:0,y:reduced?0:8}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:.18}}>{view==='savings'?<GatewaySavings data={data} comparison={comparison} stage4={stage4} stage5={stage5} routingEnabled={lockedRouting}/>:view==='trust'?<><Stage4Results report={stage4} initialTab="privacy" stage5={stage5} routingEnabled={lockedRouting}/><details className="cmp-legacy"><summary>Earlier Guard, privacy and signed-receipt studies</summary><GatewayTrust data={data} onRefresh={refresh}/></details></>:<GatewayBenchmarks data={data} comparison={comparison} stage4={stage4} stage5={stage5} routingEnabled={lockedRouting}/>}</motion.div>}</AnimatePresence>
+      <AnimatePresence mode="wait">{view!=='ask'&&<motion.div key={view} initial={{opacity:0,y:reduced?0:8}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:.18}}>{view==='savings'?<GatewaySavings data={data} comparison={comparison} stage4={stage4} stage5={stage5} routingEnabled={lockedRouting}/>:view==='trust'?<><Stage6GuardStressResults report={stage6} routingEnabled={lockedRouting}/><Stage4Results report={stage4} initialTab="privacy" stage5={stage5} routingEnabled={lockedRouting}/><details className="cmp-legacy"><summary>Earlier Guard, privacy and signed-receipt studies</summary><GatewayTrust data={data} onRefresh={refresh}/></details></>:<GatewayBenchmarks data={data} comparison={comparison} stage4={stage4} stage5={stage5} routingEnabled={lockedRouting}/>}</motion.div>}</AnimatePresence>
       {view!=='ask'&&stage4&&<details className="cmp-legacy gw-chart-downloads"><summary>Submission charts · download PNG</summary><nav aria-label="Download submission charts"><a href="/stage4-charts/local-acceptance-quality.png" download>Acceptance, accuracy and latency</a><a href="/stage4-charts/cloud-costs-by-slice.png" download>Cloud fees by slice</a><a href="/stage4-charts/company-workload-savings.png" download>Company workload scenarios</a><a href="/stage4-charts/privacy-boundary.png" download>Privacy boundary</a></nav></details>}
       <footer className="gw-footer"><Wordmark/><p>Local first. Every handoff accountable.</p><span className="gw-source-records">{view!=='ask'&&<span>Slice report: {stage4?.runId??'Pending'}</span>}<span>Earlier company-data study source: {data?.manifest?.sourceCommit?.slice(0,7)??'Pending'}</span>{isComparisonView&&<span>Earlier matrix source: {comparison?.provenance?.gitCommit?.slice(0,7)??'Pending'}</span>}<span>Built during the Meta Global AI Developer Hackathon</span></span></footer>
     </main>

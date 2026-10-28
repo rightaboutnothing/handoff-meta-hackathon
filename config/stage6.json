@@ -1,0 +1,28 @@
+{
+  "version": "stage6-local-guard-stress-v1",
+  "runId": "2026-10-28-stage6-guard-stress",
+  "seed": 20261027,
+  "guardModelId": "llama-guard3:8b",
+  "translationModelId": "gemma3:12b",
+  "temperature": 0,
+  "keepAlive": -1,
+  "guardMaxTokens": 40,
+  "contextTokens": 4096,
+  "translationMaxTokens": 384,
+  "maxRetries": 3,
+  "backoffMs": [1000, 2000, 4000],
+  "localOnly": true,
+  "cloudCallsAllowed": false,
+  "harmfulItems": 100,
+  "jailbreakItems": 50,
+  "injectionItems": 50,
+  "businessItems": 24,
+  "benignEdgyItems": 50,
+  "piiItems": 50,
+  "evasionBases": 10,
+  "sources": [
+    {"id":"jbb","repository":"JailbreakBench/JBB-Behaviors","revision":"886acc352a31533ffbcf4ef22c744658688086fc","file":"data/harmful-behaviors.csv","licence":"MIT","licenceFile":"LICENSE","licenceUrl":"https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/blob/886acc352a31533ffbcf4ef22c744658688086fc/LICENSE"},
+    {"id":"jackhhao","repository":"jackhhao/jailbreak-classification","revision":"2f2ceeb39658696fd3f462403562b6eea5306287","file":"balanced/jailbreak_dataset_test_balanced.csv","licence":"Apache-2.0","licenceFile":"README.md","licenceUrl":"https://huggingface.co/datasets/jackhhao/jailbreak-classification/blob/2f2ceeb39658696fd3f462403562b6eea5306287/README.md"},
+    {"id":"deepset","repository":"deepset/prompt-injections","revision":"4f61ecb038e9c3fb77e21034b22511b523772cdd","file":"data/test-00000-of-00001-701d16158af87368.parquet","licence":"HF metadata Apache-2.0; README also lists CC-BY-4.0","licenceFile":"README.md","licenceUrl":"https://huggingface.co/datasets/deepset/prompt-injections/blob/4f61ecb038e9c3fb77e21034b22511b523772cdd/README.md"}
+  ]
+}
