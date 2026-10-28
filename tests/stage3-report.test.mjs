@@ -4,6 +4,10 @@ import{summarizeStage3Acceptance,renderStage3Summary}from'../src/comparison/stag
 
 const row=(id,overrides={})=>({id,groupId:id,modelId:'llama3.1:8b',population:'dev-audit',role:'audit',category:'company-data multi-doc',slice:'company',safe:true,accepted:true,gate:{eligible:true},scoring:{score:1,labelAvailable:true},...overrides});
 const summarize=(rows,options={})=>summarizeStage3Acceptance(rows,{seed:7,replicates:40,...options});
+test('zero-error bootstrap is presented alongside a wider explicitly IID sensitivity interval',()=>{
+  const acceptance=summarize([row('a'),row('b')]),report={runId:'unit',tier:0,cloudCalls:0,spendUsd:0,network:{externalRequests:0},settings:{errorBudget:.05},acceptance,costs:{summary:[]}};
+  const text=renderStage3Summary(report);assert.match(text,/Wilson 95% IID sensitivity/);assert.match(text,/descriptive bootstrap 95%/);assert.match(text,/100\.0% \[100\.0%, 100\.0%\]/);assert.match(text,/\[34\.2%, 100\.0%\]/);
+});
 test('unknown accepted answers are conservative errors, supported-only sensitivity is separate',()=>{
   const result=summarize([row('a'),row('b',{scoring:{score:.5,labelAvailable:true}}),row('c',{scoring:{score:null,labelAvailable:false}}),row('d',{accepted:false})]),r=result.rows.find(r=>r.slice==='company');
   assert.equal(r.accepted,3);assert.equal(r.acceptedCorrect,1);assert.equal(r.acceptedKnownWrong,1);assert.equal(r.acceptedUnknown,1);assert.equal(r.acceptedConservativeWrong,2);assert.equal(r.acceptedAnswerAccuracy,1/3);assert.equal(r.acceptedAccuracySupportedOnly.estimate,.5);

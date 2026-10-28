@@ -1,0 +1,34 @@
+{
+  "runId": "2026-10-28-stage3-dev-risk-calibration",
+  "verifiedAt": "2026-10-28T10:01:48.574Z",
+  "passed": true,
+  "modelItemRows": 2460,
+  "frozenRows": 330,
+  "acceptedRows": 180,
+  "unsafeLocalOnlyRows": 21,
+  "invalidAcceptedRows": 0,
+  "unsafeCloudPayloadRows": 0,
+  "modelErrors": [
+    {
+      "id": "ifeval-251",
+      "modelId": "gemma3:4b",
+      "category": "instruction-following",
+      "role": "calib",
+      "error": "LOCAL_STAGE3_FAILED"
+    }
+  ],
+  "retryEvents": 4,
+  "policyHash": "a1c9b90667b1f70bceaa4291e5660591c1edfec6223afdf41739828e8c2aad77",
+  "policyLockedAt": "2026-10-28T09:56:32.592Z",
+  "replayOpenedAt": "2026-10-28T09:56:32.884Z",
+  "policyLockEvents": 1,
+  "sourceCommit": "b07e042bbd7a0895ef916d345b7899340366e5e2",
+  "pinnedSourceFilesVerified": 62,
+  "devContextHashesVerified": 820,
+  "cloudCalls": 0,
+  "externalRequests": 0,
+  "spendUsd": 0,
+  "cloudBudgetUnset": true,
+  "modelsPooled": false,
+  "postRunChange": "Summary presentation adds the already-recorded Wilson IID sensitivity intervals beside descriptive bootstrap intervals; measured JSON, policies and settings are unchanged."
+}
