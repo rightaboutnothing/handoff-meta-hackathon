@@ -1,0 +1,58 @@
+{
+  "country": "AU",
+  "phoneRegion": "AU",
+  "rules": [
+    {
+      "id": "AU_TFN",
+      "pattern": "(?<!\\d)\\d{3}[ -]?\\d{3}[ -]?\\d{3}(?!\\d)",
+      "validator": "stdnum.au.tfn",
+      "sensitiveKeywords": [
+        "tfn",
+        "tax file number"
+      ]
+    },
+    {
+      "id": "AU_MEDICARE",
+      "pattern": "(?<!\\d)[2-6]\\d{3}[ -]?\\d{5}[ -]?\\d(?:[ -]?\\d)?(?!\\d)",
+      "validator": "au_medicare",
+      "sensitiveKeywords": [
+        "medicare"
+      ]
+    },
+    {
+      "id": "AU_ABN",
+      "pattern": "(?<!\\d)\\d{2}[ -]?\\d{3}[ -]?\\d{3}[ -]?\\d{3}(?!\\d)",
+      "validator": "stdnum.au.abn",
+      "sensitiveKeywords": [
+        "abn",
+        "australian business number"
+      ]
+    },
+    {
+      "id": "AU_POSTCODE",
+      "pattern": "(?<![A-Za-z0-9])\\d{4}(?![A-Za-z0-9])",
+      "validator": "format"
+    },
+    {
+      "id": "AU_TFN_LEGACY_8",
+      "pattern": "(?<!\\d)\\d{3}[ -]?\\d{3}[ -]?\\d{2}(?!\\d)",
+      "validator": "stdnum.au.tfn",
+      "sensitiveKeywords": [
+        "tfn",
+        "tax file number"
+      ],
+      "notes": "Legacy eight-digit TFNs use the same pinned library checksum validator."
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.au.tfn",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.au.abn",
+    "https://github.com/microsoft/presidio/blob/main/presidio-analyzer/presidio_analyzer/predefined_recognizers/country_specific/australia/au_medicare_recognizer.py"
+  ]
+}

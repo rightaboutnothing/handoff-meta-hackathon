@@ -1,0 +1,29 @@
+{
+  "country": "CA",
+  "phoneRegion": "CA",
+  "rules": [
+    {
+      "id": "CA_SIN",
+      "pattern": "(?<!\\d)\\d{3}[ -]?\\d{3}[ -]?\\d{3}(?!\\d)",
+      "validator": "stdnum.ca.sin",
+      "sensitiveKeywords": [
+        "sin",
+        "social insurance"
+      ]
+    },
+    {
+      "id": "CA_POSTCODE",
+      "pattern": "\\b[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z][ ]?\\d[ABCEGHJ-NPRSTV-Z]\\d\\b",
+      "validator": "format"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.ca.sin"
+  ]
+}

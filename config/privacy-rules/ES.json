@@ -1,0 +1,39 @@
+{
+  "country": "ES",
+  "phoneRegion": "ES",
+  "rules": [
+    {
+      "id": "ES_DNI",
+      "pattern": "\\b\\d{8}[A-Z]\\b",
+      "validator": "stdnum.es.dni"
+    },
+    {
+      "id": "ES_NIE",
+      "pattern": "\\b[XYZ]\\d{7}[A-Z]\\b",
+      "validator": "stdnum.es.nie"
+    },
+    {
+      "id": "ES_VAT",
+      "pattern": "\\bES[ ]?[A-Z0-9]\\d{7}[A-Z0-9]\\b",
+      "validator": "stdnum.es.nif"
+    },
+    {
+      "id": "ES_POSTCODE",
+      "pattern": "(?<![A-Za-z0-9])(?:0[1-9]|[1-4]\\d|5[0-2])\\d{3}(?![A-Za-z0-9])",
+      "validator": "stdnum.es.postal_code",
+      "validationKind": "format"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.es.dni",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.es.nie",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.es.nif",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.es.postal_code"
+  ]
+}

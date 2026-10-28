@@ -1,0 +1,82 @@
+{
+  "country": "UNIVERSAL",
+  "rules": [
+    {
+      "id": "EMAIL",
+      "pattern": "(?<![\\w.%+\\-])[\\w.!#$%&'*+/=?^_`{|}~\\-]+@[\\w](?:[\\w\\-]*[\\w])?(?:\\.[\\w](?:[\\w\\-]*[\\w])?)*",
+      "validator": "email"
+    },
+    {
+      "id": "PAYMENT_CARD",
+      "pattern": "(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)",
+      "validator": "luhn",
+      "minDigits": 13,
+      "maxDigits": 19
+    },
+    {
+      "id": "IBAN",
+      "pattern": "\\b[A-Z]{2}[ -]?\\d{2}(?:[ -]?[A-Z0-9]){11,30}\\b",
+      "validator": "stdnum.iban"
+    },
+    {
+      "id": "IP_ADDRESS",
+      "pattern": "(?<![A-Za-z0-9])(?:\\d{1,3}\\.){3}\\d{1,3}(?![A-Za-z0-9])|(?<![A-Za-z0-9])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}(?![A-Za-z0-9])",
+      "validator": "ip"
+    },
+    {
+      "id": "DATE_OF_BIRTH",
+      "pattern": "\\b(?:\\d{4}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}[-/.]\\d{1,2}[-/.]\\d{2,4}|\\d{1,2}[ -](?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[ -]\\d{4})\\b",
+      "validator": "date"
+    },
+    {
+      "id": "STREET_ADDRESS",
+      "pattern": "\\b\\d{1,6}\\s+[A-Za-z][A-Za-z .'-]{1,65}\\s(?:Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Drive|Dr|Boulevard|Blvd|Way|Court|Ct|Place|Pl|Terrace|Tce)\\b(?:[^;\\r\\n]{0,40})",
+      "validator": "format"
+    },
+    {
+      "id": "LABELED_ADDRESS",
+      "pattern": "(?:address|residential address|street address|住所)\\s*[:=：]\\s*([^;\\r\\n]{6,140})",
+      "group": 1,
+      "validator": "format"
+    },
+    {
+      "id": "PASSPORT_NUMBER",
+      "pattern": "\\b(?=[A-Z0-9-]*\\d)[A-Z0-9][A-Z0-9-]{5,20}\\b",
+      "validator": "keyword_identifier",
+      "keywords": [
+        "passport",
+        "travel document",
+        "旅券",
+        "パスポート"
+      ],
+      "keywordWindow": 35
+    },
+    {
+      "id": "DRIVER_LICENCE",
+      "pattern": "\\b(?=[A-Z0-9-]*\\d)[A-Z0-9][A-Z0-9-]{5,20}\\b",
+      "validator": "keyword_identifier",
+      "keywords": [
+        "driver licence",
+        "driver license",
+        "driving licence",
+        "driving license",
+        "licence number",
+        "license number",
+        "運転免許"
+      ],
+      "keywordWindow": 45
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches.",
+    "Email syntax includes Unicode/IDN and internal single-label domains; DNS assignment is not checked. Generic travel/licence identifiers require nearby supporting keywords."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.iban",
+    "https://github.com/daviddrysdale/python-phonenumbers",
+    "https://docs.python.org/3/library/ipaddress.html"
+  ]
+}

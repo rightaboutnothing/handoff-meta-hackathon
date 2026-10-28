@@ -1,0 +1,36 @@
+{
+  "country": "JP",
+  "phoneRegion": "JP",
+  "rules": [
+    {
+      "id": "JP_MY_NUMBER",
+      "pattern": "(?<!\\d)(?:\\d[ -]?){11}\\d(?!\\d)",
+      "validator": "stdnum.jp.in_",
+      "sensitiveKeywords": [
+        "my number",
+        "mynumber",
+        "マイナンバー",
+        "個人番号"
+      ]
+    },
+    {
+      "id": "JP_POSTAL",
+      "pattern": "(?<!\\d)\\d{3}-\\d{4}(?!\\d)",
+      "validator": "format"
+    },
+    {
+      "id": "JP_ADDRESS",
+      "pattern": "(?:東京都|北海道|大阪府|京都府|[一-龯]{2,3}県)[^;\\r\\n]{3,90}",
+      "validator": "format"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.jp.in_"
+  ]
+}

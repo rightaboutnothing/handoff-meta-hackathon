@@ -1,0 +1,36 @@
+{
+  "country": "US",
+  "phoneRegion": "US",
+  "rules": [
+    {
+      "id": "US_SSN",
+      "pattern": "(?<!\\d)\\d{3}[ -]?\\d{2}[ -]?\\d{4}(?!\\d)",
+      "validator": "us_ssn",
+      "sensitiveKeywords": [
+        "ssn",
+        "social security"
+      ]
+    },
+    {
+      "id": "US_ITIN",
+      "pattern": "(?<!\\d)9\\d{2}[ -]?\\d{2}[ -]?\\d{4}(?!\\d)",
+      "validator": "us_itin",
+      "sensitiveKeywords": [
+        "itin",
+        "taxpayer identification"
+      ]
+    },
+    {
+      "id": "US_ZIP",
+      "pattern": "(?<![A-Za-z0-9])\\d{5}(?:-\\d{4})?(?![A-Za-z0-9])",
+      "validator": "format"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": []
+}

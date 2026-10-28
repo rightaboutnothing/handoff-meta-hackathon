@@ -1,0 +1,37 @@
+{
+  "country": "IN",
+  "phoneRegion": "IN",
+  "rules": [
+    {
+      "id": "IN_AADHAAR",
+      "pattern": "(?<!\\d)[2-9]\\d{3}[ -]?\\d{4}[ -]?\\d{4}(?!\\d)",
+      "validator": "stdnum.in_.aadhaar",
+      "sensitiveKeywords": [
+        "aadhaar",
+        "aadhar"
+      ]
+    },
+    {
+      "id": "IN_PAN",
+      "pattern": "\\b[A-Z]{5}\\d{4}[A-Z]\\b",
+      "validator": "stdnum.in_.pan",
+      "validationKind": "format_only_checksum_not_publicly_validated",
+      "notes": "PAN uses a trailing alphabetic check character; this implementation validates published syntax only, not an unpublished checksum algorithm."
+    },
+    {
+      "id": "IN_POSTCODE",
+      "pattern": "(?<![A-Za-z0-9])[1-9]\\d{5}(?![A-Za-z0-9])",
+      "validator": "format"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.in_.aadhaar",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.in_.pan"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "country": "DE",
+  "phoneRegion": "DE",
+  "rules": [
+    {
+      "id": "DE_TAX_ID",
+      "pattern": "(?<!\\d)\\d(?:[ -]?\\d){10}(?!\\d)",
+      "validator": "stdnum.de.idnr",
+      "sensitiveKeywords": [
+        "steuer",
+        "tax id",
+        "identifikationsnummer"
+      ]
+    },
+    {
+      "id": "DE_VAT",
+      "pattern": "\\bDE[ -]?\\d{3}[ -]?\\d{3}[ -]?\\d{3}\\b",
+      "validator": "stdnum.de.vat"
+    },
+    {
+      "id": "DE_POSTCODE",
+      "pattern": "(?<![A-Za-z0-9])\\d{5}(?![A-Za-z0-9])",
+      "validator": "format"
+    },
+    {
+      "id": "DE_ID_CARD",
+      "pattern": "\\b[CFGHJKLMNPRTVWXYZ0-9]{9}\\b",
+      "validator": "keyword_identifier",
+      "validationKind": "format_only_no_embedded_checksum",
+      "keywords": [
+        "personalausweis",
+        "identity card",
+        "national id",
+        "ausweis"
+      ],
+      "keywordWindow": 35
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.de.idnr",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.de.vat"
+  ]
+}

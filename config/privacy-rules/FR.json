@@ -1,0 +1,50 @@
+{
+  "country": "FR",
+  "phoneRegion": "FR",
+  "rules": [
+    {
+      "id": "FR_NIR",
+      "pattern": "(?<![A-Za-z0-9])[12](?:[ -]?[0-9AB]){14}(?![A-Za-z0-9])",
+      "validator": "stdnum.fr.nir",
+      "sensitiveKeywords": [
+        "nir",
+        "national id",
+        "social security",
+        "sécurité sociale"
+      ]
+    },
+    {
+      "id": "FR_VAT",
+      "pattern": "\\bFR[ -]?[A-Z0-9]{2}[ -]?\\d{3}[ -]?\\d{3}[ -]?\\d{3}\\b",
+      "validator": "stdnum.fr.tva"
+    },
+    {
+      "id": "FR_POSTCODE",
+      "pattern": "(?<![A-Za-z0-9])\\d{5}(?![A-Za-z0-9])",
+      "validator": "format"
+    },
+    {
+      "id": "FR_CNI",
+      "pattern": "\\b(?:[A-Z0-9]{9}|\\d{12})\\b",
+      "validator": "keyword_identifier",
+      "validationKind": "format_only_no_embedded_checksum",
+      "keywords": [
+        "carte nationale",
+        "identity card",
+        "national id",
+        "cni"
+      ],
+      "keywordWindow": 35
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.fr.nir",
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.fr.tva"
+  ]
+}

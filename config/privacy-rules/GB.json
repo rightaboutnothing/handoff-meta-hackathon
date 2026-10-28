@@ -1,0 +1,37 @@
+{
+  "country": "GB",
+  "phoneRegion": "GB",
+  "rules": [
+    {
+      "id": "GB_NINO",
+      "pattern": "\\b[A-Z]{2}[ ]?\\d{2}[ ]?\\d{2}[ ]?\\d{2}[ ]?[A-D]\\b",
+      "validator": "gb_nino",
+      "sensitiveKeywords": [
+        "national insurance",
+        "nino"
+      ]
+    },
+    {
+      "id": "GB_NHS",
+      "pattern": "(?<!\\d)\\d{3}[ -]?\\d{3}[ -]?\\d{4}(?!\\d)",
+      "validator": "stdnum.gb.nhs",
+      "sensitiveKeywords": [
+        "nhs"
+      ]
+    },
+    {
+      "id": "GB_POSTCODE",
+      "pattern": "\\b(?:GIR ?0AA|[A-PR-UWYZ][A-HK-Y]?\\d[0-9A-HJKPSTUW]? ?\\d[ABD-HJLNP-UW-Z]{2})\\b",
+      "validator": "format"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "https://arthurdejong.org/python-stdnum/doc/2.2/",
+  "notes": [
+    "Format matches are sensitive indicators, not proof an identifier belongs to a real person.",
+    "Checksum-invalid labelled identifiers are separately flagged conservatively; not credited as checksum-valid matches."
+  ],
+  "sources": [
+    "https://arthurdejong.org/python-stdnum/doc/2.2/stdnum.gb.nhs"
+  ]
+}
