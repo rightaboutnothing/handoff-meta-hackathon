@@ -6,7 +6,7 @@
   "items": 820,
   "sourceDatasetSha256": "84b62bdece635c23b6955eeb9b4a904e8b33e1ffe5b4add7e44722ce657d947f",
   "sourceManifestHash": "464693fddd8224d46df744f3900785bdcf3b03884e981f8a7f999e98d748faf6",
-  "settingsHash": "dc2f068fea87a16415383952aa5c51710e4fbc5c4c99c9c94b122b99d1283018",
+  "settingsHash": "61190177bf807f83ad2522418c7245d557293b13906da2d92595364b68707f1e",
   "devTrainIDs": [
     "company-power-and-order-cost-AF200-14",
     "mmlu-pro-2088",
@@ -11662,5 +11662,6 @@
       }
     }
   ],
-  "policy": "IDs and metadata only. No prompts, answers, references, API keys or GPQA question text. Roles fixed before new inference or labels; test data cannot select thresholds. Saved Stage 2 replay only after durable threshold lock."
+  "policy": "IDs and metadata only. No prompts, answers, references, API keys or GPQA question text. Roles fixed before new inference or labels; test data cannot select thresholds. Saved Stage 2 replay only after durable threshold lock.",
+  "settingsHashAlgorithm": "SHA-256 canonical JSON (sorted object keys), src/rag/receipts.mjs"
 }

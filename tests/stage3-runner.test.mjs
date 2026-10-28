@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import {mkdtemp,rm,writeFile} from 'node:fs/promises';
+import {mkdtemp,rm,writeFile,readFile} from 'node:fs/promises';
 import {assertStage3BudgetUnset,assertLockedReplay,replayAfterPolicyLock,decorateAcceptance,projectableRow} from '../src/comparison/stage3.mjs';
 import {sha256} from '../src/rag/receipts.mjs';
 import {generateLocalAnswer} from '../src/comparison/local-answer.mjs';
@@ -10,6 +10,11 @@ import {generateLocalAnswer} from '../src/comparison/local-answer.mjs';
 test('Stage 3 leaves the cloud budget absent, even zero is rejected',()=>{
   assert.doesNotThrow(()=>assertStage3BudgetUnset({}));
   for(const value of ['0','1','',0])assert.throws(()=>assertStage3BudgetUnset({CLOUD_BUDGET_USD:value}),/remain unset/);
+});
+test('committed dev manifest and runtime use the same canonical settings hash',async()=>{
+  const settings=JSON.parse(await readFile(new URL('../config/stage3.json',import.meta.url),'utf8')),manifest=JSON.parse(await readFile(new URL('../tasks/comparison/stage3-manifest.json',import.meta.url),'utf8'));
+  assert.equal(manifest.settingsHash,sha256(settings));assert.equal(manifest.devTrainIDs.length,820);assert.equal(new Set(manifest.devTrainIDs).size,820);
+  assert.equal(sha256([...manifest.devTrainIDs].sort()),manifest.partition.devIdsHash);
 });
 test('saved test loader cannot run before a durable unchanged dev policy lock',async()=>{
   const dir=await mkdtemp(path.join(os.tmpdir(),'handoff-stage3-'));
