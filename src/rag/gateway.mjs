@@ -11,8 +11,9 @@ import { calculateLocal } from './calculators.mjs';
 import { createPrivacyVault, countPlaceholders, assertNoResidualPii } from './privacy.mjs';
 import { signReceipt, verifyReceipt, appendReceipt, recordOutboundPayload, sha256 } from './receipts.mjs';
 import {buildLeanPayload,semanticLeanWireText} from '../comparison/handoff-payload.mjs';
-import {isCloudEligible} from '../comparison/policy.mjs';
+import {isCloudEligible,createCloudPolicyRegistry} from '../comparison/policy.mjs';
 import {LOCKED_COMPANY_MODEL,LOCKED_POLICY_HASH,loadLockedPolicy,inferGatewayTask,decideLockedRoute,skippedGeneralAnswer} from './locked-routing.mjs';
+import {readLiveMuseConfig} from '../server/live-muse.mjs';
 
 export const estimateTokens = text => Math.ceil(String(text).length / 4);
 const logDirectory = fileURLToPath(new URL('../../.logs/gateway/', import.meta.url));
@@ -37,7 +38,7 @@ export function parseLocalAnswer(text) {
   } catch { return { answer: 'The local model could not produce a grounded answer.', confidence: 0, needsCloud: true, citations: [] }; }
 }
 
-export async function askRag(question, { dataDir = path.resolve('.handoff'), offlineMeta = true, retrievalEnabled = true, onEvent, localOnly = false, lockedCompanyRouting=ragConfig.lockedCompanyRoutingEnabled, task, dependencies = {} } = {}) {
+export async function askRag(question, { dataDir = path.resolve('.handoff'), offlineMeta = true, retrievalEnabled = true, onEvent, localOnly = false, lockedCompanyRouting=ragConfig.lockedCompanyRoutingEnabled, task, liveRunId=process.env.HANDOFF_LIVE_RUN_ID, dependencies = {} } = {}) {
   if (typeof question !== 'string' || !question.trim() || question.length > 8000) throw new Error('Question must contain 1 to 8000 characters');
   if(typeof lockedCompanyRouting!=='boolean')throw new Error('The locked company-routing flag must be boolean');
   if(lockedCompanyRouting&&(ragConfig.lockedCompanyModel!==LOCKED_COMPANY_MODEL||ragConfig.lockedPolicyHash!==LOCKED_POLICY_HASH))throw new Error('Locked routing configuration does not match Stage 3');
@@ -123,9 +124,14 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
   const inputPrice = prices.museInputPerMillionUsd;
   const outputPrice = prices.museOutputPerMillionUsd;
   const price = (input, output) => (input * inputPrice + output * outputPrice) / 1e6;
-  metric.estimatedCloudOutputTokens = prices.expectedOutputTokens;
+  const liveConfig=await readLiveMuseConfig(),outputProjections=JSON.parse(await readFile(new URL('../../config/pricing.yaml',import.meta.url),'utf8')).outputProjections;
+  const outputProjection=outputProjections[routingTask?.category??'company-data multi-doc']??{answerTokens:prices.expectedOutputTokens,reasoningTokens:128};
+  metric.estimatedCloudVisibleOutputTokens=outputProjection.answerTokens;
+  metric.estimatedCloudReasoningTokens=outputProjection.reasoningTokens;
+  metric.estimatedCloudOutputTokens = outputProjection.answerTokens+outputProjection.reasoningTokens;
+  metric.cloudCompletionTokenCap=liveConfig.maxCompletionTokens;
   metric.estimatedAllCloudInputTokens = estimateTokens(redacted.text + context) + 140;
-  metric.allCloudCostUsdAssumption = price(metric.estimatedAllCloudInputTokens, prices.expectedOutputTokens);
+  metric.allCloudCostUsdAssumption = price(metric.estimatedAllCloudInputTokens, metric.estimatedCloudOutputTokens);
   metric.estimatedCloudInputTokens = 0;
   metric.projectedHandoffCostUsd = 0;
   let receipt, outbound = { question: '', chunks: [] }, answer = parsed.renderedAnswer ?? parsed.answer, route = 'local', status = 'ok', citationChunks = validCitations;
@@ -155,7 +161,7 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
       Object.assign(metric,{handoffPayloadHash:lean.payloadHash,handoffVariant:'question-only',localDraftSent:false,proposedChunks:outbound.chunks.length});
     }
     metric.estimatedCloudInputTokens = estimateTokens(cloudInput);
-    metric.projectedHandoffCostUsd = price(metric.estimatedCloudInputTokens, prices.expectedOutputTokens);
+    metric.projectedHandoffCostUsd = price(metric.estimatedCloudInputTokens, metric.estimatedCloudOutputTokens);
     assertNoResidualPii(cloudInput, vault);
     await emit('screened', 2, 'Llama Guard is screening the redacted handoff', 'guard', { status: 'checking' });
     const outboundGuard = await screenForCloud(cloudInput,{guard:dependencies.guardText??guardText,localOnly:effectiveLocalOnly,allowInjectedLegacy:Boolean(dependencies.guardText)});
@@ -179,7 +185,10 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
         await emit('handed_off', 5, 'Guard approved the redacted handoff to Muse Spark', 'guard', { route: 'cloud' });
         await emit('thinking', 5, 'Muse Spark is considering the redacted evidence', 'cloud');
         try {
-          const cloud = await (dependencies.callMuse ?? callMuse)(cloudInput, { offlineMeta: false,releasePermit:outboundGuard.releasePermit });
+          const cloudItem=routingTask??inferGatewayTask(redacted.text,retrieval,{id:runId,localOnly,task});
+          // The question trace UUID must never reset a multi-question spend cap.
+          // Only operator environment or a trusted server caller selects a run.
+          const cloud = await (dependencies.callMuse ?? callMuse)(cloudInput, { offlineMeta: false,releasePermit:outboundGuard.releasePermit,item:cloudItem,registry:createCloudPolicyRegistry([cloudItem]),liveRunId,dataDir });
           metric.tokensSentToCloud = cloud.tokens.input; metric.outboundChunks = outbound.chunks.length;
           metric.actualCostUsd = cloud.providerCostUsd ?? null;
           metric.cloudCostUnknown = cloud.providerCostUsd == null;
@@ -193,7 +202,9 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
           receipt = await signReceipt({ ...payload, status: inboundGuard.safe ? 'completed' : 'inbound_blocked', actualChunksSent: outbound.chunks.length, responseHash: sha256(cloud.text), guardInbound: inboundGuard.safe ? 'safe' : 'unsafe', responseId: cloud.responseId, tokens: cloud.tokens }, { dataDir });
           receipt = await appendReceipt(receipt, { dataDir });
         } catch (error) {
-          status = 'deferred_cloud'; answer = 'The cloud request failed. This item remains deferred for a later retry.'; citationChunks = [];
+          metric.cloudFailureCode=/^LIVE_[A-Z_]+$/.test(error.code??'')?error.code:'CLOUD_REQUEST_FAILED';
+          if(error.tokens){metric.tokensSentToCloud=error.tokens.input;metric.outboundChunks=outbound.chunks.length;metric.estimatedCloudCostUsd=price(error.tokens.input,error.tokens.output);}
+          status = 'deferred_cloud'; answer = error.code==='LIVE_EMPTY_OUTPUT'?'Muse Spark returned no answer text. This item remains deferred.':'The cloud request failed. This item remains deferred for a later retry.'; citationChunks = [];
           metric.cloudCostUnknown = true; metric.actualCostUsd = null; metric.cloudDeliveryUnknown = true;
           receipt = await signReceipt({ ...payload, status: 'request_failed', actualChunksSent: null, attemptedChunks: outbound.chunks.length, delivery: 'unknown' }, { dataDir });
           receipt = await appendReceipt(receipt, { dataDir });

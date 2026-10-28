@@ -5,6 +5,8 @@ import { getModelApiKey } from './env.mjs';
 import {llamaGuardPrompt} from './comparison-models.mjs';
 import {assertNoRawPrivatePatterns} from '../comparison/handoff-payload.mjs';
 import {sha256} from '../rag/receipts.mjs';
+import {assertCloudEligible} from '../comparison/policy.mjs';
+import {readLiveMuseConfig,buildMuseRequest,reserveMuseRequest,createMuseRunBudget,isMuseKilled,parseMuseResponse} from './live-muse.mjs';
 
 export const ragConfig = JSON.parse(await readFile(new URL('../../config/rag.json', import.meta.url), 'utf8'));
 const configuredHost = process.env.OLLAMA_HOST || 'http://localhost:11434';
@@ -63,24 +65,46 @@ export async function screenForCloud(input,{guard=guardText,localOnly=false,allo
   if(localOnly)return{safe:false,classification:'local_only',safetyCategories:[],categories:[],wouldRelease:false,releasePermit:null,reason:'The server safety policy keeps this item local',modelId:ragConfig.guardModel,latencyMs:0,tokens:{input:0,output:0,total:0}};
   const result=await guard(input),classification=result?.classification??(allowInjectedLegacy&&result?.safe===true?'safe':'invalid');
   const safe=result?.safe===true&&classification==='safe',permit=safe?Object.freeze({}):null;
-  if(permit)releases.set(permit,{hash:sha256(input),modelId:result.modelId});
+  if(permit)releases.set(permit,{hash:sha256(input),modelId:result.modelId,issuedAt:Date.now()});
   return{...result,classification,safe,safetyCategories:result?.safetyCategories??result?.categories??[],wouldRelease:safe,releasePermit:permit,inputHash:sha256(input)};
 }
-export function assertCloudRelease(input,permit){
-  if(!permit||!releases.has(permit)||releases.get(permit).hash!==sha256(input))throw new Error('Cloud boundary requires an unused Guard pass for the exact redacted input');
+export function assertCloudRelease(input,permit,{maxAgeMs=30000}={}){
+  const record=permit&&releases.get(permit),age=record?Date.now()-record.issuedAt:Infinity;
+  if(!record||record.hash!==sha256(input)||age<0||age>Math.min(maxAgeMs,30000))throw new Error('Cloud boundary requires a fresh unused Guard pass for the exact redacted input');
   releases.delete(permit);return true;
 }
 
-export async function callMuse(input, { offlineMeta = true,releasePermit } = {}) {
+export function assertMuseItem(item,registry){
+  assertCloudEligible(item,registry);
+  if(item.attackSet||item.attack||item.piiTest||[item.suite,item.category,item.type,item.sourceKind].some(value=>/attack|jailbreak|injection|evasion|guard[-_ ]?stress|pii[-_ ]?test|harmful|red[-_ ]?team|poison|strongreject/i.test(String(value??''))))throw Object.assign(new Error('Attack and privacy-test sets are structurally local-only'),{code:'LOCAL_ONLY_ITEM'});
+}
+export async function callMuse(input, { offlineMeta = true,releasePermit,item,registry,liveRunId=process.env.HANDOFF_LIVE_RUN_ID,dataDir,dependencies={} } = {}) {
   if (offlineMeta || !metaAccessEnabled()) throw new Error('Meta access is paused; cloud request deferred');
-  assertCloudRelease(input,releasePermit);
-  const client = new OpenAI({ baseURL: 'https://api.meta.ai/v1', apiKey: getModelApiKey(), maxRetries: 3, timeout: 120000 });
+  const config=await readLiveMuseConfig(dependencies.configFile);
+  // The permit is consumed even if a later safety/budget gate blocks dispatch.
+  // Persisted Stage 5/6 verdicts are evidence only, never live authorization.
+  assertCloudRelease(input,releasePermit,{maxAgeMs:config.guardPermitMaxAgeMs});
+  assertMuseItem(item,registry);
+  if(await isMuseKilled(config,{dataDir}))throw Object.assign(new Error('The live cloud kill switch is active'),{code:'LIVE_KILL_SWITCH'});
+  const body=buildMuseRequest(input,config),budget=await createMuseRunBudget({runId:liveRunId,dataDir,config}),reservation=reserveMuseRequest(input,config);
+  const ticket=await budget.reserve({itemId:item.id,inputHash:sha256(input),guardVerdict:'safe',reservation});
+  // No SDK retry can bypass per-call reservations. Failed/unknown calls keep
+  // their full reservation and halt the run until an operator reconciles it.
+  let parsed,response,settled=false;
   const started = performance.now();
-  const response = await client.responses.create({ model: ragConfig.cloudModel, input, reasoning: { effort: ragConfig.reasoningEffort }, max_output_tokens: ragConfig.maxOutputTokens });
-  return { text: response.output_text ?? '', modelId: ragConfig.cloudModel, responseId: response.id,
-    latencyMs: performance.now() - started,
-    tokens: { input: response.usage?.input_tokens ?? 0, output: response.usage?.output_tokens ?? 0, total: response.usage?.total_tokens ?? 0 },
-    providerCostUsd: Number.isFinite(response.usage?.cost) ? response.usage.cost : null };
+  try{
+    if(await isMuseKilled(config,{dataDir}))throw Object.assign(new Error('The live cloud kill switch is active'),{code:'LIVE_KILL_SWITCH'});
+    const client=dependencies.client??new OpenAI({baseURL:'https://api.meta.ai/v1',apiKey:getModelApiKey(),maxRetries:0,timeout:120000,logLevel:'off'});
+    response=await client.responses.create(body);parsed=parseMuseResponse(response);
+    const settlement=await budget.settle(ticket,{tokens:parsed.tokens,providerCostUsd:Number.isFinite(response.usage?.cost)?response.usage.cost:null});settled=true;
+    if(settlement.halted)throw Object.assign(new Error('Provider usage exceeded the reserved live budget; the run is halted'),{code:'LIVE_USAGE_OVERFLOW'});
+    return{text:parsed.text,modelId:config.modelId,responseId:response.id,latencyMs:performance.now()-started,tokens:parsed.tokens,providerCostUsd:Number.isFinite(response.usage?.cost)?response.usage.cost:null,estimatedCloudCostUsd:settlement.costUsd,requestHash:sha256(body)};
+  }catch(error){
+    if(!settled)await budget.settle(ticket,{tokens:error.tokens??null,providerCostUsd:Number.isFinite(response?.usage?.cost)?response.usage.cost:null,code:/^LIVE_[A-Z_]+$/.test(error.code??'')?error.code:'LIVE_REQUEST_UNKNOWN'});
+    // Do not propagate provider content, account identifiers or keys into logs.
+    const code=/^LIVE_[A-Z_]+$/.test(error.code??'')?error.code:'LIVE_REQUEST_UNKNOWN';
+    throw Object.assign(new Error(code==='LIVE_EMPTY_OUTPUT'?'Muse returned no output_text; cloud answer deferred':`The Muse request did not produce a usable answer (${code})`),{code,...(error.tokens?{tokens:error.tokens}:{})});
+  }
 }
 
 export async function warmUpGateway({ dataDir } = {}) {

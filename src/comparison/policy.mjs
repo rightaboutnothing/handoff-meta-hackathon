@@ -7,7 +7,7 @@ export const CLOUD_CATEGORY_ALLOWLIST = Object.freeze([
 ]);
 const categories = new Set(CLOUD_CATEGORY_ALLOWLIST);
 const registries = new WeakMap();
-const forbidden = /harmful|red[-_ ]?team|poison|strongreject/i;
+const forbidden = /harmful|red[-_ ]?team|poison|strongreject|attack|jailbreak|injection|evasion|guard[-_ ]?stress|pii[-_ ]?test/i;
 
 function safetyKind(item) { return item?.safety?.kind ?? item?.safetyKind ?? item?.safety; }
 function explicitSafe(item) {
@@ -15,13 +15,15 @@ function explicitSafe(item) {
 }
 export function isCloudEligible(item) {
   if (!item || !item.id || !categories.has(item.category) || !explicitSafe(item)) return false;
-  if (item.harmful || item.redTeam || item.poisoning || item.localOnly) return false;
-  return ![item.suite, item.category, safetyKind(item), item.type].some(value => forbidden.test(String(value ?? '')));
+  if (item.harmful || item.redTeam || item.poisoning || item.localOnly || item.attack || item.attackSet || item.piiTest) return false;
+  if(item.sourceKind!=null&&typeof item.sourceKind!=='string')return false;
+  return ![item.suite, item.category, safetyKind(item), item.type, item.sourceKind].some(value => forbidden.test(String(value ?? '')));
 }
 function identity(item) {
   return JSON.stringify({ id: item.id, suite: item.suite, category: item.category,
     safetyKind: safetyKind(item), cloudEligible: item?.safety?.cloudEligible ?? item?.cloudEligible,
     harmful: !!item.harmful, redTeam: !!item.redTeam, poisoning: !!item.poisoning, localOnly: !!item.localOnly,
+    attack: !!item.attack, attackSet: !!item.attackSet, piiTest: !!item.piiTest, sourceKind:item.sourceKind??null,
     promptHash: createHash('sha256').update(String(item.prompt ?? '')).digest('hex') });
 }
 /** Snapshot the trusted dataset manifest before any routing/control can alter an item. */

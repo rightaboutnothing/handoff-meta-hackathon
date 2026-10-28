@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "modelId": "muse-spark-1.3",
+  "endpoint": "responses",
+  "killSwitch": true,
+  "maxCompletionTokens": 768,
+  "reasoningEffort": "medium",
+  "guardPermitMaxAgeMs": 30000,
+  "maxCallsPerRun": 1,
+  "maxTokensPerRun": 4096,
+  "maxCostUsdPerRun": 0.01,
+  "inputFramingReserveTokens": 256,
+  "pricingAssumptions": true,
+  "inputUsdPerMillion": 2,
+  "outputUsdPerMillion": 6,
+  "notes": [
+    "Default kill switch prevents every live call. Meta access and a positive CLOUD_BUDGET_USD are separate requirements.",
+    "maxCompletionTokens is the total visible-plus-reasoning completion budget. Responses serializes it as max_output_tokens; chat completions would use max_completion_tokens.",
+    "Unit prices and input byte/framing upper bound are explicit planning assumptions, not a verified provider invoice guarantee.",
+    "Unknown dispatch outcomes retain their entire reservation. Automatic SDK retries are disabled.",
+    "HANDOFF_LIVE_RUN_ID must be set by the operator, or supplied by a trusted server caller. All questions in one authorized run share this ledger; question trace UUIDs never select or reset a budget. Browser input cannot set a live run ID."
+  ]
+}
