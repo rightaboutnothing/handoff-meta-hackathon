@@ -17,6 +17,7 @@ import {GatewayBenchmarks} from './src/components/GatewayBenchmarks';
 import {GatewaySavings} from './src/components/GatewaySavings';
 export const render=(view,data,comparison)=>renderToStaticMarkup(React.createElement(view==='benchmarks'?GatewayBenchmarks:GatewaySavings,{data,comparison}));
 export {plansForVariant} from './src/components/Tier0CostAudit';
+export {promptFormatConclusion} from './src/components/GradingAudit';
 `, resolveDir:root, sourcefile:'comparison-check.tsx', loader:'tsx' }, absWorkingDir:root, bundle:true, write:false, platform:'node', format:'cjs', jsx:'automatic', loader:{'.css':'empty'}, logLevel:'silent', define:{'process.env.NODE_ENV':'"production"'} });
 const compiled={exports:{}};
 new Function('module','exports','require',bundle.outputFiles[0].text)(compiled,compiled.exports,require);
@@ -45,8 +46,8 @@ const winners={...report,tier:1,categoryWinners:{reasoning:{accuracy:{pipelineId
 assert.match(text(compiled.exports.render('benchmarks',data,winners)),/Measured category leaders/);
 assert.match(text(compiled.exports.render('benchmarks',data,winners)),/Local control fixture/);
 
-const feeScope={items:17,cloudInputTokensPerQuery:measure(76.5),cloudOnlyInputTokensPerQuery:measure(210.5),projectedAnswerTokensPerQuery:measure(54),projectedReasoningTokensPerQuery:measure(20),costPer1000Usd:measure(.1234),cloudOnlyCostPer1000Usd:measure(1.5),savingRate:measure((1.5-.1234)/1.5),inputTokensBySource:{instructions:{handoff:measure(12),cloudOnly:measure(12)},query:{handoff:measure(21),cloudOnly:measure(21)},localDraft:{handoff:measure(0),cloudOnly:measure(0)},guardWrapper:{handoff:measure(0),cloudOnly:measure(0)},receiptMetadata:{handoff:measure(0),cloudOnly:measure(0)},piiMap:{handoff:measure(0),cloudOnly:measure(0)}}};
-const feePlan={pipelineId:pipeline.id,name:pipeline.name,variant:'question-only',items:17,handedOffItems:5,costPer1000Usd:.1234,cloudOnlyCostPer1000Usd:1.5,allQueries:feeScope,handedOffQueries:{...feeScope,items:5,costPer1000Usd:measure(.4195),cloudOnlyCostPer1000Usd:measure(.5)},localAllocationPer1000Usd:.2,combinedCostPer1000AllQueriesUsd:.3234,qualityPerDollar:null,actualCloudSpendUsd:0};
+const feeScope={items:17,cloudInputTokensPerQuery:measure(76.5),cloudTotalTokensPerQuery:measure(150.5),cloudOnlyInputTokensPerQuery:measure(210.5),projectedAnswerTokensPerQuery:measure(54),projectedReasoningTokensPerQuery:measure(20),costPer1000Usd:measure(.1234),cloudOnlyCostPer1000Usd:measure(1.5),savingRate:measure((1.5-.1234)/1.5),inputTokensBySource:{instructions:{handoff:measure(12),cloudOnly:measure(12)},query:{handoff:measure(21),cloudOnly:measure(21)},localDraft:{handoff:measure(0),cloudOnly:measure(0)},guardWrapper:{handoff:measure(0),cloudOnly:measure(0)},receiptMetadata:{handoff:measure(0),cloudOnly:measure(0)},piiMap:{handoff:measure(0),cloudOnly:measure(0)}}};
+const feePlan={pipelineId:pipeline.id,name:pipeline.name,variant:'question-only',items:17,handedOffItems:5,costPer1000Usd:.1234,cloudOnlyCostPer1000Usd:1.5,allQueries:feeScope,handedOffQueries:{...feeScope,items:5,cloudTotalTokensPerQuery:measure(351.4),costPer1000Usd:measure(.4195),cloudOnlyCostPer1000Usd:measure(.5)},localAllocationPer1000Usd:.2,combinedCostPer1000AllQueriesUsd:.3234,qualityPerDollar:null,actualCloudSpendUsd:0};
 const gradeModel={items:17,firstLabelled:17,secondLabelled:17,pairedLabelled:17,firstScore:measure(.51),secondScore:measure(.61),exactScoreAgreement:measure(.9),fullCreditAgreement:measure(.94),fullCreditKappa:measure(.78),formatDisagreements:3,disagreements:[{id:'fixture-id',category:'knowledge',firstScore:0,secondScore:1,reason:'format_option_recovery'}]};
 const gradeCohort={items:17,pairedModels:17,models:{'llama3.1:8b':gradeModel,'gemma3:12b':gradeModel},baselineGap:measure(.1),secondMethodGap:measure(.02),gapChange:measure(-.08)};
 const corrected={...report,costPlan:[feePlan],costPlanVariants:[feePlan,{...feePlan,variant:'with-draft',costPer1000Usd:.1999}],costAudit:{version:'payload-token-cost-v2',tokenizers:{gemini:{method:'official local tokenizer fixture',repository:'official-fixture',revision:'revision-fixture'},'muse-spark':{method:'local proxy tokenizer fixture',proxy:true}},legacyReconciliation:{historicalCombinedCostPer1000Usd:1.3759,historicalCloudFeesPer1000Usd:1.1759,historicalLocalAllocationPer1000Usd:.2,historicalCloudOnlyPer1000Usd:1.2549,explanation:'Earlier combined price included local allocation.',sourceBreakdown:{instructions:12,query:21,localDraft:0,guardWrapper:0,receiptMetadata:0,piiMap:0},sourceBreakdownCloudOnly:{instructions:12,query:21,localDraft:0,guardWrapper:0,receiptMetadata:0,piiMap:0}},gradingAudit:{random200:gradeCohort,originalReportedSlice:gradeCohort,promptFormatAblation:{items:7,models:{'llama3.1:8b':{items:7,originalScore:measure(.51),plainScore:measure(.55),withinModelChange:measure(.04),originalEnvelopeValidRate:measure(.8)}},originalPromptGap:measure(.1),plainPromptGap:measure(.05),gapChange:measure(-.05)}}}};
@@ -57,6 +58,18 @@ assert.match(text(feeSavings),/\$13\.77/,'Monthly savings use all-query fees and
 assert.match(text(feeSavings),/Handed-off subset/);
 assert.match(text(feeSavings),/Hardware allocation · separate from cloud-fee saving/);
 assert.match(feeBench,/Random held-out sample/);assert.match(feeBench,/Original reported slice/);assert.match(feeBench,/Prompt-format control/);
+assert.match(feeBench,/Total cloud tokens \/ query/);assert.match(feeBench,/Total cloud tokens \/ handoff/);
+assert.match(feeBench,/151/,'All-query total includes projected output and reasoning');
+assert.match(feeBench,/351/,'Handoff total uses the matched-subset measurement');
+assert.match(feeBench,/weighted by category and cloud eligibility/);
+assert.match(feeBench,/Original grader · own labels/);assert.match(feeBench,/Each score column uses that grader/);
+assert.match(feeBench,/17 questions supported by both graders and both models/);
+assert.match(compiled.exports.promptFormatConclusion(),/pending/);
+const sensitive={items:31,originalPromptGap:measure(.27),plainPromptGap:measure(.03),gapChange:{estimate:-.24,ci95:[-.4,-.1]}};
+assert.match(compiled.exports.promptFormatConclusion(sensitive),/31 paired questions.*narrows: 27\.0 pp.*3\.0 pp/);
+assert.match(compiled.exports.promptFormatConclusion(sensitive),/interval excludes zero.*sensitivity to the wrapper/);
+assert.match(compiled.exports.promptFormatConclusion({...sensitive,gapChange:{estimate:-.24,ci95:[-.4,.1]}}),/does not establish a clear format effect/);
+assert.match(compiled.exports.promptFormatConclusion({...sensitive,plainPromptGap:measure(-.03)}),/reverses sign/);
 assert.match(feeBench,/90\.0%/);assert.match(feeBench,/Pending Tier 1/);assert.match(feeBench,/Tokenizer proxy/);
 assert.match(feeBench,/Guard wrapper · stays local/);assert.match(feeBench,/Receipt metadata · stays local/);assert.match(feeBench,/PII map · stays local/);
 assert.equal(compiled.exports.plansForVariant(corrected,'with-draft')[0].costPer1000Usd,.1999);
@@ -78,6 +91,10 @@ if(actual?.tier===0) {
     assert.match(actualSavings,/Cloud fees per 1,000 queries · all questions/);
     assert.ok(actualSavings.includes(`$${heroPlan.allQueries.costPer1000Usd.estimate.toFixed(4)}`),'New headline uses per-item all-query cloud fees');
     assert.ok(actualSavings.includes(Math.round((heroPlan.allQueries.cloudOnlyInputTokensPerQuery.estimate-heroPlan.allQueries.cloudInputTokensPerQuery.estimate)*10000).toLocaleString('en-US')),'Actual monthly token projection uses all-query means');
+    const actualBench=text(compiled.exports.render('benchmarks',data,actual));
+    assert.ok(actualBench.includes(Math.round(heroPlan.allQueries.cloudTotalTokensPerQuery.estimate).toLocaleString('en-US')),'Counted report total cloud tokens are displayed');
+    assert.ok(actualBench.includes(`${actual.costAudit.gradingAudit.random200.pairedModels} questions supported by both graders and both models`),'Actual common-label coverage is explicit');
+    assert.ok(actualBench.includes(compiled.exports.promptFormatConclusion(actual.costAudit.gradingAudit.promptFormatAblation)),'Prompt-format interpretation is derived from the measured report');
   }else{
     assert.ok(actualSavings.includes(`${(hero.metrics.localStageMedianLatencyMs.estimate/1000).toFixed(2)}s`),'Savings shows measured local stage time while cloud completion remains pending');
     assert.ok(actualSavings.includes(Math.round((heroPlan.expectedAllCloudInputTokensPer1000-heroPlan.expectedInputTokensPer1000)*10).toLocaleString('en-US')),'Actual weighted monthly token projection is displayed');
