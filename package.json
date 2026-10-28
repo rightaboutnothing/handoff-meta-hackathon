@@ -23,6 +23,8 @@
     "privacy:setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-privacy.ps1",
     "privacy:preflight": "node scripts/preflight-stage6b.mjs",
     "privacy:stage6b": "node scripts/run-stage6b.mjs",
+    "privacy:preflight:stage6c": "node scripts/preflight-stage6c.mjs",
+    "privacy:stage6c": "node scripts/run-stage6c.mjs",
     "privacy:prompt-guard": "node scripts/rerun-stage6b-prompt-guard.mjs",
     "comparison:prepare-tokenizers": "node scripts/prepare-tokenizers.mjs",
     "test:comparison": "node --test tests/comparison-*.test.mjs",

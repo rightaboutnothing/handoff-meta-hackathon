@@ -542,3 +542,7 @@ Round 2 projects $0.5158 Handoff cost versus $2.6105 all-cloud per 1,000 queries
 ## Stage 6b: question-only privacy boundary
 
 The reproducible Stage 6b method, ordered checks, country scopes, offline protocol and caveats are documented in [docs/stage6b-method.md](docs/stage6b-method.md). This stage supersedes earlier live payload preparation: outgoing bodies now contain only an abstract question and the shared system prompt. Live dispatch remains disabled. Historical results above remain unchanged.
+
+## Stage 6c: Prompt Guard and intent-preserving private questions
+
+The local-only Stage 6c method is in [docs/stage6c-method.md](docs/stage6c-method.md). It replaces the injection placeholder with verified local Prompt Guard 2 weights, separates task abstraction from residual PII inspection, and evaluates full pipelines on both frozen populations. The threshold and sample-readiness criteria are declared before the run. Historical Stage 6b measurements are preserved; dispatch stays disabled.

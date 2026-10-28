@@ -2,7 +2,13 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
-## Stage 6b: send the question, never the data
+## Stage 6c: local injection screening and intent-preserving questions
+
+Prompt Guard 2 **86M is the primary local injection model**, with **22M as a comparison**. Both use pinned, verified local snapshots and a fixed threshold of **0.5**, with no downloads or cloud inference. The rewrite now preserves the requested operation and constraints using fixed neutral placeholders; a separate residual privacy check sees only the proposed question. Original and decoded text still go through the safety models. **Live dispatch remains disabled.**
+
+Run `npm run privacy:preflight:stage6c` to verify the local runtime and safety state, then `npm run privacy:stage6c` for the frozen comparison. Machine-specific Python/model paths stay in ignored `.cache/prompt-guard-local.json`. The [Stage 6c method](docs/stage6c-method.md) declares the evaluation populations, fixed operating point, usability targets, false-block budget and Stage 7 readiness rules before measurement. Results are added after the frozen run completes; earlier measurements below remain unchanged.
+
+## Stage 6b: historical question-only boundary
 
 The new boundary prepares a short, general question locally. Retrieved records, drafts, Guard verdicts, receipts, PII maps and local replacement tokens are excluded from the cloud body. General guidance is checked before a local model applies it to the original evidence. **Live dispatch is disabled, with zero cloud calls authorized.** Prompt Guard 2 **86M and 22M remain PENDING**; missing weights block every full-lens handoff. The Google native-only comparison omits injection protection and cannot authorize a send.
 
