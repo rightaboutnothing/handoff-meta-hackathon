@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "kind": "stage6d-authored-local-application-development",
+  "seed": 20261027,
+  "modelIds": [
+    "llama3.2:3b",
+    "gemma3:4b"
+  ],
+  "temperature": 0,
+  "contextTokens": 4096,
+  "maxOutputTokens": 1024,
+  "cloudCalls": 0,
+  "externalRequests": 0,
+  "spendUsd": 0,
+  "liveDispatchEnabled": false,
+  "source": {
+    "script": ".logs/stage6d-application-development.mjs",
+    "scriptSha256": "09b55bf233d80bc6f63b3bc145083106ee70cb7e65c0bd7b53e7ccbd933d202a",
+    "privateFixtureFile": "../Handoff-private/stage6d/development/application-contract/authored-fixtures.json",
+    "fixtureFileSha256": "1e06e152018c21755ce91366de2a2a5cc692b757672620d8996a5c4d69eeed2e"
+  },
+  "finalProbe": {
+    "localModelCalls": 6,
+    "warmupCalls": 2,
+    "applicationCalls": 4,
+    "externalRequests": 0,
+    "cases": [
+      {
+        "id": "authored-warranty",
+        "lens": "meta",
+        "fixtureHash": "f7c280d09c3161e1b89db699b7e84ecc8de8a9f1f732b8de011bb18cd3244516",
+        "status": "COMPLETE",
+        "modelId": "llama3.2:3b",
+        "completionKnown": true,
+        "grounded": true,
+        "tokenRoundTripVerified": true,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PASS",
+            "modelId": "llama3.2:3b",
+            "maxTokens": 1024,
+            "tokens": {
+              "input": 300,
+              "output": 30,
+              "total": 330
+            }
+          }
+        ],
+        "selectedSpans": 1,
+        "uniqueSelectedSpans": 1,
+        "privateResultSha256": "c055b6580f4e065501e4b9932c570e8f3722972d899789a554266cba8cfed867"
+      },
+      {
+        "id": "authored-long-policy",
+        "lens": "meta",
+        "fixtureHash": "e758c3f6113948294a67060dfa963c816b19e37e633565e5c97254c60d971b98",
+        "status": "COMPLETE",
+        "modelId": "llama3.2:3b",
+        "completionKnown": true,
+        "grounded": true,
+        "tokenRoundTripVerified": true,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PASS",
+            "modelId": "llama3.2:3b",
+            "maxTokens": 1024,
+            "tokens": {
+              "input": 995,
+              "output": 91,
+              "total": 1086
+            }
+          }
+        ],
+        "selectedSpans": 5,
+        "uniqueSelectedSpans": 5,
+        "privateResultSha256": "73d14779867327168838429eb3c90d8723cf6a05735deae71a9ed1f186de25dd"
+      },
+      {
+        "id": "authored-warranty",
+        "lens": "google",
+        "fixtureHash": "f7c280d09c3161e1b89db699b7e84ecc8de8a9f1f732b8de011bb18cd3244516",
+        "status": "COMPLETE",
+        "modelId": "gemma3:4b",
+        "completionKnown": true,
+        "grounded": true,
+        "tokenRoundTripVerified": true,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PASS",
+            "modelId": "gemma3:4b",
+            "maxTokens": 1024,
+            "tokens": {
+              "input": 321,
+              "output": 35,
+              "total": 356
+            }
+          }
+        ],
+        "selectedSpans": 1,
+        "uniqueSelectedSpans": 1,
+        "privateResultSha256": "44f74266c132dd26b54a247eb8cb7fd4fcc6e6ecdb6592442d1c75d42f932b71"
+      },
+      {
+        "id": "authored-long-policy",
+        "lens": "google",
+        "fixtureHash": "e758c3f6113948294a67060dfa963c816b19e37e633565e5c97254c60d971b98",
+        "status": "COMPLETE",
+        "modelId": "gemma3:4b",
+        "completionKnown": true,
+        "grounded": true,
+        "tokenRoundTripVerified": true,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PASS",
+            "modelId": "gemma3:4b",
+            "maxTokens": 1024,
+            "tokens": {
+              "input": 1177,
+              "output": 142,
+              "total": 1319
+            }
+          }
+        ],
+        "selectedSpans": 5,
+        "uniqueSelectedSpans": 5,
+        "privateResultSha256": "7ddae6d9ed347664772fa615efb60fb1c1b0b5601ac6faeadb7b1ef1cd28c6a0"
+      }
+    ]
+  },
+  "preservedInitialFailures": [
+    {
+      "phase": "initial-freeform-quote-development",
+      "id": "authored-long-policy",
+      "lens": "meta",
+      "status": "FAILED",
+      "code": "PRIVACY_LOCAL_TRUNCATED",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_TRUNCATED",
+          "recovered": false,
+          "maxTokens": 1024,
+          "tokens": {
+            "input": 559,
+            "output": 1024,
+            "total": 1583
+          }
+        },
+        {
+          "attempt": 2,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_TRUNCATED",
+          "recovered": false,
+          "maxTokens": 1024,
+          "tokens": {
+            "input": 605,
+            "output": 1024,
+            "total": 1629
+          }
+        }
+      ],
+      "privateFailureSha256": "e6876820e6cd40d26cbddb7a441727f8a588de70e5b838f0b2c13f62c59c8bed",
+      "subsequentlyFixedInDevelopment": true
+    },
+    {
+      "phase": "initial-freeform-quote-development",
+      "id": "authored-warranty",
+      "lens": "google",
+      "status": "FAILED",
+      "code": "LOCAL_APPLICATION_SUPPORT_INVALID",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "ERROR",
+          "code": "LOCAL_APPLICATION_SUPPORT_INVALID",
+          "recovered": false,
+          "maxTokens": 1024,
+          "tokens": {
+            "input": 241,
+            "output": 39,
+            "total": 280
+          }
+        },
+        {
+          "attempt": 2,
+          "status": "ERROR",
+          "code": "LOCAL_APPLICATION_SUPPORT_INVALID",
+          "recovered": false,
+          "maxTokens": 1024,
+          "tokens": {
+            "input": 288,
+            "output": 37,
+            "total": 325
+          }
+        }
+      ],
+      "privateFailureSha256": "775335f21a27e7b6791ba48507771ec2feae513c6c7c387a1b53a90e6e1c4f6a",
+      "subsequentlyFixedInDevelopment": true
+    }
+  ],
+  "developmentHistory": {
+    "probeInvocations": 4,
+    "totalLocalModelCalls": 26,
+    "totalExcludedWarmupCalls": 8,
+    "initialInvocationLocalCalls": 8,
+    "laterInvocationLocalCalls": [
+      6,
+      6,
+      6
+    ],
+    "frozenEvaluationItems": 0,
+    "notes": [
+      "Initial free-form quote development had two local truncation/support failures; their private failure artifacts and metadata are preserved.",
+      "Answer selection evolved to bounded arrays of actual source-span pointers; source text is rendered locally and the final four authored cases completed without error.",
+      "No output cap, Guard threshold or classifier was tuned on frozen evaluation answers. Application output cap1024 was selected by the authorized method change.",
+      "The earlier successful-result snapshots were overwritten by later authored development probes; only the initial failure artifacts and final probe results are retained.",
+      "Fixtures are authored benign development data, separate from every frozen evaluation population."
+    ]
+  }
+}

@@ -157,7 +157,7 @@ test('fresh authored business JSON task and invented identifier complete the act
   const screened=await screenQuestionOnly(prepared,{shadowEvaluation:true,dependencies});assert.equal(screened.hypotheticalBlocked,false);assert.equal(screened.releasePermit,null);
   const wire=buildQuestionOnlyPayload(screened.question);assert.deepEqual(Object.keys(JSON.parse(wire)).sort(),['question','system']);assert.doesNotMatch(wire,/NOVA27|ZENITH83|Fictional Willow|authored-chunk|local private product evidence/);assert.ok(safetyInputs.some(args=>args[1].includes('NOVA27')));
   const checked=await checkIncomingAnswer(prepared,'Calculate total cost divided by units, then compare the product options in a table.',{shadowEvaluation:true,dependencies});assert.equal(checked.availableChecksPassed,true);
-  const applied=await applyAnswerLocally(prepared,checked,{localContext:[{chunkId:'authored-chunk',text:'Local synthetic evidence.'}],shadowEvaluation:true,dependencies});assert.equal(applied.tokenRoundTripVerified,true);assert.equal(applied.answer,'A supported private unit-cost table.');assert.deepEqual(applied.citations,['authored-chunk']);
+  const applied=await applyAnswerLocally(prepared,checked,{localContext:[{chunkId:'authored-chunk',text:'Local synthetic evidence: A supported private unit-cost table.'}],shadowEvaluation:true,dependencies});assert.equal(applied.tokenRoundTripVerified,true);assert.equal(applied.answer,'A supported private unit-cost table.');assert.deepEqual(applied.citations,['authored-chunk']);
 });
 
 test('actual known identity literals cannot be waved through by the opening-word allowance',()=>{

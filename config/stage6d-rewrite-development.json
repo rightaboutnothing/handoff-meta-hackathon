@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 1,
+  "seed": 20261030,
+  "count": 8,
+  "fixtureHash": "a88cc14db0381a5215dc8a68fe678abdfad13bf7f5ee5424123bca892234123c",
+  "iterations": 2,
+  "previousIterations": [
+    {
+      "directory": "development-v1",
+      "summaryHash": "bea2ced7edd30afb1a816493944f2493c6ae7bb99112605bade613511909d4ca",
+      "counts": {
+        "meta": 8,
+        "google": 7
+      },
+      "totalPerLens": 8,
+      "piiSurvivors": 0,
+      "publicMetadata": "config/stage6d-rewrite-development-v1.json"
+    }
+  ],
+  "modelInferenceScope": "authored benign development only",
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "lenses": [
+    {
+      "lens": "meta",
+      "rows": [
+        {
+          "id": "dev6d-technical",
+          "questionHash": "4c53012553999332937064813302a387b06878ce8e32d6b554d3f9766e5cf768",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-conditional",
+          "questionHash": "2dc72ff5d1d914110f2acb2dd13db1e67b6e0f3b01e1028f55286bde9382a4bf",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-org-json",
+          "questionHash": "ba3d93aefa90e2e3c101d4f0c3d43303e23fefa8ce4434e03c12bed0e41f5106",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-neutral-role",
+          "questionHash": "23272e82b0bc03e88a1128a07c99649b15d357afe766691cb33567227aecf386",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "communications"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-calculation",
+          "questionHash": "9d4a8640e6e60c28651236bfa0624584e24b98805850648818dd85ea32863d44",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money",
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-multi",
+          "questionHash": "56ebfe7344a9a69c31411c9e60e446e8b0d030abbc9cb0d976be3c9b88ebfad9",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-identity",
+          "questionHash": "a5cd4196ab27dd2f3da88c9cf0e8629eda0af68ad7e1dadd18dd7d2709b3e0c2",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "communications",
+              "identity"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-product",
+          "questionHash": "9ebfe2b2a38e3e6dccbe6b755d9834e72a7374a534ea4e8ce3f0622eb78c2937",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        }
+      ],
+      "passed": 8,
+      "piiSurvivors": 0,
+      "modelCalls": 12
+    },
+    {
+      "lens": "google",
+      "rows": [
+        {
+          "id": "dev6d-technical",
+          "questionHash": "4c53012553999332937064813302a387b06878ce8e32d6b554d3f9766e5cf768",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-conditional",
+          "questionHash": "2dc72ff5d1d914110f2acb2dd13db1e67b6e0f3b01e1028f55286bde9382a4bf",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-org-json",
+          "questionHash": "ba3d93aefa90e2e3c101d4f0c3d43303e23fefa8ce4434e03c12bed0e41f5106",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-neutral-role",
+          "questionHash": "23272e82b0bc03e88a1128a07c99649b15d357afe766691cb33567227aecf386",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "communications"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-calculation",
+          "questionHash": "64536b0cdb00e2680809cccb11a1859e7eb9ebb944d132df16a00d2764af1909",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money",
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [
+            {
+              "layerId": "rewrite",
+              "code": "PRIVACY_LOCAL_QUESTION_FORMAT",
+              "recovered": true
+            }
+          ],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-multi",
+          "questionHash": "9b4453bf88fe4fc7e6e24b3029178d39b3f86b527cd7f1bed2776b0518efa7fb",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-identity",
+          "questionHash": "c5e7cfe66cc1367c6535fb616d115178532446b06021eca0d945685271852214",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "communications",
+              "identity"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "dev6d-product",
+          "questionHash": "4114555a7c23b7e3fcd047888a1cd8e16725934ae5523b38a9f01859a417b16a",
+          "passed": true,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "repairAttempts": [],
+          "piiSurvivors": 0
+        }
+      ],
+      "passed": 8,
+      "piiSurvivors": 0,
+      "modelCalls": 13
+    }
+  ],
+  "scopeCaveat": "Authored benign preparation smoke; no attack-set tuning, no harmful-Guard false-block estimate and no unseen evaluation claim."
+}
