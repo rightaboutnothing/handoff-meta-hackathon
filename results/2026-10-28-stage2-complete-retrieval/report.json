@@ -1,0 +1,4522 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-28-stage2-complete-retrieval",
+  "timestamp": "2026-10-28T06:19:16.778Z",
+  "tier": 0,
+  "status": "STAGE2_COMPLETE",
+  "cloudCalls": 0,
+  "remoteCountingCalls": 0,
+  "spendUsd": 0,
+  "network": {
+    "externalRequests": 0,
+    "localRequests": 651
+  },
+  "settings": {
+    "version": "stage2-complete-evidence-calculators-v1",
+    "tier": 0,
+    "seed": 20261027,
+    "models": [
+      "llama3.1:8b",
+      "gemma3:4b",
+      "gemma3:12b"
+    ],
+    "baselineRun": "2026-10-28-stage1-answer-citations",
+    "sourceRun": "2026-10-28-tier0-payload-costs",
+    "structuredMaxTokens": 768,
+    "plainMaxTokens": 384,
+    "selfCheckMaxTokens": 128,
+    "retrievalTopK": 8,
+    "retrievalTokenBudget": 1800,
+    "retrievalCompletenessThreshold": 1,
+    "capPilot": "Re-run only the 11 prior structured failures with the original saved context and Stage 1 schema at 768; diagnostic subset, not a representative new score",
+    "contextBudgetCounter": "Maximum of offline Llama BPE and Google SDK-selected local tokenizer; conservative shared text budget, not provider billing",
+    "inference": "Local Ollama only; no cloud generation, remote grading or remote token counting",
+    "calibration": "Freeze the complete Stage 1 classifier objects and thresholds; no fitting or selection",
+    "stopAfter": "Stage 2; do not start Stage 3 dev calibration"
+  },
+  "source": {
+    "hash": "8fecdf6cafcd68e3a448f96b03358d01d8cb32ff97fc8ea5718f1734b8fdc875",
+    "files": {
+      "config/comparison.json": "9ea4f32723add210e8a54c27c69f621aa5a826357b087186f38278825fee2351",
+      "config/handoff-cost.json": "de6d3c7e7b4871814f8c67f99561a3df089b1a5a823de19df0cb28a9dbe96690",
+      "config/pricing.yaml": "1fc3f532abe2245d2da490955a986b4fdc2eab02c98369bbaeb889696d1c4e8e",
+      "config/rag-pricing.json": "2f168257d209264a73ebfe52bd3963920c1bdbffdf7e343c0bb6606b447cdb03",
+      "config/rag.json": "338ec1e36125a92749ef403cdbe350cda9161b5370ad7911b20bc3ccfbe9167f",
+      "config/stage1-answer.json": "1e066c7bd34eacf52d7717b797e933a4456d3e6ad6ef65886f3942c47ac46a03",
+      "config/stage2.json": "04d4173bf2f2405d0e4deed3567e0826cc7f8dd3ce116ff951c5a863d7825628",
+      "package-lock.json": "1f03cf08110412b2797feca0d96b5f532d3bc83679c22886f9d745bb78b55f8f",
+      "src/comparison/budget.mjs": "e90b04ce978c16a0aca09bee6d268400bdd6db706a9dc74b54d9bb107b65039a",
+      "src/comparison/calibration.mjs": "df7d8ac9a21ad33e28425f14115d69e0d0576118f560a0cb51bb86495ad6c90d",
+      "src/comparison/citations.mjs": "b9e23805be2216cb1f903c112130cdc0e233b2773942722085dfb4fcf92792a6",
+      "src/comparison/claim-citations.mjs": "03ffcde5eb84e832b615e3e869049a7bb5c5f236bd6c44efb4fcc4966de4b5a1",
+      "src/comparison/context.mjs": "b82e38defaacaa9d7ac14e447adfc48bacd4912e5af804d69bbc539376046455",
+      "src/comparison/corpus.mjs": "360a9b79238c03a244c89d17e76e7ffacb30e1e62444f3a377e0fdc91e969478",
+      "src/comparison/cost-audit.mjs": "ce688eac32af6a46929ea9f5a3636eacc137399c78b8728bb29bcaf90564bd22",
+      "src/comparison/cost-metrics.mjs": "e01f14baddea25ccc02c32948c0b4fa52e4b5df36370dcb067be4a43cced88c0",
+      "src/comparison/dataset.mjs": "346d1bb256bdf54282976be1621008fa2c8b9369615f30866e78f5dfef91db1b",
+      "src/comparison/grading-audit.mjs": "c165ffc85710b06d2731eca77c0acc27adac4f3bc31c26ccd5da82724b885ba1",
+      "src/comparison/handoff-payload.mjs": "90b77ac413d97fde1a4683ea26dd87c4aabc1684a8678011ef11b4c8a92eeb35",
+      "src/comparison/hardware.mjs": "4edf58b120e7e529f9b3d522996806b2260796aa2f9184e2d5c811b8a94cdf4e",
+      "src/comparison/local-answer.mjs": "42faac14861ec90073bf024a16a95ef53e0e167a9e666df8f56ad7ebac55b1de",
+      "src/comparison/matrix.mjs": "824c4685852e811cbabf8a9ab6be5eca3f2227fce94715a2bb0a69c0c2b3e291",
+      "src/comparison/metrics.mjs": "337ef02adc4dea5f3f96cc4e8f40e0a78f0f8fcb19b0383d4ad1d1bc59f59e58",
+      "src/comparison/policy.mjs": "70f0dd62e0ca79aa8fca599d94eb30c1ea1a1291120a40206c02992e1969f85d",
+      "src/comparison/receipt-journal.mjs": "77b597b60193304d80e916f72f272e802b181b9ea0f8d0d029cf2685e7aa3c8d",
+      "src/comparison/resume.mjs": "ee54363fcd41890d373590aa14ea35ad74b8d063ca539040eeed4da7cc81411d",
+      "src/comparison/run-lock.mjs": "a1ce737fc1e39e1405b626ec08f95f6e0546ca49f69c7ca95f3e4b1a48f3d535",
+      "src/comparison/runner.mjs": "a9703a8820f9690b5eaf758b758402529ab18161488eaa1d7e8fed76b4238a21",
+      "src/comparison/scoring.mjs": "bfe88916c0ec825bbabea82d511e33f4bb6d906cb83847b3cf61880d60dd404c",
+      "src/comparison/stage1-report.mjs": "7ad4f64e832ff2ce52ec15688130c6ed8611c2eaff7a6aa77f510d45577aa093",
+      "src/comparison/stage1.mjs": "c89ae845cb32474e420522fc4b5747f902db82f20c96260dac36c76a9d993b00",
+      "src/comparison/stage2-metrics.mjs": "5ddbb431af7c5d8c92dab782294c14d30c95b1f2982311600716acf41c661828",
+      "src/comparison/stage2.mjs": "9b82933aa59c64bda18721671ed801010dd44176df41fae50c0a2645f763bc38",
+      "src/rag/calculators.mjs": "78feed8e2aeb804cd5c602dd2cdbb71f2533aebc99a5f4424e5eaf4920862416",
+      "src/rag/complete-retrieval.mjs": "49e23fd23290c6bc8cb52f86c5d15333724aa0f9372d5d76fc3df2f2de0b6021",
+      "src/rag/documents.mjs": "5b53b52ca3f13b3da7001cb967f3fc529ceda6831848cad565b1c786d33f5deb",
+      "src/rag/embeddings.mjs": "2057b22c7942d88a321add365f75561a7bc18af61b421ab2de7cbc47e1840e87",
+      "src/rag/evaluate.mjs": "c7edd639be112047cc91f52b913a87861e1008830ec29f5a13a8b054fd41befb",
+      "src/rag/gateway.mjs": "fae0bff6a40256a64c98af5529182b421d72f7b098fe955f4f0c63addbe10630",
+      "src/rag/ingest.mjs": "6782500601b6b8ad2a4eae5c59b1847d38e6e9d924c2cc0eb99fa4b1e1aebd3e",
+      "src/rag/privacy.mjs": "624026518465e38acf5f7f05aa0697b91c0da137d1e8ea933bdb0dc026777fb3",
+      "src/rag/receipts.mjs": "5abb0dbd338e9dc9c79dd38e781c8ca0ce2a06847844a463a16c3b8c55483b1e",
+      "src/rag/store.mjs": "a072a6e6179fb29c7a7eb7ee1e5bf0614421a3574605a47ae1374c1d2d053213",
+      "src/scoring/canary-check.mjs": "37126afbc1bdd52b2feff9b0681066f41e67da7a4b97415c8dc38eaf20ae88c0",
+      "src/scoring/grader.mjs": "a09dd15a14d5e6c214e73459595ac0d3376a65ef3d4e48fe4e7f678023ef66b3",
+      "src/scoring/local-safety-grader.mjs": "897854adb7dbc3257b3f94f7386ccb2eaf0ca858d98e9409f3c5a3d1a1d970a4",
+      "src/scoring/metrics.mjs": "738851920b0d78c314b6106e3fb76c182ebb8f95d206b49cbd90d3e5d05cbf3e",
+      "src/scoring/resume-plan.mjs": "0a442b413e271058ea52f3a8966b8ce27534989eaadeccb5d5c8025149f28faf",
+      "src/scoring/second-grader.mjs": "fadcce6929d9a11ba2ac7783ee9a69712e03f2ff88d1cb86f5360b4d30379a2a",
+      "src/server/comparison-models.mjs": "56ffcd027cf685ee084b37c065bdb560e591c6808d0f3218e628062a03a59c1d",
+      "src/server/env.mjs": "0616e629a6987a00bf7330b33030f265c5f14670885efad06c8a5172d96c8ef4",
+      "src/server/gateway-models.mjs": "b0c360f29aed27af142d56485e305426ac96616187ce8a0d293bab72824417a7",
+      "src/server/model-router.mjs": "41f5e6ed935dbbaf32f6e7f1209e7b1caf94d4e93d269a2c27829d0a8c19926b",
+      "src/server/token-counts.mjs": "63013251ff32ca90c693b7dbf8ca359b8e12cb986332b3302eca39f4d92948bb",
+      "tasks/comparison/grading-audit-manifest.json": "9d6ac0f1bdbb6ac781d758d783f324c8b3145b486cba8b2c1e64f60b289556ee",
+      "tasks/comparison/manifest.json": "2489ae535ca0b8fba7c146316fd09d8bcd08715d522638934a5586d5abde8a0f"
+    },
+    "gitCommit": "d4b2ab7830632747b4d6642c4525064d9a601e32"
+  },
+  "environment": {
+    "profile": "SMB-class local workstation",
+    "recordedAt": "2026-10-28T06:11:39.536Z",
+    "nodeVersion": "v24.18.0",
+    "cpu": {
+      "name": "AMD Ryzen 7 7800X3D 8-Core Processor           ",
+      "logicalCores": 16
+    },
+    "ramGiB": 31.11,
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 5080",
+        "driverVersion": "621.01",
+        "vramMiB": 16303
+      }
+    ],
+    "os": {
+      "platform": "win32",
+      "release": "10.0.26300",
+      "architecture": "x64"
+    },
+    "ollamaVersion": "ollama version is 0.40.11",
+    "ollamaModels": [
+      {
+        "modelId": "gemma3:4b",
+        "digest": "68ceab7e468a31c988b44d5a4984a0e21f58c4f7158c6ce29c1804babac38df7",
+        "bytes": 3350272403,
+        "details": {
+          "parent_model": "dhiltgen/gemma3:4b-it-q4_K_M-llamacpp",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3",
+            "clip"
+          ],
+          "parameter_size": "3.9B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 2560,
+          "runner": "llamacpp"
+        }
+      },
+      {
+        "modelId": "shieldgemma:9b",
+        "digest": "c82cacd5af5e2654d3b2bea8a7f8fd502d9a930b12f61a4c1b2a598117d44115",
+        "bytes": 5761070842,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma2",
+          "families": [
+            "gemma2"
+          ],
+          "parameter_size": "9.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 8192,
+          "embedding_length": 3584,
+          "runner": "ggml"
+        }
+      },
+      {
+        "modelId": "nomic-embed-text:v1.5",
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "bytes": 274302450,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "nomic-bert",
+          "families": [
+            "nomic-bert"
+          ],
+          "parameter_size": "137M",
+          "quantization_level": "F16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        }
+      },
+      {
+        "modelId": "llama-guard3:8b",
+        "digest": "46f211c3d8662823ea4956d1a9e92b2924f84cbd0a0f88b64eaadb59fe58b99d",
+        "bytes": 4920745186,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "8.0B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 4096,
+          "runner": "ggml"
+        }
+      },
+      {
+        "modelId": "gemma3:12b",
+        "digest": "b92b218582c521ba287f38f1d6057dcd3c6cbff036f13cac97b5d861f5e58ec3",
+        "bytes": 8164039732,
+        "details": {
+          "parent_model": "dhiltgen/gemma3:12b-it-q4_K_M-llamacpp",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3",
+            "clip"
+          ],
+          "parameter_size": "11.8B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 3840,
+          "runner": "llamacpp"
+        }
+      },
+      {
+        "modelId": "llama3.1:8b",
+        "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+        "bytes": 4920753328,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "8.0B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 4096,
+          "runner": "ggml"
+        }
+      }
+    ],
+    "guardTemplates": [
+      {
+        "modelId": "llama-guard3:8b",
+        "templateSha256": "cb5a7b24ae22ddee985e72490538cf8d5b3cd4125143f23933887ef5bcdb80c2",
+        "parametersSha256": "1f5dc8d2b8edc9c1f10db279cf7ba27c7b65d8107695a768dba3657e98478810"
+      },
+      {
+        "modelId": "shieldgemma:9b",
+        "templateSha256": "1b667144a522432ff2be769cedd83e6357ccb4788f56853cbe81de39ac57d7b9",
+        "parametersSha256": "1f5dc8d2b8edc9c1f10db279cf7ba27c7b65d8107695a768dba3657e98478810"
+      }
+    ],
+    "sha256": "f2d09077ababf5f980b22a5d951a88a0f56f77e8636595ba0ed1f75950941d12"
+  },
+  "thresholds": {
+    "llama3.1:8b": 0.3601657326870417,
+    "gemma3:4b": 0,
+    "gemma3:12b": 0
+  },
+  "classifierHashes": {
+    "llama3.1:8b": "6089a0b409b548e305de96b3c19d87746ff076ce15fb11be334d9c37fd0001d0",
+    "gemma3:4b": "1a2f4c4deb9f758a8de839c9d8a5ce67f958e6e7a65b20f874fd1dd84d3247b2",
+    "gemma3:12b": "9ecbbaa60b2949e0d66de41179e26d4f7ae065630f8b0a15090cd04e3b1fc0a7"
+  },
+  "calibrationChanged": false,
+  "questionInputsFrozen": true,
+  "retrievalChanged": true,
+  "contextSourceHash": "02c1f0582d423a709a818827f46badf657840df05dae0639c1972b70213dfc25",
+  "corpus": {
+    "chunks": 23,
+    "corpusHash": "fc990203d56a6ea6157cd81ab316090dc8efcd829f75af684f194f34e056d76d"
+  },
+  "tokenBudgetCounters": {
+    "gemini": {
+      "cloudModelId": "gemini-3.1-flash-lite",
+      "repository": "google/gemma-4-E4B-it",
+      "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "files": {
+        "tokenizer.json": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f",
+        "tokenizer_config.json": "9f4fec4b1dc6ecddf8f4a92e9caea5971c0e67d81309f3f9066a2bee8c362633"
+      },
+      "mappingSdkRepository": "googleapis/python-genai",
+      "mappingSdkRevision": "6e80d42acf101a6b51d91021025e509170b388bf",
+      "mappingSource": "https://github.com/googleapis/python-genai/blob/6e80d42acf101a6b51d91021025e509170b388bf/google/genai/_local_tokenizer_loader.py",
+      "countSource": "https://github.com/googleapis/python-genai/blob/6e80d42acf101a6b51d91021025e509170b388bf/google/genai/local_tokenizer.py",
+      "method": "provider_selected_local_tokenizer",
+      "tokenizerLibrary": "@huggingface/tokenizers@0.2.0",
+      "specialTokens": "No automatic BOS/EOS or undocumented server chat framing",
+      "exactForSelectedTokenizer": true,
+      "exactProviderBillingTokens": false,
+      "remoteCountRequests": 0,
+      "cloudInferenceCalls": 0,
+      "limitation": "Google SDK selects this public tokenizer for Gemini 3.1 Flash-Lite; the local SDK is experimental/text-only. Hidden server framing and tokenizer deployment revisions are not measured by an API request."
+    },
+    "muse-spark": {
+      "cloudModelId": "muse-spark-1.3",
+      "proxyModelId": "llama3.1:8b",
+      "algorithmRevision": "a0940f9cf7065d45bb6675660f80d305c041a754",
+      "algorithmSource": "https://github.com/meta-llama/llama3/blob/a0940f9cf7065d45bb6675660f80d305c041a754/llama/tokenizer.py",
+      "limitation": "Muse Spark has no public tokenizer in this project. Installed Llama 3.1 BPE counts are a documented proxy, not actual Muse Spark billed tokens.",
+      "sourceManifestSha256": "3fc95d284915704cf140b825abf5150af0d32fde95f55c081c9602d49d4547c0",
+      "sourceModelBlobDigest": "sha256:667b0c1932bc6ffc593ed1d03f895bf2dc8dc6df21db3042284a6f4416b06a29",
+      "metadataBytes": 7823282,
+      "tokenizerMetadataSha256": "13f2bf9183b4cc9e20e1212bb03d5cfaed1c042e7b1d63bf469d641193c4532b",
+      "files": {
+        "tokenizer.json": "b30567ac6cf7e01d43fec15e4da7d8356745ba7c1283c685de6a5a8dcfa1b1db",
+        "tokenizer_config.json": "4938ea171380bb3d797ea5c8cfe8ae79e0d11c6c23fbc77f05c147e6347b7f24"
+      },
+      "method": "documented_local_proxy",
+      "tokenizerLibrary": "@huggingface/tokenizers@0.2.0",
+      "specialTokens": "No automatic BOS/EOS or undocumented server chat framing",
+      "exactForSelectedTokenizer": true,
+      "exactProviderBillingTokens": false,
+      "remoteCountRequests": 0,
+      "cloudInferenceCalls": 0
+    }
+  },
+  "summary": {
+    "schemaVersion": 1,
+    "rows": [
+      {
+        "cohort": "saved60",
+        "modelId": "llama3.1:8b",
+        "requested": 60,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 29,
+          "fullCreditRate": 0.4915254237288136,
+          "meanScore": 0.5398305084745763,
+          "secondLabelled": 59,
+          "secondFullCredit": 29,
+          "secondMeanScore": 0.5398305084745763,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 1,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 7,
+          "baselineSources": {
+            "saved_stage1": 60
+          },
+          "latencyMeasured": 60,
+          "medianLatencyMs": 588.1314999999977,
+          "p95LatencyMs": 1437.8133200000004,
+          "tokenMeasured": 60,
+          "inputTokens": 56113,
+          "outputTokens": 5002,
+          "meanInputTokens": 935.2166666666667,
+          "meanOutputTokens": 83.36666666666666,
+          "stages": {
+            "local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 364.02844999999706,
+              "meanLatencyMs": 499.76547000000016,
+              "inputTokens": 25688,
+              "outputTokens": 3598
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 220.62710000000243,
+              "meanLatencyMs": 243.23712333333353,
+              "inputTokens": 30425,
+              "outputTokens": 1404
+            },
+            "retrieval": {
+              "calls": 60,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 6.616666666666666,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 16,
+            "complete": 10,
+            "requiredSources": 25,
+            "retrievedSources": 19,
+            "meanScore": 0.7916666666666666,
+            "productRequired": 16,
+            "productRetrieved": 12,
+            "runtimeMeanScore": null
+          },
+          "arithmetic": {
+            "items": 14,
+            "labelled": 14,
+            "fullCredit": 7,
+            "meanScore": 0.625,
+            "toolComputed": 0,
+            "toolInsufficient": 0,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 16,
+            "measured": 16,
+            "missingItems": 16,
+            "factualClaims": 17,
+            "coveredClaims": 0
+          },
+          "generatedAnswers": 60,
+          "calculatorAnswers": 0,
+          "outputCapHits": 1,
+          "answerPathMedianLatencyMs": 588.1314999999977
+        },
+        "after": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 35,
+          "fullCreditRate": 0.5932203389830508,
+          "meanScore": 0.6016949152542372,
+          "secondLabelled": 59,
+          "secondFullCredit": 35,
+          "secondMeanScore": 0.6016949152542372,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 60,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 7,
+          "baselineSources": {},
+          "latencyMeasured": 60,
+          "medianLatencyMs": 471.670699999999,
+          "p95LatencyMs": 1568.9918199999981,
+          "tokenMeasured": 60,
+          "inputTokens": 42917,
+          "outputTokens": 4669,
+          "meanInputTokens": 715.2833333333333,
+          "meanOutputTokens": 77.81666666666666,
+          "stages": {
+            "local_answer": {
+              "calls": 47,
+              "medianLatencyMs": 342.6496999999981,
+              "meanLatencyMs": 541.3264978723404,
+              "inputTokens": 13356,
+              "outputTokens": 3264
+            },
+            "local_calculator": {
+              "calls": 13,
+              "medianLatencyMs": 0.43289999999979045,
+              "meanLatencyMs": 0.7306230769222916,
+              "inputTokens": 0,
+              "outputTokens": 0
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 221.57470000000103,
+              "meanLatencyMs": 236.4151983333334,
+              "inputTokens": 29561,
+              "outputTokens": 1405
+            },
+            "retrieval": {
+              "calls": 60,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 45.604745,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 16,
+            "complete": 15,
+            "requiredSources": 25,
+            "retrievedSources": 23,
+            "meanScore": 0.9375,
+            "productRequired": 16,
+            "productRetrieved": 15,
+            "runtimeMeanScore": 1
+          },
+          "arithmetic": {
+            "items": 14,
+            "labelled": 14,
+            "fullCredit": 13,
+            "meanScore": 0.9642857142857143,
+            "toolComputed": 12,
+            "toolInsufficient": 2,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 16,
+            "measured": 16,
+            "missingItems": 0,
+            "factualClaims": 37,
+            "coveredClaims": 37
+          },
+          "generatedAnswers": 47,
+          "calculatorAnswers": 13,
+          "outputCapHits": 0,
+          "answerPathMedianLatencyMs": 449.24945000000116
+        },
+        "paired": {
+          "items": 60,
+          "labelled": 59,
+          "secondLabelled": 59,
+          "beforeMeanScore": 0.5398305084745763,
+          "afterMeanScore": 0.6016949152542372,
+          "meanScoreChange": {
+            "estimate": 0.06186440677966101,
+            "ci95": [
+              -0.028589901477832514,
+              0.1549222006112809
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.1016949152542373,
+            "ci95": [
+              0,
+              0.21666666666666667
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.06186440677966101,
+            "ci95": [
+              -0.028589901477832514,
+              0.1549222006112809
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.1016949152542373,
+            "ci95": [
+              0,
+              0.21666666666666667
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "saved60",
+        "modelId": "gemma3:4b",
+        "requested": 60,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 20,
+          "fullCreditRate": 0.3389830508474576,
+          "meanScore": 0.411864406779661,
+          "secondLabelled": 59,
+          "secondFullCredit": 22,
+          "secondMeanScore": 0.4330508474576271,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 1,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 3,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_stage1": 60
+          },
+          "latencyMeasured": 60,
+          "medianLatencyMs": 706.1875999999902,
+          "p95LatencyMs": 2323.1744549999767,
+          "tokenMeasured": 60,
+          "inputTokens": 64148,
+          "outputTokens": 8337,
+          "meanInputTokens": 1069.1333333333334,
+          "meanOutputTokens": 138.95,
+          "stages": {
+            "local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 470.80209999998624,
+              "meanLatencyMs": 753.3447516666633,
+              "inputTokens": 28064,
+              "outputTokens": 6877
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 238.0792999999976,
+              "meanLatencyMs": 272.72404833332837,
+              "inputTokens": 36084,
+              "outputTokens": 1460
+            },
+            "retrieval": {
+              "calls": 60,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 6.616666666666666,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 16,
+            "complete": 10,
+            "requiredSources": 25,
+            "retrievedSources": 19,
+            "meanScore": 0.7916666666666666,
+            "productRequired": 16,
+            "productRetrieved": 12,
+            "runtimeMeanScore": null
+          },
+          "arithmetic": {
+            "items": 14,
+            "labelled": 14,
+            "fullCredit": 3,
+            "meanScore": 0.42857142857142855,
+            "toolComputed": 0,
+            "toolInsufficient": 0,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 16,
+            "measured": 16,
+            "missingItems": 16,
+            "factualClaims": 119,
+            "coveredClaims": 16
+          },
+          "generatedAnswers": 60,
+          "calculatorAnswers": 0,
+          "outputCapHits": 3,
+          "answerPathMedianLatencyMs": 699.2516999999789
+        },
+        "after": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 31,
+          "fullCreditRate": 0.5254237288135594,
+          "meanScore": 0.5338983050847458,
+          "secondLabelled": 59,
+          "secondFullCredit": 31,
+          "secondMeanScore": 0.5338983050847458,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 1,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 60,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 60,
+          "medianLatencyMs": 580.7250499999864,
+          "p95LatencyMs": 2026.6745349999785,
+          "tokenMeasured": 60,
+          "inputTokens": 48481,
+          "outputTokens": 6141,
+          "meanInputTokens": 808.0166666666667,
+          "meanOutputTokens": 102.35,
+          "stages": {
+            "local_answer": {
+              "calls": 47,
+              "medianLatencyMs": 401.2639999999956,
+              "meanLatencyMs": 643.3548808510659,
+              "inputTokens": 14180,
+              "outputTokens": 4702
+            },
+            "local_calculator": {
+              "calls": 13,
+              "medianLatencyMs": 0.4005999999935739,
+              "meanLatencyMs": 0.6765769230752574,
+              "inputTokens": 0,
+              "outputTokens": 0
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 230.2533499999845,
+              "meanLatencyMs": 244.90252999999964,
+              "inputTokens": 34301,
+              "outputTokens": 1439
+            },
+            "retrieval": {
+              "calls": 60,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 45.604745,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 16,
+            "complete": 15,
+            "requiredSources": 25,
+            "retrievedSources": 23,
+            "meanScore": 0.9375,
+            "productRequired": 16,
+            "productRetrieved": 15,
+            "runtimeMeanScore": 1
+          },
+          "arithmetic": {
+            "items": 14,
+            "labelled": 14,
+            "fullCredit": 13,
+            "meanScore": 0.9642857142857143,
+            "toolComputed": 12,
+            "toolInsufficient": 2,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 16,
+            "measured": 16,
+            "missingItems": 0,
+            "factualClaims": 32,
+            "coveredClaims": 32
+          },
+          "generatedAnswers": 47,
+          "calculatorAnswers": 13,
+          "outputCapHits": 1,
+          "answerPathMedianLatencyMs": 580.7250499999864
+        },
+        "paired": {
+          "items": 60,
+          "labelled": 59,
+          "secondLabelled": 59,
+          "beforeMeanScore": 0.411864406779661,
+          "afterMeanScore": 0.5338983050847458,
+          "meanScoreChange": {
+            "estimate": 0.12203389830508475,
+            "ci95": [
+              0.03386612021857923,
+              0.21865210403272936
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.1864406779661017,
+            "ci95": [
+              0.08218616662923871,
+              0.3016233766233764
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.10084745762711866,
+            "ci95": [
+              0.028999158249158264,
+              0.17724927849927852
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.15254237288135594,
+            "ci95": [
+              0.06896551724137931,
+              0.24561403508771928
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "saved60",
+        "modelId": "gemma3:12b",
+        "requested": 60,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 38,
+          "fullCreditRate": 0.6440677966101694,
+          "meanScore": 0.6977401129943503,
+          "secondLabelled": 59,
+          "secondFullCredit": 38,
+          "secondMeanScore": 0.6977401129943503,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 2,
+          "ungroundedCitationItems": 2,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 7,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_stage1": 60
+          },
+          "latencyMeasured": 60,
+          "medianLatencyMs": 1757.4843500000425,
+          "p95LatencyMs": 5378.210479999977,
+          "tokenMeasured": 60,
+          "inputTokens": 66354,
+          "outputTokens": 10284,
+          "meanInputTokens": 1105.9,
+          "meanOutputTokens": 171.4,
+          "stages": {
+            "local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 1214.9135999999708,
+              "meanLatencyMs": 1884.3583450000074,
+              "inputTokens": 28064,
+              "outputTokens": 8962
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 457.5249499999918,
+              "meanLatencyMs": 528.7919883333311,
+              "inputTokens": 38290,
+              "outputTokens": 1322
+            },
+            "retrieval": {
+              "calls": 60,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 6.616666666666666,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 16,
+            "complete": 10,
+            "requiredSources": 25,
+            "retrievedSources": 19,
+            "meanScore": 0.7916666666666666,
+            "productRequired": 16,
+            "productRetrieved": 12,
+            "runtimeMeanScore": null
+          },
+          "arithmetic": {
+            "items": 14,
+            "labelled": 14,
+            "fullCredit": 7,
+            "meanScore": 0.6904761904761906,
+            "toolComputed": 0,
+            "toolInsufficient": 0,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 16,
+            "measured": 16,
+            "missingItems": 15,
+            "factualClaims": 103,
+            "coveredClaims": 16
+          },
+          "generatedAnswers": 60,
+          "calculatorAnswers": 0,
+          "outputCapHits": 7,
+          "answerPathMedianLatencyMs": 1757.4843500000425
+        },
+        "after": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 44,
+          "fullCreditRate": 0.7457627118644068,
+          "meanScore": 0.7570621468926553,
+          "secondLabelled": 59,
+          "secondFullCredit": 44,
+          "secondMeanScore": 0.7570621468926553,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 3,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 60,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 60,
+          "medianLatencyMs": 1489.6287999999768,
+          "p95LatencyMs": 6864.742794999999,
+          "tokenMeasured": 60,
+          "inputTokens": 51782,
+          "outputTokens": 9241,
+          "meanInputTokens": 863.0333333333333,
+          "meanOutputTokens": 154.01666666666668,
+          "stages": {
+            "local_answer": {
+              "calls": 47,
+              "medianLatencyMs": 1199.0901000000304,
+              "meanLatencyMs": 2166.666127659575,
+              "inputTokens": 14180,
+              "outputTokens": 7910
+            },
+            "local_calculator": {
+              "calls": 13,
+              "medianLatencyMs": 0.41899999999441206,
+              "meanLatencyMs": 0.6584692307828496,
+              "inputTokens": 0,
+              "outputTokens": 0
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 502.36759999996866,
+              "meanLatencyMs": 554.1710033333336,
+              "inputTokens": 37602,
+              "outputTokens": 1331
+            },
+            "retrieval": {
+              "calls": 60,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 45.604745,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 16,
+            "complete": 15,
+            "requiredSources": 25,
+            "retrievedSources": 23,
+            "meanScore": 0.9375,
+            "productRequired": 16,
+            "productRetrieved": 15,
+            "runtimeMeanScore": 1
+          },
+          "arithmetic": {
+            "items": 14,
+            "labelled": 14,
+            "fullCredit": 13,
+            "meanScore": 0.9761904761904762,
+            "toolComputed": 12,
+            "toolInsufficient": 2,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 16,
+            "measured": 16,
+            "missingItems": 0,
+            "factualClaims": 41,
+            "coveredClaims": 41
+          },
+          "generatedAnswers": 47,
+          "calculatorAnswers": 13,
+          "outputCapHits": 3,
+          "answerPathMedianLatencyMs": 1489.6287999999768
+        },
+        "paired": {
+          "items": 60,
+          "labelled": 59,
+          "secondLabelled": 59,
+          "beforeMeanScore": 0.6977401129943503,
+          "afterMeanScore": 0.7570621468926553,
+          "meanScoreChange": {
+            "estimate": 0.059322033898305086,
+            "ci95": [
+              0,
+              0.13209279394520831
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.1016949152542373,
+            "ci95": [
+              0,
+              0.20969864176570446
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.059322033898305086,
+            "ci95": [
+              0,
+              0.13209279394520831
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.1016949152542373,
+            "ci95": [
+              0,
+              0.20969864176570446
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "plain50",
+        "modelId": "llama3.1:8b",
+        "requested": 50,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 24,
+          "fullCreditRate": 0.48,
+          "meanScore": 0.525,
+          "secondLabelled": 50,
+          "secondFullCredit": 24,
+          "secondMeanScore": 0.5316666666666666,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 1,
+          "rawInvalidCitationRate": 0.07142857142857142,
+          "missingCitationItems": 4,
+          "ungroundedCitationItems": 4,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 1,
+          "rejectedIds": 2,
+          "residualInvalidItems": 1,
+          "residualInvalid": 2,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 1,
+          "baselineSources": {
+            "saved_stage1": 50
+          },
+          "latencyMeasured": 50,
+          "medianLatencyMs": 1281.9061500000098,
+          "p95LatencyMs": 3250.132064999998,
+          "tokenMeasured": 50,
+          "inputTokens": 58015,
+          "outputTokens": 9852,
+          "meanInputTokens": 1160.3,
+          "meanOutputTokens": 197.04,
+          "stages": {
+            "local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 962.254700000005,
+              "meanLatencyMs": 1313.7351780000006,
+              "inputTokens": 23772,
+              "outputTokens": 8705
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 262.44144999999116,
+              "meanLatencyMs": 282.96245000000096,
+              "inputTokens": 34243,
+              "outputTokens": 1147
+            },
+            "retrieval": {
+              "calls": 50,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 9.38,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 14,
+            "complete": 11,
+            "requiredSources": 26,
+            "retrievedSources": 21,
+            "meanScore": 0.875,
+            "productRequired": 16,
+            "productRetrieved": 13,
+            "runtimeMeanScore": null
+          },
+          "arithmetic": {
+            "items": 13,
+            "labelled": 13,
+            "fullCredit": 8,
+            "meanScore": 0.769230769230769,
+            "toolComputed": 0,
+            "toolInsufficient": 0,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 14,
+            "measured": 14,
+            "missingItems": 14,
+            "factualClaims": 197,
+            "coveredClaims": 15
+          },
+          "generatedAnswers": 50,
+          "calculatorAnswers": 0,
+          "outputCapHits": 7,
+          "answerPathMedianLatencyMs": 1271.9061500000098
+        },
+        "after": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 25,
+          "fullCreditRate": 0.5,
+          "meanScore": 0.5416666666666666,
+          "secondLabelled": 50,
+          "secondFullCredit": 25,
+          "secondMeanScore": 0.5416666666666666,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 2,
+          "rawInvalidCitationRate": 0.14285714285714285,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 1,
+          "repairedItems": 2,
+          "repairedIds": 2,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 50,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 1,
+          "baselineSources": {},
+          "latencyMeasured": 50,
+          "medianLatencyMs": 897.181150000004,
+          "p95LatencyMs": 2998.0562050000044,
+          "tokenMeasured": 50,
+          "inputTokens": 46401,
+          "outputTokens": 7487,
+          "meanInputTokens": 928.02,
+          "meanOutputTokens": 149.74,
+          "stages": {
+            "local_answer": {
+              "calls": 40,
+              "medianLatencyMs": 749.8205999999991,
+              "meanLatencyMs": 1118.2173549999993,
+              "inputTokens": 13695,
+              "outputTokens": 6290
+            },
+            "local_calculator": {
+              "calls": 10,
+              "medianLatencyMs": 0.317799999989802,
+              "meanLatencyMs": 0.3811099999984435,
+              "inputTokens": 0,
+              "outputTokens": 0
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 247.458000000006,
+              "meanLatencyMs": 269.7317639999994,
+              "inputTokens": 32706,
+              "outputTokens": 1197
+            },
+            "retrieval": {
+              "calls": 50,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 11.751491999999999,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 14,
+            "complete": 14,
+            "requiredSources": 26,
+            "retrievedSources": 26,
+            "meanScore": 1,
+            "productRequired": 16,
+            "productRetrieved": 16,
+            "runtimeMeanScore": 1
+          },
+          "arithmetic": {
+            "items": 13,
+            "labelled": 13,
+            "fullCredit": 10,
+            "meanScore": 0.9102564102564101,
+            "toolComputed": 10,
+            "toolInsufficient": 3,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 14,
+            "measured": 14,
+            "missingItems": 3,
+            "factualClaims": 91,
+            "coveredClaims": 28
+          },
+          "generatedAnswers": 40,
+          "calculatorAnswers": 10,
+          "outputCapHits": 7,
+          "answerPathMedianLatencyMs": 897.181150000004
+        },
+        "paired": {
+          "items": 50,
+          "labelled": 50,
+          "secondLabelled": 50,
+          "beforeMeanScore": 0.525,
+          "afterMeanScore": 0.5416666666666666,
+          "meanScoreChange": {
+            "estimate": 0.01666666666666667,
+            "ci95": [
+              -0.0666826923076923,
+              0.09334848484848475
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.02,
+            "ci95": [
+              -0.08333333333333333,
+              0.11538461538461539
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.01,
+            "ci95": [
+              -0.06803107606679035,
+              0.08035714285714286
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.02,
+            "ci95": [
+              -0.08333333333333333,
+              0.11538461538461539
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "plain50",
+        "modelId": "gemma3:4b",
+        "requested": 50,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 19,
+          "fullCreditRate": 0.38,
+          "meanScore": 0.4383333333333333,
+          "secondLabelled": 50,
+          "secondFullCredit": 19,
+          "secondMeanScore": 0.455,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 1,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_stage1": 50
+          },
+          "latencyMeasured": 50,
+          "medianLatencyMs": 855.9754500000272,
+          "p95LatencyMs": 2297.483070000002,
+          "tokenMeasured": 50,
+          "inputTokens": 62114,
+          "outputTokens": 9620,
+          "meanInputTokens": 1242.28,
+          "meanOutputTokens": 192.4,
+          "stages": {
+            "local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 571.0432000000146,
+              "meanLatencyMs": 921.8762419999962,
+              "inputTokens": 26151,
+              "outputTokens": 8388
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 263.42089999999735,
+              "meanLatencyMs": 273.6536579999991,
+              "inputTokens": 35963,
+              "outputTokens": 1232
+            },
+            "retrieval": {
+              "calls": 50,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 9.38,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 14,
+            "complete": 11,
+            "requiredSources": 26,
+            "retrievedSources": 21,
+            "meanScore": 0.875,
+            "productRequired": 16,
+            "productRetrieved": 13,
+            "runtimeMeanScore": null
+          },
+          "arithmetic": {
+            "items": 13,
+            "labelled": 13,
+            "fullCredit": 5,
+            "meanScore": 0.608974358974359,
+            "toolComputed": 0,
+            "toolInsufficient": 0,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 14,
+            "measured": 14,
+            "missingItems": 14,
+            "factualClaims": 167,
+            "coveredClaims": 41
+          },
+          "generatedAnswers": 50,
+          "calculatorAnswers": 0,
+          "outputCapHits": 8,
+          "answerPathMedianLatencyMs": 840.9754500000272
+        },
+        "after": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 24,
+          "fullCreditRate": 0.48,
+          "meanScore": 0.51,
+          "secondLabelled": 50,
+          "secondFullCredit": 24,
+          "secondMeanScore": 0.51,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 50,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 50,
+          "medianLatencyMs": 607.6063999999897,
+          "p95LatencyMs": 2252.851899999984,
+          "tokenMeasured": 50,
+          "inputTokens": 49871,
+          "outputTokens": 6680,
+          "meanInputTokens": 997.42,
+          "meanOutputTokens": 133.6,
+          "stages": {
+            "local_answer": {
+              "calls": 40,
+              "medianLatencyMs": 470.34560000000056,
+              "meanLatencyMs": 773.3275374999997,
+              "inputTokens": 14715,
+              "outputTokens": 5472
+            },
+            "local_calculator": {
+              "calls": 10,
+              "medianLatencyMs": 0.3249999999970896,
+              "meanLatencyMs": 0.3919999999983702,
+              "inputTokens": 0,
+              "outputTokens": 0
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 252.85520000000542,
+              "meanLatencyMs": 268.94665799999785,
+              "inputTokens": 35156,
+              "outputTokens": 1208
+            },
+            "retrieval": {
+              "calls": 50,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 11.751491999999999,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 14,
+            "complete": 14,
+            "requiredSources": 26,
+            "retrievedSources": 26,
+            "meanScore": 1,
+            "productRequired": 16,
+            "productRetrieved": 16,
+            "runtimeMeanScore": 1
+          },
+          "arithmetic": {
+            "items": 13,
+            "labelled": 13,
+            "fullCredit": 10,
+            "meanScore": 0.8846153846153846,
+            "toolComputed": 10,
+            "toolInsufficient": 3,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 14,
+            "measured": 14,
+            "missingItems": 1,
+            "factualClaims": 43,
+            "coveredClaims": 40
+          },
+          "generatedAnswers": 40,
+          "calculatorAnswers": 10,
+          "outputCapHits": 6,
+          "answerPathMedianLatencyMs": 607.6063999999897
+        },
+        "paired": {
+          "items": 50,
+          "labelled": 50,
+          "secondLabelled": 50,
+          "beforeMeanScore": 0.4383333333333333,
+          "afterMeanScore": 0.51,
+          "meanScoreChange": {
+            "estimate": 0.07166666666666667,
+            "ci95": [
+              0.012820512820512822,
+              0.14126124712282895
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.1,
+            "ci95": [
+              0.021727567067530065,
+              0.1875
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.05500000000000001,
+            "ci95": [
+              0.010638297872340425,
+              0.11166666666666668
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.1,
+            "ci95": [
+              0.021727567067530065,
+              0.1875
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "plain50",
+        "modelId": "gemma3:12b",
+        "requested": 50,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 22,
+          "fullCreditRate": 0.44,
+          "meanScore": 0.4783333333333333,
+          "secondLabelled": 50,
+          "secondFullCredit": 22,
+          "secondMeanScore": 0.4783333333333333,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_stage1": 50
+          },
+          "latencyMeasured": 50,
+          "medianLatencyMs": 1881.6355499999481,
+          "p95LatencyMs": 5173.897525000016,
+          "tokenMeasured": 50,
+          "inputTokens": 61092,
+          "outputTokens": 8305,
+          "meanInputTokens": 1221.84,
+          "meanOutputTokens": 166.1,
+          "stages": {
+            "local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 1230.4670000000333,
+              "meanLatencyMs": 1794.886709999995,
+              "inputTokens": 26151,
+              "outputTokens": 7163
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 499.3280499999819,
+              "meanLatencyMs": 547.980784,
+              "inputTokens": 34941,
+              "outputTokens": 1142
+            },
+            "retrieval": {
+              "calls": 50,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 9.38,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 14,
+            "complete": 11,
+            "requiredSources": 26,
+            "retrievedSources": 21,
+            "meanScore": 0.875,
+            "productRequired": 16,
+            "productRetrieved": 13,
+            "runtimeMeanScore": null
+          },
+          "arithmetic": {
+            "items": 13,
+            "labelled": 13,
+            "fullCredit": 7,
+            "meanScore": 0.685897435897436,
+            "toolComputed": 0,
+            "toolInsufficient": 0,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 14,
+            "measured": 14,
+            "missingItems": 11,
+            "factualClaims": 121,
+            "coveredClaims": 32
+          },
+          "generatedAnswers": 50,
+          "calculatorAnswers": 0,
+          "outputCapHits": 4,
+          "answerPathMedianLatencyMs": 1856.6355499999481
+        },
+        "after": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 28,
+          "fullCreditRate": 0.56,
+          "meanScore": 0.56,
+          "secondLabelled": 50,
+          "secondFullCredit": 28,
+          "secondMeanScore": 0.56,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 50,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 50,
+          "medianLatencyMs": 1314.1210999999894,
+          "p95LatencyMs": 5260.490064999988,
+          "tokenMeasured": 50,
+          "inputTokens": 49297,
+          "outputTokens": 5953,
+          "meanInputTokens": 985.94,
+          "meanOutputTokens": 119.06,
+          "stages": {
+            "local_answer": {
+              "calls": 40,
+              "medianLatencyMs": 1010.5025000000023,
+              "meanLatencyMs": 1611.185965,
+              "inputTokens": 14715,
+              "outputTokens": 4826
+            },
+            "local_calculator": {
+              "calls": 10,
+              "medianLatencyMs": 0.3213000000396278,
+              "meanLatencyMs": 0.36310000001103615,
+              "inputTokens": 0,
+              "outputTokens": 0
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 530.619400000025,
+              "meanLatencyMs": 564.3305499999993,
+              "inputTokens": 34582,
+              "outputTokens": 1127
+            },
+            "retrieval": {
+              "calls": 50,
+              "medianLatencyMs": 0,
+              "meanLatencyMs": 11.751491999999999,
+              "inputTokens": 0,
+              "outputTokens": 0
+            }
+          },
+          "evidence": {
+            "items": 14,
+            "complete": 14,
+            "requiredSources": 26,
+            "retrievedSources": 26,
+            "meanScore": 1,
+            "productRequired": 16,
+            "productRetrieved": 16,
+            "runtimeMeanScore": 1
+          },
+          "arithmetic": {
+            "items": 13,
+            "labelled": 13,
+            "fullCredit": 13,
+            "meanScore": 1,
+            "toolComputed": 10,
+            "toolInsufficient": 3,
+            "toolUnsupported": 0
+          },
+          "claims": {
+            "items": 14,
+            "measured": 14,
+            "missingItems": 1,
+            "factualClaims": 39,
+            "coveredClaims": 36
+          },
+          "generatedAnswers": 40,
+          "calculatorAnswers": 10,
+          "outputCapHits": 4,
+          "answerPathMedianLatencyMs": 1314.1210999999894
+        },
+        "paired": {
+          "items": 50,
+          "labelled": 50,
+          "secondLabelled": 50,
+          "beforeMeanScore": 0.4783333333333333,
+          "afterMeanScore": 0.56,
+          "meanScoreChange": {
+            "estimate": 0.08166666666666667,
+            "ci95": [
+              0.017005361466620548,
+              0.15667156862745096
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.12,
+            "ci95": [
+              0.021739130434782608,
+              0.22
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.08166666666666667,
+            "ci95": [
+              0.017005361466620548,
+              0.15667156862745096
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.12,
+            "ci95": [
+              0.021739130434782608,
+              0.22
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      }
+    ],
+    "cohorts": [
+      {
+        "id": "saved60",
+        "requested": 60
+      },
+      {
+        "id": "plain50",
+        "requested": 50
+      }
+    ],
+    "modelIds": [
+      "llama3.1:8b",
+      "gemma3:4b",
+      "gemma3:12b"
+    ],
+    "thresholds": {
+      "llama3.1:8b": 0.3601657326870417,
+      "gemma3:4b": 0,
+      "gemma3:12b": 0
+    },
+    "thresholdsRetuned": false,
+    "seed": 20261027,
+    "intervalMethod": {
+      "method": "paired source-group bootstrap percentile 95%",
+      "seed": 20261027,
+      "replicates": 2000
+    },
+    "method": "Full-credit answer rubric, raw citation invalidity before repair/rejection, grounded citation coverage, and answer/self-check parsing reported separately. Model sizes and cohorts are never pooled."
+  },
+  "capPilot": [
+    {
+      "modelId": "llama3.1:8b",
+      "items": 1,
+      "parseFailures": 0,
+      "errors": 0,
+      "capHits": 0
+    },
+    {
+      "modelId": "gemma3:4b",
+      "items": 3,
+      "parseFailures": 1,
+      "errors": 0,
+      "capHits": 1
+    },
+    {
+      "modelId": "gemma3:12b",
+      "items": 7,
+      "parseFailures": 4,
+      "errors": 0,
+      "capHits": 4
+    }
+  ],
+  "retrievalDiagnostic": {
+    "before": {
+      "items": 31,
+      "complete": 13,
+      "requiredSources": 78,
+      "retrievedSources": 47,
+      "meanScore": 0.6720430107526882,
+      "productRequired": 37,
+      "productRetrieved": 17,
+      "runtimeMeanScore": null
+    },
+    "after": {
+      "items": 31,
+      "complete": 30,
+      "requiredSources": 78,
+      "retrievedSources": 77,
+      "meanScore": 0.9838709677419355,
+      "productRequired": 37,
+      "productRetrieved": 37,
+      "runtimeMeanScore": 1
+    },
+    "errors": 0,
+    "rows": [
+      {
+        "id": "company-safety-stock-shortfall-AF100-15",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 657,
+        "bestMatchScore": 0.8515109717845917,
+        "latencyMs": 110,
+        "retrievalError": false
+      },
+      {
+        "id": "company-safety-stock-shortfall-AF100-15",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 335,
+        "bestMatchScore": 0.8515109717845917,
+        "latencyMs": 34.67479999999978,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF300-50",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 1,
+          "score": 0.25,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 2,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.8587220311164856,
+        "latencyMs": 36,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF300-50",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 4,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "policies/shipping.md",
+            "products/af300.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 705,
+        "bestMatchScore": 0.8587220311164856,
+        "latencyMs": 65.9360999999999,
+        "retrievalError": false
+      },
+      {
+        "id": "acme-038",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "products/af300.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 684,
+        "bestMatchScore": 0.761674702167511,
+        "latencyMs": 30,
+        "retrievalError": false
+      },
+      {
+        "id": "acme-038",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "products/af300.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "product:AF300"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "product:AF300"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "products/af300.md"
+          ],
+          "retrievedSources": [
+            "products/af300.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 350,
+        "bestMatchScore": 0.761674702167511,
+        "latencyMs": 48.628600000000006,
+        "retrievalError": false
+      },
+      {
+        "id": "company-flow-budget-AF300-35",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 730,
+        "bestMatchScore": 0.8512820899486542,
+        "latencyMs": 24,
+        "retrievalError": false
+      },
+      {
+        "id": "company-flow-budget-AF300-35",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 538,
+        "bestMatchScore": 0.8512820899486542,
+        "latencyMs": 44.84610000000066,
+        "retrievalError": false
+      },
+      {
+        "id": "company-parallel-flow-freight-AF200-42",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md"
+          ],
+          "missingFiles": [
+            "policies/shipping.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 686,
+        "bestMatchScore": 0.8460998684167862,
+        "latencyMs": 19,
+        "retrievalError": false
+      },
+      {
+        "id": "company-parallel-flow-freight-AF200-42",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "products/af200.md",
+            "policies/shipping.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 326,
+        "bestMatchScore": 0.8460998684167862,
+        "latencyMs": 31.562799999999697,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF300-22",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 1,
+          "score": 0.25,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 2,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.8583681732416153,
+        "latencyMs": 28,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF300-22",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 4,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "policies/shipping.md",
+            "products/af300.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 705,
+        "bestMatchScore": 0.8583681732416153,
+        "latencyMs": 49.7515999999996,
+        "retrievalError": false
+      },
+      {
+        "id": "company-warranty-and-dispatch-AF200-15",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 2,
+          "score": 0.6666666666666666,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/returns.md"
+          ],
+          "missingFiles": [
+            "policies/service.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 633,
+        "bestMatchScore": 0.8187281936407089,
+        "latencyMs": 25,
+        "retrievalError": false
+      },
+      {
+        "id": "company-warranty-and-dispatch-AF200-15",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 3,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "returns-policy",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "returns-policy",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "products/af200.md",
+            "policies/service.md",
+            "policies/returns.md",
+            "operations/stock.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 720,
+        "bestMatchScore": 0.8187281936407089,
+        "latencyMs": 40.40760000000046,
+        "retrievalError": false
+      },
+      {
+        "id": "company-discounted-quote-AF200-50",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 1,
+          "score": 0.3333333333333333,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af200.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.8615394085645676,
+        "latencyMs": 22,
+        "retrievalError": false
+      },
+      {
+        "id": "company-discounted-quote-AF200-50",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 3,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "policies/shipping.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 539,
+        "bestMatchScore": 0.8615394085645676,
+        "latencyMs": 40.54730000000018,
+        "retrievalError": false
+      },
+      {
+        "id": "company-warranty-and-dispatch-AF100-28",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 2,
+          "score": 0.6666666666666666,
+          "complete": false,
+          "requiredFiles": [
+            "products/af100.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "policies/returns.md"
+          ],
+          "missingFiles": [
+            "policies/service.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 624,
+        "bestMatchScore": 0.8191797584295273,
+        "latencyMs": 25,
+        "retrievalError": false
+      },
+      {
+        "id": "company-warranty-and-dispatch-AF100-28",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 3,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "returns-policy",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "returns-policy",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "policies/returns.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "policies/service.md",
+            "products/af100.md",
+            "policies/returns.md",
+            "operations/stock.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 711,
+        "bestMatchScore": 0.8191797584295273,
+        "latencyMs": 62.17320000000018,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF200-4",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 1,
+          "score": 0.25,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 2,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.856342226266861,
+        "latencyMs": 25,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF200-4",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 4,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "products/af300.md",
+            "policies/shipping.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 714,
+        "bestMatchScore": 0.856342226266861,
+        "latencyMs": 66.09299999999985,
+        "retrievalError": false
+      },
+      {
+        "id": "company-flow-budget-AF100-29",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "policies/discounts.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "policies/discounts.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 730,
+        "bestMatchScore": 0.8410611301660538,
+        "latencyMs": 31,
+        "retrievalError": false
+      },
+      {
+        "id": "company-flow-budget-AF100-29",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "policies/discounts.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "policies/discounts.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 530,
+        "bestMatchScore": 0.8410611301660538,
+        "latencyMs": 59.17630000000008,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF300-7",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/service.md"
+          ],
+          "missingFiles": [
+            "products/af300.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 690,
+        "bestMatchScore": 0.8606838285923004,
+        "latencyMs": 26,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF300-7",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "policies/service.md",
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 576,
+        "bestMatchScore": 0.8606838285923004,
+        "latencyMs": 50.70169999999962,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF300-14",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/service.md"
+          ],
+          "missingFiles": [
+            "products/af300.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 690,
+        "bestMatchScore": 0.8555093854665756,
+        "latencyMs": 33,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF300-14",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "policies/service.md",
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 576,
+        "bestMatchScore": 0.8555093854665756,
+        "latencyMs": 38.81750000000011,
+        "retrievalError": false
+      },
+      {
+        "id": "company-safety-stock-shortfall-AF200-39",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 686,
+        "bestMatchScore": 0.8474290817975998,
+        "latencyMs": 20,
+        "retrievalError": false
+      },
+      {
+        "id": "company-safety-stock-shortfall-AF200-39",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 344,
+        "bestMatchScore": 0.8474290817975998,
+        "latencyMs": 37.10570000000007,
+        "retrievalError": false
+      },
+      {
+        "id": "company-warranty-and-dispatch-AF200-4",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 2,
+          "score": 0.6666666666666666,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/returns.md"
+          ],
+          "missingFiles": [
+            "policies/service.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 633,
+        "bestMatchScore": 0.8174974173307419,
+        "latencyMs": 27,
+        "retrievalError": false
+      },
+      {
+        "id": "company-warranty-and-dispatch-AF200-4",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 3,
+          "retrieved": 3,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "returns-policy",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "returns-policy",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "policies/returns.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "products/af200.md",
+            "policies/service.md",
+            "policies/returns.md",
+            "operations/stock.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 720,
+        "bestMatchScore": 0.8174974173307419,
+        "latencyMs": 48.861799999999675,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF100-22",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 654,
+        "bestMatchScore": 0.85650734603405,
+        "latencyMs": 31,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF100-22",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 335,
+        "bestMatchScore": 0.85650734603405,
+        "latencyMs": 33.80760000000009,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF300-14",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "operations/stock.md"
+          ],
+          "missingFiles": [
+            "products/af300.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 654,
+        "bestMatchScore": 0.8491231054067612,
+        "latencyMs": 24,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF300-14",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 343,
+        "bestMatchScore": 0.8491231054067612,
+        "latencyMs": 33.16939999999977,
+        "retrievalError": false
+      },
+      {
+        "id": "acme-058",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "sales/northshore.md",
+            "sales/forecast.md"
+          ],
+          "retrievedRequiredFiles": [
+            "sales/northshore.md",
+            "sales/forecast.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 0,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 764,
+        "bestMatchScore": 0.7710400521755219,
+        "latencyMs": 40,
+        "retrievalError": false
+      },
+      {
+        "id": "acme-058",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "sales/northshore.md",
+            "sales/forecast.md"
+          ],
+          "retrievedRequiredFiles": [
+            "sales/northshore.md"
+          ],
+          "missingFiles": [
+            "sales/forecast.md"
+          ],
+          "productRequired": 0,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "account-notes"
+          ],
+          "coveredFacets": [
+            "account-notes"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "sales/northshore.md"
+          ],
+          "retrievedSources": [
+            "sales/northshore.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 238,
+        "bestMatchScore": 0.7710400521755219,
+        "latencyMs": 72.98520000000008,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF200-21",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 1,
+          "score": 0.25,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 2,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.8603282123804092,
+        "latencyMs": 27,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF200-21",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 4,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "products/af300.md",
+            "policies/shipping.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 714,
+        "bestMatchScore": 0.8603282123804092,
+        "latencyMs": 72.59270000000015,
+        "retrievalError": false
+      },
+      {
+        "id": "company-flow-budget-AF300-53",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 730,
+        "bestMatchScore": 0.853858083486557,
+        "latencyMs": 30,
+        "retrievalError": false
+      },
+      {
+        "id": "company-flow-budget-AF300-53",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "policies/discounts.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 538,
+        "bestMatchScore": 0.853858083486557,
+        "latencyMs": 54.1841000000004,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF100-46",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af100.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/service.md"
+          ],
+          "missingFiles": [
+            "products/af100.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 690,
+        "bestMatchScore": 0.8516913205385208,
+        "latencyMs": 27,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF100-46",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "policies/service.md",
+            "operations/stock.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 568,
+        "bestMatchScore": 0.8516913205385208,
+        "latencyMs": 49.338299999999435,
+        "retrievalError": false
+      },
+      {
+        "id": "company-annual-spare-plan-AF300-28",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 653,
+        "bestMatchScore": 0.866924986243248,
+        "latencyMs": 36,
+        "retrievalError": false
+      },
+      {
+        "id": "company-annual-spare-plan-AF300-28",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 343,
+        "bestMatchScore": 0.866924986243248,
+        "latencyMs": 50.8107,
+        "retrievalError": false
+      },
+      {
+        "id": "company-stock-after-service-AF300-29",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 686,
+        "bestMatchScore": 0.8560077995061874,
+        "latencyMs": 27,
+        "retrievalError": false
+      },
+      {
+        "id": "company-stock-after-service-AF300-29",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 343,
+        "bestMatchScore": 0.8560077995061874,
+        "latencyMs": 45.46180000000004,
+        "retrievalError": false
+      },
+      {
+        "id": "company-stock-after-service-AF100-29",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 686,
+        "bestMatchScore": 0.862588569521904,
+        "latencyMs": 34,
+        "retrievalError": false
+      },
+      {
+        "id": "company-stock-after-service-AF100-29",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 335,
+        "bestMatchScore": 0.862588569521904,
+        "latencyMs": 31.658800000000156,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF300-32",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "operations/stock.md"
+          ],
+          "missingFiles": [
+            "products/af300.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 654,
+        "bestMatchScore": 0.8492538332939148,
+        "latencyMs": 32,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF300-32",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 343,
+        "bestMatchScore": 0.8492538332939148,
+        "latencyMs": 40.51140000000032,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF200-29",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/service.md"
+          ],
+          "missingFiles": [
+            "products/af200.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 690,
+        "bestMatchScore": 0.8599072843790054,
+        "latencyMs": 29,
+        "retrievalError": false
+      },
+      {
+        "id": "company-support-business-hours-AF200-29",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "policies/service.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "policies/service.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "service-policy",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "policies/service.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "policies/service.md",
+            "operations/stock.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 577,
+        "bestMatchScore": 0.8599072843790054,
+        "latencyMs": 51.45970000000034,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF300-36",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 1,
+          "score": 0.25,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 2,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.8571444898843765,
+        "latencyMs": 25,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF300-36",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 4,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "product:AF100",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "products/af100.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "products/af300.md",
+            "policies/shipping.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 705,
+        "bestMatchScore": 0.8571444898843765,
+        "latencyMs": 51.134799999999814,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF300-18",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 1,
+          "score": 0.5,
+          "complete": false,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "operations/stock.md"
+          ],
+          "missingFiles": [
+            "products/af300.md"
+          ],
+          "productRequired": 1,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 654,
+        "bestMatchScore": 0.8492655158042908,
+        "latencyMs": 26,
+        "retrievalError": false
+      },
+      {
+        "id": "company-reorder-quantity-AF300-18",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 343,
+        "bestMatchScore": 0.8492655158042908,
+        "latencyMs": 39.50630000000001,
+        "retrievalError": false
+      },
+      {
+        "id": "company-safety-stock-shortfall-AF100-4",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 657,
+        "bestMatchScore": 0.8527775257825851,
+        "latencyMs": 30,
+        "retrievalError": false
+      },
+      {
+        "id": "company-safety-stock-shortfall-AF100-4",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF100",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af100.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af100.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 335,
+        "bestMatchScore": 0.8527775257825851,
+        "latencyMs": 39.227200000000266,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF200-8",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 1,
+          "score": 0.25,
+          "complete": false,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "policies/discounts.md"
+          ],
+          "missingFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/shipping.md"
+          ],
+          "productRequired": 2,
+          "productRetrieved": 0,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 763,
+        "bestMatchScore": 0.8575689345598221,
+        "latencyMs": 22,
+        "retrievalError": false
+      },
+      {
+        "id": "company-mixed-product-quote-AF200-8",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 4,
+          "retrieved": 4,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 2,
+          "productRetrieved": 2,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF200",
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "coveredFacets": [
+            "product:AF200",
+            "product:AF300",
+            "discount-policy",
+            "shipping-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af200.md",
+            "products/af300.md",
+            "policies/discounts.md",
+            "policies/shipping.md"
+          ],
+          "retrievedSources": [
+            "policies/discounts.md",
+            "products/af300.md",
+            "policies/shipping.md",
+            "products/af200.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 714,
+        "bestMatchScore": 0.8575689345598221,
+        "latencyMs": 48.58299999999963,
+        "retrievalError": false
+      },
+      {
+        "id": "company-stock-after-service-AF300-7",
+        "phase": "before",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": null,
+        "tokenCount": 686,
+        "bestMatchScore": 0.8571111261844635,
+        "latencyMs": 26,
+        "retrievalError": false
+      },
+      {
+        "id": "company-stock-after-service-AF300-7",
+        "phase": "after",
+        "oracleEvidence": {
+          "required": 2,
+          "retrieved": 2,
+          "score": 1,
+          "complete": true,
+          "requiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedRequiredFiles": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "missingFiles": [],
+          "productRequired": 1,
+          "productRetrieved": 1,
+          "method": "Held-out source-list coverage evaluated after retrieval; never a runtime feature"
+        },
+        "runtimeCompleteness": {
+          "score": 1,
+          "requiredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "coveredFacets": [
+            "product:AF300",
+            "inventory-policy"
+          ],
+          "missingFacets": [],
+          "requiredSources": [
+            "products/af300.md",
+            "operations/stock.md"
+          ],
+          "retrievedSources": [
+            "operations/stock.md",
+            "products/af300.md"
+          ],
+          "method": "Share of inferred source requirements represented in selected evidence; not semantic fact coverage or oracle benchmark completeness",
+          "inferred": true
+        },
+        "tokenCount": 343,
+        "bestMatchScore": 0.8571111261844635,
+        "latencyMs": 38.30629999999928,
+        "retrievalError": false
+      }
+    ]
+  },
+  "notes": [
+    "Required-source lists are used for evaluation only, never runtime retrieval or calculations.",
+    "All Stage 1 coefficients/thresholds are frozen.",
+    "Company retrieval and claim rendering change; noncompany question inputs remain frozen.",
+    "Calculator answers require complete sourced inputs, with trace citations and no model rewriting.",
+    "Baseline claim coverage is a retrospective application of the new per-claim policy; original missing-any-citation counts remain separate.",
+    "Both diagnostic context token counts are recounted using the same offline counters.",
+    "No Stage 3 or cloud API run is authorized by this study."
+  ]
+}
