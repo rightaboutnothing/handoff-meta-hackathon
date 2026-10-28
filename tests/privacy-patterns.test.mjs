@@ -43,6 +43,29 @@ test('recursive decoder limits fail closed and do not turn arbitrary prose into 
   assert.ok(decodeVariants(encoded).variants.some(variant=>variant.depth===2));
 });
 
+test('unmarked recognized encoding remaining at the depth boundary fails closed',()=>{
+  const plain='unit'+'@'+'example.invalid';
+  for(const encoding of ['base64','hex']){
+    let value=plain;for(let layer=0;layer<4;layer++)value=Buffer.from(value).toString(encoding);
+    const result=decodeVariants(value);assert.equal(result.failClosed,true);assert.ok(result.issues.includes('DECODE_DEPTH_LIMIT'));
+    let bounded=plain;for(let layer=0;layer<3;layer++)bounded=Buffer.from(bounded).toString(encoding);
+    assert.equal(decodeVariants(bounded).failClosed,false);
+  }
+});
+
+test('a checksum-valid IBAN is extracted before adjacent free prose without accepting an unbroken extension',async()=>{
+  const bban=''.padStart(7,'0')+'1'+''.padStart(9,'0')+'2';
+  const check=String(98-Number(BigInt(bban+'131400')%97n)).padStart(2,'0'),compact='DE'+check+bban;
+  assert.equal((await validatePrivacyValue('IBAN',compact)).valid,true);
+  for(const value of [compact,compact.match(/.{1,4}/g).join(' ')]){
+    const text='Please explain the transfer for IBAN '+value+' and summarize the general steps.';
+    const result=await scanPrivateText(text,{decode:false}),finding=result.findings.find(row=>row.type==='IBAN');
+    assert.ok(finding);assert.equal(finding.value===value,true);assert.equal(text.slice(finding.start,finding.end)===value,true);
+  }
+  const extended=await scanPrivateText('IBAN '+compact+'ABC and general steps.',{decode:false});
+  assert.equal(extended.findings.some(row=>row.type==='IBAN'),false);
+});
+
 test('private extraction offsets remain correct after non-BMP Unicode characters',async()=>{
   const value='unit'+'@'+'example.invalid',text='🧪 '+value;
   const result=await scanPrivateText(text,{decode:false}),finding=result.findings.find(row=>row.type==='EMAIL');
@@ -66,6 +89,15 @@ test('Medicare issue and individual reference zero are not checksum-valid identi
   const value=fixtures.flatMap(row=>row.piiSeeds).find(seed=>seed.type==='AU_MEDICARE').value;
   assert.equal((await validatePrivacyValue('AU_MEDICARE',value+'0')).valid,false);
   assert.equal((await validatePrivacyValue('AU_MEDICARE',value.slice(0,9)+'0')).valid,false);
+});
+
+test('common month-first birth-date forms are detected and calendar-validated',async()=>{
+  for(const words of [['March','9,','1976'],['Mar','9','1976'],['Oct.','6,','1980'],['Sept','3','1984']]){
+    const value=words.join(' '),result=await scanPrivateText('Date of birth: '+value,{decode:false});
+    assert.ok(result.findings.some(row=>row.type==='DATE_OF_BIRTH'&&row.value===value));
+  }
+  const invalid=['February','31,','1976'].join(' '),result=await scanPrivateText('Date of birth: '+invalid,{decode:false});
+  assert.equal(result.findings.some(row=>row.type==='DATE_OF_BIRTH'),false);
 });
 
 test('invalid labelled TFN is a private warning and never checksum-valid',async()=>{

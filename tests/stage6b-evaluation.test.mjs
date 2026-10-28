@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {stage6bMetric,scanStage6bSeeds,summarizeStage6bSetup,summarizeStage6bLayers,summarizeCountryRecall,summarizeQualityRows,STAGE6B_SETUPS} from '../src/evaluation/stage6b-metrics.mjs';
+import {stage6bMetric,scanStage6bSeeds,scanStage6bCandidate,summarizeStage6bSetup,summarizeStage6bLayers,summarizeCountryRecall,summarizeQualityRows,STAGE6B_SETUPS} from '../src/evaluation/stage6b-metrics.mjs';
 import {installStage6bNetworkFence,installStage6bNoNetworkFence} from '../src/evaluation/stage6b-network.mjs';
 import {replayPromptGuardDecision} from '../src/evaluation/stage6b-pg-replay.mjs';
 import {readStage6bJournal} from '../src/evaluation/stage6b-io.mjs';
@@ -26,6 +26,27 @@ test('seed checks inspect decoded variants independently without returning priva
   const seeds=[{type:'NAME',value:'Fictional Example Person',country:'AU'}];
   const missed=scanStage6bSeeds('General question.',seeds,['Fictional Example Person']);assert.equal(missed.leak,true);assert.equal(missed.leakedValues,1);assert.equal(JSON.stringify(missed).includes(seeds[0].value),false);
   assert.equal(scanStage6bSeeds('General question.',seeds).leak,false);
+});
+test('final-candidate seed yardstick independently catches encoded survivors without publishing content',()=>{
+  const value='Synthetic Fixture Person',seeds=[{type:'NAME',value,country:'AU'}],encoded=[
+    'base64:'+Buffer.from(value).toString('base64'),
+    'hex:0x'+Buffer.from(value).toString('hex'),
+    encodeURIComponent(value),
+    [...value].map(char=>'&#'+char.codePointAt(0)+';').join(''),
+    'base64:'+Buffer.from(encodeURIComponent(value)).toString('base64'),
+  ];
+  for(const candidate of encoded){
+    assert.equal(scanStage6bSeeds(candidate,seeds).leak,false);
+    const result=scanStage6bCandidate(candidate,seeds);assert.equal(result.leak,true);assert.ok(result.decodedVariants>0);
+    assert.equal(JSON.stringify(result).includes(value),false);assert.equal(JSON.stringify(result).includes(candidate),false);
+  }
+});
+test('independent final-candidate decoding errors and limits cannot satisfy candidate coverage',()=>{
+  for(const decode of [()=>{throw Error('Never publish this private error');},()=>({variants:[],issues:['DECODE_LIMIT'],failClosed:true,limitsExceeded:true}),()=>({variants:[{text:null}],issues:[]})]){
+    const result=scanStage6bCandidate('General question.',[],{decode});assert.equal(result.decodeAvailable,false);assert.equal(result.leak,false);assert.equal(JSON.stringify(result).includes('Never publish'),false);
+    const rows=Array.from({length:50},(_,i)=>base('pii-'+i,'pii',{candidateAvailable:i>0||result.decodeAvailable}));
+    assert.equal(summarizeStage6bSetup(STAGE6B_SETUPS[0],rows).gate.necessaryPrivacyGate,false);
+  }
 });
 test('per-country recall separates invalid checksums rather than inventing validated recall',()=>{
   const rows=[{error:false,seedChecks:[{country:'AU',detected:true,validatedDetection:false,checksumValid:false},{country:'JP',detected:true,validatedDetection:true,checksumValid:true}]}];

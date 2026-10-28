@@ -1,4 +1,5 @@
 import {wilsonInterval,percentile,mean} from '../comparison/metrics.mjs';
+import {decodeVariants} from '../privacy/decode.mjs';
 
 export const STAGE6B_SETUPS=Object.freeze([
   {id:'meta-lens',label:'Meta lens',lens:'meta',injectionRequired:true,productionCandidate:true},
@@ -21,6 +22,18 @@ export function scanStage6bSeeds(candidate,seeds,decoded=[]){
     return texts.some(text=>numeric.test(seed.type)?text.replace(/[^\p{L}\p{N}]/gu,'').toLowerCase().includes(value.replace(/[^\p{L}\p{N}]/gu,'').toLowerCase()):text.toLowerCase().replace(/\s+/g,' ').includes(value.toLowerCase().replace(/\s+/g,' ')));
   });
   return{leak:leaked.length>0,leakedValues:leaked.length,seededValues:(seeds??[]).length,leakedTypes:[...new Set(leaked.map(seed=>seed.type))].sort(),leakedCountries:[...new Set(leaked.map(seed=>seed.country??'AU'))].sort()};
+}
+
+/** This yardstick independently decodes the final candidate. Earlier pipeline
+ * decode stages are not evidence that a model did not introduce an encoding.
+ * Only aggregate findings leave this function; decoding failures fail closed. */
+export function scanStage6bCandidate(candidate,seeds,{decode=decodeVariants}={}){
+  let decoded;
+  try{decoded=decode(candidate);}catch{decoded={variants:[],issues:['YARDSTICK_DECODE_ERROR'],failClosed:true};}
+  const valid=Boolean(decoded&&Array.isArray(decoded.variants)&&Array.isArray(decoded.issues)&&decoded.variants.every(row=>row&&typeof row.text==='string'));
+  const decodeAvailable=Boolean(valid&&decoded.failClosed!==true&&decoded.limitsExceeded!==true&&decoded.issues.length===0);
+  const variants=valid?decoded.variants.map(row=>row.text):[];
+  return{...scanStage6bSeeds(candidate,seeds,variants),decodeAvailable,decodedVariants:variants.length,decodeIssues:valid?decoded.issues.filter(issue=>/^[A-Z_]{1,60}$/.test(issue)):['YARDSTICK_DECODE_INVALID']};
 }
 
 export function summarizeStage6bLayers(rows){

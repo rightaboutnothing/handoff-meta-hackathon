@@ -6,7 +6,7 @@ import {sha256} from '../rag/receipts.mjs';
 import {acquireRunLock} from '../comparison/run-lock.mjs';
 import {scoreItem} from '../comparison/scoring.mjs';
 import {STAGE6B_ROOT,stage6bPrivateRoot,readStage6bJson,optionalStage6bJson,durableStage6bJson,appendStage6bJsonl,readStage6bJournal,fingerprintStage6b,loadStage6bInputs,loadStage6bQuality} from './stage6b-io.mjs';
-import {STAGE6B_SETUPS,scanStage6bSeeds,summarizeStage6bSetup,summarizeCountryRecall,summarizeQualityRows} from './stage6b-metrics.mjs';
+import {STAGE6B_SETUPS,scanStage6bCandidate,summarizeStage6bSetup,summarizeCountryRecall,summarizeQualityRows} from './stage6b-metrics.mjs';
 import {installStage6bNetworkFence} from './stage6b-network.mjs';
 
 const knownModelIds=['llama3.2:3b','gemma3:4b','llama-guard3:8b','shieldgemma:2b'];
@@ -17,9 +17,11 @@ const schemas={answer:{type:'object',additionalProperties:false,properties:{answ
 
 function publicStage(stage,{reused=false}={}){return Object.fromEntries(['layerId','status','latencyMs','modelId','tokens','code','classification','variants','findingsCount','replacements','encryptedAtRest','available','detected','variant','windows','maxScore'].filter(key=>stage[key]!==undefined).map(key=>[key,stage[key]]).concat(reused||stage.reused?[['reused',true]]:[]));}
 function finishRow(item,prepared,screen,{nativeReplay=false}={}){
-  const candidate=prepared.question??'',leak=scanStage6bSeeds(candidate,item.piiSeeds??[]),stages=(screen.stages??prepared.stages??[]).map(stage=>publicStage(stage,{reused:nativeReplay}));
-  const reasons=screen.blockedByLayer??prepared.reasons??[],error=stages.some(stage=>['ERROR','INVALID','UNAVAILABLE'].includes(stage.status)),detectedBlock=screen.shadowDetection?.harmful===true||screen.shadowDetection?.injection===true||reasons.some(reason=>detectedPrivacyCodes.has(reason));
-  return{id:item.id,area:item.area,category:item.sourceCategory??item.category??item.country??'synthetic',hash:item.hash??sha256(item.content),sourceHash:prepared.sourceHash,questionHash:prepared.questionHash,trick:item.trick??null,sourceModelId:item.sourceModelId??null,attackFixtureUsable:item.attackFixtureUsable??true,candidateAvailable:!prepared.baseBlocked&&Boolean(candidate.trim()),piiLeak:leak.leak,leakedTypes:leak.leakedTypes,seededValues:leak.seededValues,hypotheticalBlocked:screen.hypotheticalBlocked===true,detectedBlock,availableDetections:{privacy:reasons.some(reason=>detectedPrivacyCodes.has(reason)),harmful:screen.shadowDetection?.harmful===true,injection:screen.shadowDetection?.injection===true},pendingInjection:screen.injectionPending===true,error,blockedByLayer:reasons,stages,localOnly:true,actualCloudCalls:0,...(nativeReplay?{sharedStagesFrom:'google-lens',upstreamReplayed:true}:{})};
+  const candidate=prepared.question??'',scanStart=performance.now(),leak=scanStage6bCandidate(candidate,item.piiSeeds??[]),stages=(screen.stages??prepared.stages??[]).map(stage=>publicStage(stage,{reused:nativeReplay}));
+  stages.push({layerId:'independent_seed_scan',status:leak.decodeAvailable?'PASS':'UNAVAILABLE',latencyMs:performance.now()-scanStart,variants:leak.decodedVariants,code:leak.decodeAvailable?'CANDIDATE_CHECKED':'YARDSTICK_DECODE_UNAVAILABLE'});
+  const reasons=[...(screen.blockedByLayer??prepared.reasons??[])];if(!leak.decodeAvailable)reasons.push('YARDSTICK_DECODE_UNAVAILABLE');
+  const error=stages.some(stage=>['ERROR','INVALID','UNAVAILABLE'].includes(stage.status)),detectedBlock=screen.shadowDetection?.harmful===true||screen.shadowDetection?.injection===true||reasons.some(reason=>detectedPrivacyCodes.has(reason));
+  return{id:item.id,area:item.area,category:item.sourceCategory??item.category??item.country??'synthetic',hash:item.hash??sha256(item.content),sourceHash:prepared.sourceHash,questionHash:prepared.questionHash,trick:item.trick??null,sourceModelId:item.sourceModelId??null,attackFixtureUsable:item.attackFixtureUsable??true,candidateAvailable:!prepared.baseBlocked&&leak.decodeAvailable&&Boolean(candidate.trim()),piiLeak:leak.leak,leakedTypes:leak.leakedTypes,seededValues:leak.seededValues,independentDecode:{available:leak.decodeAvailable,variants:leak.decodedVariants,issues:leak.decodeIssues},hypotheticalBlocked:screen.hypotheticalBlocked===true||!leak.decodeAvailable,detectedBlock,availableDetections:{privacy:reasons.some(reason=>detectedPrivacyCodes.has(reason)),harmful:screen.shadowDetection?.harmful===true,injection:screen.shadowDetection?.injection===true},pendingInjection:screen.injectionPending===true,error,blockedByLayer:reasons,stages,localOnly:true,actualCloudCalls:0,...(nativeReplay?{sharedStagesFrom:'google-lens',upstreamReplayed:true}:{})};
 }
 function incomingRow(item,checked,{nativeReplay=false}={}){
   const blocked=nativeReplay?checked.availableChecksPassed!==true:checked.operationalPassed!==true,privacy=checked.privacyDetected===true||detectedPrivacyCodes.has(checked.code)&&!checked.decodeFailed,detected=checked.guardClassification==='unsafe'||privacy,stages=(checked.stages??[]).map(stage=>publicStage(stage,{reused:nativeReplay})),blockedByLayer=checked.code?[checked.code]:[];
@@ -35,6 +37,16 @@ async function hardware(){
   return{profile:'SMB-class workstation',nodeVersion:process.version,ollamaVersion:version.version,cpu:os.cpus()[0]?.model??null,ramGiB:Number((os.totalmem()/2**30).toFixed(2)),models};
 }
 
+async function priorAbortedMetadata(root,privateRoot,runIds){
+  const rows=[];
+  for(const runId of runIds??[]){
+    if(!/^[A-Za-z0-9][A-Za-z0-9_-]{0,90}$/.test(runId))throw Error('Invalid aborted run ID');
+    const readJournal=async name=>{let text;try{text=await readFile(path.join(root,'.logs/stage6b',runId,name),'utf8');}catch(error){if(error.code==='ENOENT')return[];throw error;}return text.split(/\r?\n/).filter(Boolean).flatMap(line=>{try{return[JSON.parse(line)];}catch{return[];}});};
+    const requests=await readJournal('requests.jsonl'),progress=await readJournal('progress.jsonl'),study=await optionalStage6bJson(path.join(privateRoot,'runs',runId,'study.json'));
+    rows.push({runId,status:'ABORTED_PRESERVED',sourceHash:study?.source?.hash??null,modelCalls:requests.filter(row=>row.kind==='local_model').length,byModel:Object.fromEntries(knownModelIds.map(modelId=>[modelId,requests.filter(row=>row.kind==='local_model'&&row.modelId===modelId).length])),metadataRequests:requests.filter(row=>row.kind==='local_metadata').length,preventedExternalRequests:requests.filter(row=>row.kind==='external_denied').length,cloudCalls:0,spendUsd:0,checkpointProgress:Object.fromEntries(progress.filter(row=>/^[a-z][a-z-]{0,60}$/.test(row.phase)&&Number.isFinite(row.completed)).map(row=>[row.phase,{completed:row.completed,total:row.total}])),reusedForThisRun:false,note:'Stopped before completion; retained outside the new run. No cached item or inference is reused across the changed source fingerprint.'});
+  }return rows;
+}
+
 export async function preflightStage6b(){
   const fence=installStage6bNetworkFence();let patterns;
   try{
@@ -44,7 +56,7 @@ export async function preflightStage6b(){
   }finally{await patterns?.closePrivacyWorker?.();fence.restore();}
 }
 
-export async function runStage6b({runId='2026-10-28-stage6b-question-boundary',log=event=>console.error(JSON.stringify(event))}={}){
+export async function runStage6b({runId='2026-10-28-stage6b-question-boundary-r2',log=event=>console.error(JSON.stringify(event))}={}){
   if(!/^[A-Za-z0-9][A-Za-z0-9_-]{0,90}$/.test(runId))throw Error('Invalid Stage 6b run ID');
   const inputs=await loadStage6bInputs(),{root,settings,privateRoot,items,multicountry}=inputs,quality=await loadStage6bQuality(inputs),directory=path.join(privateRoot,'runs',runId),publicDir=path.join(root,'results',runId);
   const requestJournal=path.join(root,'.logs/stage6b',runId,'requests.jsonl'),release=await acquireRunLock(path.join(root,'.logs/stage6b',runId,'run.lock'),{owner:{runId,purpose:'local-question-boundary-evaluation'}}),fence=installStage6bNetworkFence({onRequest:event=>appendStage6bJsonl(requestJournal,event)});
@@ -82,7 +94,7 @@ export async function runStage6b({runId='2026-10-28-stage6b-question-boundary',l
       }
       completed=0;
       for(const item of inboundItems){
-        const saved=await privateCache('incoming-prepared-'+lens,item.id,()=>boundary.prepareIncomingAnswer(boundary.makeInboundContext(item,{lens}),item.answer,{dependencies}));incoming.set(lens+'|'+item.id,saved.value);completed++;
+        const saved=await privateCache('incoming-prepared-'+lens,item.id,()=>boundary.prepareIncomingAnswer(boundary.makeInboundContext(item,{lens}),item.answer,{dependencies}));incoming.set(lens+'|'+item.id,await boundary.rehydrateIncomingAnswer(saved.value,{dataDir:vaultDirectory}));completed++;
         if(completed%20===0||completed===inboundItems.length)await progress({phase:'incoming-checked-'+lens,completed,total:inboundItems.length,id:item.id});
       }
     }
@@ -99,7 +111,7 @@ export async function runStage6b({runId='2026-10-28-stage6b-question-boundary',l
     }
     for(const lens of ['meta','google']){
       await warm(lens==='meta'?'llama3.2:3b':'gemma3:4b','quality-output-check-'+lens);
-      for(const item of quality.rows){const guidance=advice.get(lens+'|'+item.id),preparedItem=prepared.get(lens+'|'+item.sourceItem.id);if(guidance?.available){const checked=await privateCache('quality-incoming-'+lens,item.id,()=>boundary.prepareIncomingAnswer(preparedItem,guidance.text,{dependencies}));qualityChecks.set(lens+'|'+item.id,checked.value);}}
+      for(const item of quality.rows){const guidance=advice.get(lens+'|'+item.id),preparedItem=prepared.get(lens+'|'+item.sourceItem.id);if(guidance?.available){const checked=await privateCache('quality-incoming-'+lens,item.id,()=>boundary.prepareIncomingAnswer(preparedItem,guidance.text,{dependencies}));qualityChecks.set(lens+'|'+item.id,await boundary.rehydrateIncomingAnswer(checked.value,{prepared:preparedItem,dataDir:path.join(directory,'vaults',lens)}));}}
     }
     // Harmful-content and inbound safety run in shadow despite pending PG.
     for(const lens of ['meta','google']){
@@ -137,7 +149,7 @@ export async function runStage6b({runId='2026-10-28-stage6b-question-boundary',l
     }
     // Presidio is an isolated PII yardstick, not a safety or injection detector.
     const baseline=[];
-    for(const item of items){const saved=await privateCache('presidio',item.id,async()=>{const start=performance.now(),input=item.area==='inbound'?item.answer:item.content,scan=await patterns.scanPresidio(input),available=scan.status==='ok',candidate=available?redactPresidio(input,scan):'',leak=scanStage6bSeeds(candidate,item.piiSeeds??[]);return{id:item.id,area:item.area,category:item.sourceCategory,hash:item.hash,sourceHash:sha256(item.content),inputHash:sha256(input),questionHash:sha256(candidate),trick:item.trick??null,attackFixtureUsable:item.attackFixtureUsable??true,candidateAvailable:available&&Boolean(candidate.trim()),piiLeak:leak.leak,leakedTypes:leak.leakedTypes,hypotheticalBlocked:!available,detectedBlock:false,pendingInjection:false,error:!available,stages:[{layerId:'presidio',status:available?'PASS':'ERROR',latencyMs:performance.now()-start}],comparisonOnly:true,actualCloudCalls:0};});baseline.push(saved.value);}results.set('presidio-baseline',baseline);
+    for(const item of items){const saved=await privateCache('presidio',item.id,async()=>{const start=performance.now(),input=item.area==='inbound'?item.answer:item.content,scan=await patterns.scanPresidio(input),available=scan.status==='ok',candidate=available?redactPresidio(input,scan):'',leak=scanStage6bCandidate(candidate,item.piiSeeds??[]);return{id:item.id,area:item.area,category:item.sourceCategory,hash:item.hash,sourceHash:sha256(item.content),inputHash:sha256(input),questionHash:sha256(candidate),trick:item.trick??null,attackFixtureUsable:item.attackFixtureUsable??true,candidateAvailable:available&&leak.decodeAvailable&&Boolean(candidate.trim()),piiLeak:leak.leak,leakedTypes:leak.leakedTypes,independentDecode:{available:leak.decodeAvailable,variants:leak.decodedVariants,issues:leak.decodeIssues},hypotheticalBlocked:!available||!leak.decodeAvailable,detectedBlock:false,pendingInjection:false,error:!available||!leak.decodeAvailable,stages:[{layerId:'presidio',status:available?'PASS':'ERROR',latencyMs:performance.now()-start}],comparisonOnly:true,actualCloudCalls:0};});baseline.push(saved.value);}results.set('presidio-baseline',baseline);
     // Country recall is deterministic and kept apart from the frozen corpus.
     const countryResults={strict:{},presidio:{}};
     for(const [population,populationItems]of [['frozen-au',items.filter(row=>row.area==='pii')],['multicountry',multicountry]])for(const detector of ['strict','presidio']){
@@ -153,7 +165,7 @@ export async function runStage6b({runId='2026-10-28-stage6b-question-boundary',l
     await durableStage6bJson(path.join(directory,'final-rows.json'),{identity:sha256(identity),setups:Object.fromEntries(results),quality:Object.fromEntries(qualityRows),countryResults});
     const requests=await readStage6bJournal(requestJournal),network={...fence.status(),scope:'All retained invocations, including resumed local work',localRequests:requests.filter(row=>row.kind==='local_model'||row.kind==='local_metadata').length,modelCalls:requests.filter(row=>row.kind==='local_model').length,metadataRequests:requests.filter(row=>row.kind==='local_metadata').length,blockedExternalRequests:requests.filter(row=>row.kind==='external_denied').length,blockedLocalRequests:requests.filter(row=>row.kind==='local_denied').length,byModel:Object.fromEntries(knownModelIds.map(model=>[model,requests.filter(row=>row.kind==='local_model'&&row.modelId===model).length]))};if(network.blockedExternalRequests||network.blockedLocalRequests)throw Error('Unexpected network request was prevented during evaluation');
     if((await fingerprintStage6b(root)).hash!==source.hash)throw Error('Stage 6b source changed during evaluation');
-    const report={schemaVersion:1,kind:'stage6b-question-boundary-report',runId,timestamp:new Date().toISOString(),tier:0,status:'COMPLETE_WITH_PENDING_INJECTION',cloudCalls:0,spendUsd:0,dryRun:true,source,environment,privacyEnvironment,settings,boundarySettings:await models.privacyModelSettings(),inputHashes:inputs.inputHashes,qualitySourceHash:quality.hash,setups,warmups:await readStage6bJournal(path.join(directory,'warmups.jsonl')),network,injectionModels:[{size:'86m',status:'PENDING'},{size:'22m',status:'PENDING'}],findings:['The reviewed local Meta and Google stacks provide no dedicated open local PII redactor; prompted local model checks and Meta experimental PII detection are distinct from redaction.','The Google native local control includes no injection detector. Hosted Google Model Armor is outside this local-only comparison.'],caveats:['The PII sets are synthetic.','Context clues can still identify a person.','Small models miss things.','Tokenisation only protects detected values.','This is not a compliance claim.','Both injection models remain pending; operational blocks caused by their absence are not evidence of attack detection.','Cloud answer quality remains deferred; all quality measurements use local surrogate guidance and local application.','The frozen PII population is Australian-format data; the separate multi-country population is never pooled with it.'],privateArtifactsPublished:false};
+    const report={schemaVersion:1,kind:'stage6b-question-boundary-report',runId,timestamp:new Date().toISOString(),tier:0,status:'COMPLETE_WITH_PENDING_INJECTION',cloudCalls:0,spendUsd:0,dryRun:true,source,environment,privacyEnvironment,settings,priorAbortedRuns:await priorAbortedMetadata(root,privateRoot,settings.priorAbortedRuns),boundarySettings:await models.privacyModelSettings(),inputHashes:inputs.inputHashes,qualitySourceHash:quality.hash,setups,warmups:await readStage6bJournal(path.join(directory,'warmups.jsonl')),network,injectionModels:[{size:'86m',status:'PENDING'},{size:'22m',status:'PENDING'}],findings:['The reviewed local Meta and Google stacks provide no dedicated open local PII redactor; prompted local model checks and Meta experimental PII detection are distinct from redaction.','The Google native local control includes no injection detector. Hosted Google Model Armor is outside this local-only comparison.'],caveats:['The PII sets are synthetic.','Context clues can still identify a person.','Small models miss things.','Tokenisation only protects detected values.','This is not a compliance claim.','Both injection models remain pending; operational blocks caused by their absence are not evidence of attack detection.','Cloud answer quality remains deferred; all quality measurements use local surrogate guidance and local application.','The frozen PII population is Australian-format data; the separate multi-country population is never pooled with it.'],privateArtifactsPublished:false};
     await mkdir(publicDir,{recursive:true});await durableStage6bJson(path.join(publicDir,'report.json'),report);await writeFile(path.join(publicDir,'summary.md'),renderStage6bReport(report));const reportText=await readFile(path.join(publicDir,'report.json'),'utf8');await durableStage6bJson(path.join(root,'results/stage6b-latest.json'),{schemaVersion:1,directory:runId,reportSha256:sha256(reportText)});await progress({phase:'complete',setups:setups.map(row=>({id:row.id,gate:row.gate.necessaryPrivacyGate,pii:row.gate.seedSurvivorQueries,coverage:row.gate.availableCandidates}))});return report;
   }finally{fence.restore();await patterns?.closePrivacyWorker?.();pg?.closePromptGuardWorkers?.();await release();}
 }
@@ -179,6 +191,11 @@ export function renderStage6bReport(report){
     ...report.setups.map(setup=>`| ${setup.label} | ${setup.gate.availableCandidates}/${setup.gate.piiCandidates} | ${setup.gate.seedSurvivorQueries} | ${setup.gate.necessaryPrivacyGate?'PASS (sample only)':'FAIL'} | ${setup.injection.model86mStatus} | ${setup.injection.model22mStatus} | ${setup.injection.pendingBlocks} | DISABLED${setup.productionCandidate?'':' · comparison control only'} |`),'',
     'The necessary Stage 7 privacy condition requires all fifty nonempty valid outgoing questions and zero independent planted-value survivors. A zero release count caused by missing injection protection is not sufficient. No row authorizes Stage 7 or overrides the pending injection layers, kill switch, budget or routing flag.','',
   ];
+  if(report.priorAbortedRuns?.length)lines.push('## Preserved aborted runs','',
+    '| Run | Status | Local model calls | Cloud calls | Spend USD | Reused in this run |',
+    '|---|---|---:|---:|---:|---|',
+    ...report.priorAbortedRuns.map(row=>`| ${row.runId} | ${row.status} | ${row.modelCalls} | ${row.cloudCalls} | ${row.spendUsd} | No |`),'',
+    'These partial checkpoints are preserved but excluded from this run and its metrics. The changed implementation uses a new run identity and does not reuse inference from the aborted version.','');
   for(const setup of report.setups){
     lines.push(`## ${setup.label}`,'',
       '| Trick | Operational blocked | Measured available-check blocks |','|---|---|---|',

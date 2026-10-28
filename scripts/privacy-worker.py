@@ -54,9 +54,10 @@ def validate(value,rule):
         except ValueError: return False
     if kind=='luhn': return rule.get('minDigits',0)<=len(digits(value))<=rule.get('maxDigits',99) and luhn(value)
     if kind=='date':
-        for format in ('%Y-%m-%d','%Y/%m/%d','%Y.%m.%d','%d-%m-%Y','%d/%m/%Y','%m/%d/%Y','%d.%m.%Y','%d-%m-%y','%d/%m/%y','%m/%d/%y','%d %b %Y','%d %B %Y','%d-%b-%Y','%d-%B-%Y'):
+        normalized=re.sub(r'\bSept\b','Sep',re.sub(r'\b([A-Za-z]{3,4})\.',r'\1',value),flags=re.I)
+        for format in ('%Y-%m-%d','%Y/%m/%d','%Y.%m.%d','%d-%m-%Y','%d/%m/%Y','%m/%d/%Y','%d.%m.%Y','%d-%m-%y','%d/%m/%y','%m/%d/%y','%d %b %Y','%d %B %Y','%d-%b-%Y','%d-%B-%Y','%b %d, %Y','%B %d, %Y','%b %d %Y','%B %d %Y'):
             try:
-                date=datetime.datetime.strptime(value,format).date()
+                date=datetime.datetime.strptime(normalized,format).date()
                 if 1850<=date.year<=datetime.date.today().year: return True
             except ValueError: pass
         return False
@@ -85,6 +86,16 @@ def scan(text,countries=None):
         for match in rule['compiled'].finditer(text):
             group=rule.get('group',0); start,end=match.span(group); value=match.group(group)
             if rule.get('keywords') and not kw_near(text,start,end,rule['keywords'],rule.get('keywordWindow',40)): continue
+            if rule.get('validatedPrefix'):
+                # A permissive spaced identifier candidate may include following
+                # prose. Only accept a checksum-valid prefix at a real boundary;
+                # never carve a valid prefix from one unbroken invalid value.
+                original=value
+                for cut in range(len(original),0,-1):
+                    if original[cut-1].isspace() or (cut<len(original) and not original[cut].isspace()): continue
+                    prefix=original[:cut]
+                    if len(re.sub(r'[ -]','',prefix))<15: break
+                    if validate(prefix,rule): value=prefix;end=start+cut;break
             is_valid=validate(value,rule)
             if is_valid:
                 validity=rule.get('validationKind') or ('format' if rule['validator'] in ('format','keyword_identifier','email','ip','date','us_ssn','us_itin','gb_nino') else 'checksum_valid')

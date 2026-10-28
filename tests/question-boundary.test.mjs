@@ -4,7 +4,7 @@ import {mkdtemp,readFile,writeFile,readdir,rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {createQuestionTokenVault} from '../src/privacy/token-vault.mjs';
-import {prepareQuestionOnly,screenQuestionOnly,buildQuestionOnlyPayload,assertQuestionOnlyRelease,rehydratePrepared,validateGeneralQuestion,makeInboundContext,prepareIncomingAnswer,finishIncomingAnswer,applyAnswerLocally} from '../src/privacy/question-boundary.mjs';
+import {prepareQuestionOnly,screenQuestionOnly,buildQuestionOnlyPayload,assertQuestionOnlyRelease,rehydratePrepared,rehydrateIncomingAnswer,validateGeneralQuestion,makeInboundContext,prepareIncomingAnswer,finishIncomingAnswer,applyAnswerLocally} from '../src/privacy/question-boundary.mjs';
 import {runPromptGuard,createPromptGuardMailbox} from '../src/privacy/prompt-guard.mjs';
 import {callMuse,screenForCloud} from '../src/server/gateway-models.mjs';
 import {createCloudPolicyRegistry} from '../src/comparison/policy.mjs';
@@ -43,6 +43,13 @@ test('all prior layers must be genuinely prepared; fabricated or mutated state c
   prep.question='How can a different private method be used?';const changed=await screenQuestionOnly(prep,{dependencies});assert.equal(changed.liveEligible,false);assert.ok(changed.blockedByLayer.includes('PREPARATION_PROOF_REQUIRED'));
 });
 
+test('outgoing proof binds original and decoded scan texts, private values and restoration context',async t=>{
+  for(const mutate of [prep=>{prep.injectionScanTexts=['A different harmless inspection input.'];},prep=>{prep.privateValues.push({type:'PRIVATE',value:'a different local value'});},prep=>{prep.tokenizedLocalSource+=' changed';}]){
+    const dependencies=privacyDependencies(),prep=await prepared(t);mutate(prep);const result=await screenQuestionOnly(prep,{dependencies});assert.equal(result.liveEligible,false);assert.equal(result.releasePermit,null);assert.ok(result.blockedByLayer.includes('PREPARATION_PROOF_REQUIRED'));
+  }
+  const dependencies=privacyDependencies(),prep=await prepared(t),predict=dependencies.promptGuard;dependencies.promptGuard=async(...args)=>{prep.injectionScanTexts.push('Another harmless input.');return predict(...args);};const result=await screenQuestionOnly(prep,{dependencies});assert.equal(result.liveEligible,false);assert.ok(result.blockedByLayer.includes('PREPARATION_PROOF_REQUIRED'));
+});
+
 test('fresh question release binds the exact minimal body, expires and is consumed once',async t=>{
   let now=1000;t.mock.method(Date,'now',()=>now);const dependencies=privacyDependencies(),prep=await prepared(t),result=await screenQuestionOnly(prep,{dependencies});const input=buildQuestionOnlyPayload(result.question);
   assert.deepEqual(Object.keys(JSON.parse(input)).sort(),['question','system']);assert.equal(input.includes(safeItem.prompt),false);assert.equal(assertQuestionOnlyRelease(input,result.releasePermit),true);assert.throws(()=>assertQuestionOnlyRelease(input,result.releasePermit),{code:'QUESTION_ONLY_FRESH_RELEASE_REQUIRED'});
@@ -74,6 +81,42 @@ test('encoded incoming answers are inspected in decoded form by injection and ha
   const checked=await finishIncomingAnswer(await prepareIncomingAnswer(context,'A harmless encoded answer.',{dependencies}),{dependencies});assert.equal(checked.operationalPassed,true);assert.ok(seen.injection.includes('A harmless decoded explanation.'));assert.equal(seen.harmful.includes('A harmless decoded explanation.'),true);
 });
 
+test('incoming inspections require the exact prior object and authenticated inspection state',async()=>{
+  const mutations=[
+    checked=>({...checked}),
+    checked=>{checked.blocked=!checked.blocked;},
+    checked=>{checked.code='CHANGED';},
+    checked=>{checked.stages[0].status='BLOCKED';},
+    checked=>{checked.text+=' changed';checked.answerHash=sha256(checked.text);},
+    checked=>{checked.injectionScanTexts=['A different harmless answer.'];},
+    checked=>{checked.prepared.privateValues.push({type:'PRIVATE',value:'a different local value'});},
+    checked=>{checked.prepared.sourceText+=' changed';checked.prepared.sourceHash=sha256(checked.prepared.sourceText);},
+    checked=>{checked.prepared.question='How should another general task be approached?';checked.prepared.questionHash=sha256(checked.prepared.question);},
+    checked=>{checked.prepared.tokenizedLocalSource='changed';},
+    checked=>{checked.prepared.vault={restore:text=>text};},
+    checked=>{checked.prepared={...checked.prepared};},
+  ];
+  for(const mutate of mutations){
+    const dependencies=privacyDependencies();let laterChecks=0;dependencies.promptGuard=async()=>{laterChecks++;throw Error('Must not run');};dependencies.harmfulGuard=async()=>{laterChecks++;throw Error('Must not run');};const checked=await prepareIncomingAnswer(makeInboundContext(safeItem),'A general explanation.',{dependencies}),changed=mutate(checked)??checked;
+    await assert.rejects(finishIncomingAnswer(changed,{dependencies}),{code:'INCOMING_CHECK_PROOF_REQUIRED'});assert.equal(laterChecks,0);
+  }
+});
+
+test('incoming provenance remains bound across asynchronous inspection steps',async()=>{
+  const dependencies=privacyDependencies(),context=makeInboundContext(safeItem),checked=await prepareIncomingAnswer(context,'A general explanation.',{dependencies}),predict=dependencies.promptGuard;dependencies.promptGuard=async(...args)=>{checked.injectionScanTexts.push('Another harmless explanation.');return predict(...args);};await assert.rejects(finishIncomingAnswer(checked,{dependencies}),{code:'INCOMING_CHECK_PROOF_REQUIRED'});
+  const other=privacyDependencies(),source=makeInboundContext(safeItem),inspect=other.localCall;other.localCall=async(...args)=>{source.privateValues.push({type:'PRIVATE',value:'a changed local value'});return inspect(...args);};await assert.rejects(prepareIncomingAnswer(source,'A general explanation.',{dependencies:other}),{code:'INCOMING_CONTEXT_CHANGED'});
+});
+
+test('cached incoming snapshots can regain shadow provenance but never production authorization',async t=>{
+  const dependencies=privacyDependencies(),prep=await prepared(t),original=await prepareIncomingAnswer(prep,'A general explanation.',{dependencies}),snapshot=JSON.parse(JSON.stringify(original));await assert.rejects(finishIncomingAnswer(snapshot,{dependencies}),{code:'INCOMING_CHECK_PROOF_REQUIRED'});
+  const replay=await rehydrateIncomingAnswer(snapshot,{prepared:prep}),production=await finishIncomingAnswer(replay,{dependencies});assert.equal(production.operationalPassed,false);assert.equal(production.shadowOnly,true);assert.equal(production.checkPermit,null);
+  const shadow=await finishIncomingAnswer(replay,{shadowEvaluation:true,dependencies});assert.equal(shadow.operationalPassed,false);assert.equal(shadow.shadowOnly,true);assert.ok(shadow.checkPermit);await assert.rejects(applyAnswerLocally(prep,shadow,{dependencies}),{code:'CHECKED_LOCAL_APPLICATION_REQUIRED'});
+  const next=await finishIncomingAnswer(replay,{shadowEvaluation:true,dependencies});assert.equal((await applyAnswerLocally(prep,next,{shadowEvaluation:true,dependencies})).tokenRoundTripVerified,true);
+  const inbound=await prepareIncomingAnswer(makeInboundContext(safeItem),'A general explanation.',{dependencies}),minimal=await rehydrateIncomingAnswer(JSON.parse(JSON.stringify(inbound)));assert.equal((await finishIncomingAnswer(minimal,{dependencies})).operationalPassed,false);
+  const corrupt=JSON.parse(JSON.stringify(original));corrupt.answerHash='changed';await assert.rejects(rehydrateIncomingAnswer(corrupt,{prepared:prep}),{code:'PRIVATE_INCOMING_SNAPSHOT_CHANGED'});
+  const other={...prep,privateValues:[{type:'PRIVATE',value:'a different local value'}]};await assert.rejects(rehydrateIncomingAnswer(snapshot,{prepared:other}),{code:'PRIVATE_INCOMING_CONTEXT_CHANGED'});
+});
+
 test('pending output screening grants only an explicitly local-surrogate apply permit, never a live one',async t=>{
   const prep=await prepared(t),dependencies=privacyDependencies({answer:'A fictional local answer.'});dependencies.promptGuard=async()=>({status:'PENDING',available:false,detected:false,latencyMs:0});
   const checked=await finishIncomingAnswer(await prepareIncomingAnswer(prep,'A general explanation.',{dependencies}),{shadowEvaluation:true,dependencies});assert.equal(checked.operationalPassed,false);assert.equal(checked.availableChecksPassed,true);
@@ -92,7 +135,11 @@ test('application refuses a changed answer or private source after output checki
 
 test('local application verifies restored tokenized source before any model can use private data',async t=>{
   let modelCalls=0;const dependencies=privacyDependencies(),original=dependencies.localCall;dependencies.localCall=async(...args)=>{modelCalls++;return original(...args);};
-  const prep=await prepared(t),checked=await finishIncomingAnswer(await prepareIncomingAnswer(prep,'A general explanation.',{dependencies}),{dependencies});const before=modelCalls;prep.tokenizedLocalSource+=' modified';await assert.rejects(applyAnswerLocally(prep,checked,{dependencies}),{code:'LOCAL_SOURCE_ROUNDTRIP_MISMATCH'});assert.equal(modelCalls,before);
+  const prep=await prepared(t),checked=await finishIncomingAnswer(await prepareIncomingAnswer(prep,'A general explanation.',{dependencies}),{dependencies});const before=modelCalls;prep.tokenizedLocalSource+=' modified';await assert.rejects(applyAnswerLocally(prep,checked,{dependencies}),{code:'CHECKED_LOCAL_APPLICATION_REQUIRED'});assert.equal(modelCalls,before);
+});
+
+test('application permits bind private mappings and the exact local restoration function',async t=>{
+  for(const mutate of [prep=>{prep.privateValues.push({type:'PRIVATE',value:'a changed local value'});},prep=>{prep.vault.restore=text=>text;}]){const dependencies=privacyDependencies(),prep=await prepared(t),checked=await finishIncomingAnswer(await prepareIncomingAnswer(prep,'A general explanation.',{dependencies}),{dependencies});mutate(prep);await assert.rejects(applyAnswerLocally(prep,checked,{dependencies}),{code:'CHECKED_LOCAL_APPLICATION_REQUIRED'});}
 });
 
 test('Prompt Guard adapters remain pending without local weights and reject ambiguous/malformed model results',async()=>{

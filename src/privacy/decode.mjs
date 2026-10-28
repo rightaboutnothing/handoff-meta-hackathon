@@ -2,6 +2,18 @@ import {TextDecoder} from 'node:util';
 
 const utf8=new TextDecoder('utf-8',{fatal:true});
 const printable=text=>text.length>0&&[...text].filter(char=>/[^\p{C}]/u.test(char)||/\s/.test(char)).length/[...text].length>.9;
+function remainingEncoding(text){
+  if(/(?:base64|hex|rot13)\s*[:=]|%[0-9a-f]{2}|\\u(?:\{[0-9a-f]{1,6}\}|[0-9a-f]{4})|\\x[0-9a-f]{2}|&#(?:x[0-9a-f]+|\d+);|&(commat|period|colon|sol|amp|lt|gt|quot|apos);/i.test(text))return true;
+  if(text.normalize('NFKC').replace(/[\u200b-\u200f\u2060\ufeff]/g,'')!==text)return true;
+  for(const match of text.matchAll(/[A-Za-z0-9+/_-]{12,}={0,2}/g)){
+    const value=match[0];if(!/[0-9+/_=-]/.test(value)&&value.length<24)continue;
+    try{const canonical=value.replaceAll('-','+').replaceAll('_','/'),buffer=Buffer.from(canonical,'base64');if(buffer.toString('base64').replace(/=+$/,'')===canonical.replace(/=+$/,'')&&printable(utf8.decode(buffer)))return true;}catch{}
+  }
+  for(const match of text.matchAll(/(?:0x)?[0-9a-fA-F]{16,}/g)){
+    const value=match[0].replace(/^0x/i,'');try{if(value.length%2===0&&printable(utf8.decode(Buffer.from(value,'hex'))))return true;}catch{}
+  }
+  return false;
+}
 /** Bounded local decoding. The returned text and spans are private IPC data. */
 export function decodeVariants(input,{maxDepth=3,maxVariants=16,maxBytes=65536,maxInputBytes=16384}={}){
   const text=String(input??''),variants=[],issues=[];
@@ -17,7 +29,7 @@ export function decodeVariants(input,{maxDepth=3,maxVariants=16,maxBytes=65536,m
   };
   const queue=[{text,depth:0,originSpan:null}];
   for(let index=0;index<queue.length;index++){
-    const parent=queue[index];if(parent.depth>=maxDepth){if(/(?:base64|hex|%[0-9a-f]{2}|\\u[0-9a-f]{4})/i.test(parent.text))issues.push('DECODE_DEPTH_LIMIT');continue;}
+    const parent=queue[index];if(parent.depth>=maxDepth){if(remainingEncoding(parent.text))issues.push('DECODE_DEPTH_LIMIT');continue;}
     let before=variants.length;
     for(const match of parent.text.matchAll(/(?:[A-Za-z0-9+/_-]{12,}={0,2})/g)){
       const value=match[0],explicit=/base64\s*[:=]\s*$/i.test(parent.text.slice(Math.max(0,match.index-15),match.index));

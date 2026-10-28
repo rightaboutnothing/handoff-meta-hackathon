@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-28-stage6b-question-boundary",
+  "runId": "2026-10-28-stage6b-question-boundary-r2",
+  "priorAbortedRuns": ["2026-10-28-stage6b-question-boundary"],
   "seed": 20261027,
   "sourceRun": "2026-10-28-stage6-guard-stress",
   "sourceCorpusItems": 522,
