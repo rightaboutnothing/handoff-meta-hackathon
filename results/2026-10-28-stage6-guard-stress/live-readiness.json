@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "kind": "stage6-live-readiness",
+  "runId": "2026-10-28-stage6-guard-stress",
+  "timestamp": "2026-10-28T11:36:17.092Z",
+  "tier": 0,
+  "dryRun": true,
+  "sourceRun": "2026-10-28-stage5-guard",
+  "sourceReportHash": "6c2166c591f18f01d4e49d15ac691189513bc8ed0de3463970baeec4c73bd0a3",
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "preparedItems": 11,
+  "modelId": "muse-spark-1.3",
+  "endpoint": "responses",
+  "maxCompletionTokens": 768,
+  "defaultKillSwitch": true,
+  "defaultRoutingFlag": false,
+  "checks": [
+    {
+      "id": "eleven-exact-payloads",
+      "label": "Exact Stage 5 payloads prepared without sending",
+      "pass": true,
+      "detail": "Source and request hashes verified; private request bodies contain no credentials."
+    },
+    {
+      "id": "fresh-guard",
+      "label": "Fresh single-use exact-payload Guard pass required",
+      "pass": true,
+      "detail": "Saved Stage 5 verdicts cannot authorize dispatch; runtime permits expire within 30 seconds."
+    },
+    {
+      "id": "local-only-sets",
+      "label": "Attack, harmful and PII-test sets structurally denied",
+      "pass": true,
+      "detail": "The cloud client checks a trusted manifest registry and independently denies local-only test-suite metadata."
+    },
+    {
+      "id": "completion-cap",
+      "label": "Reasoning-inclusive completion cap is at least 500",
+      "pass": true,
+      "detail": "Logical max_completion_tokens=768; Responses wire uses max_output_tokens."
+    },
+    {
+      "id": "spend-cap",
+      "label": "Call, total-token and dollar reservations enforced",
+      "pass": true,
+      "detail": "Persisted reservations precede dispatch; unknown usage retains the full reservation and halts the run."
+    },
+    {
+      "id": "stable-run-budget",
+      "label": "Questions share one operator-controlled live run budget",
+      "pass": true,
+      "detail": "HANDOFF_LIVE_RUN_ID or a trusted server option is required. Missing run IDs fail closed; trace UUIDs and browser input cannot reset the ledger."
+    },
+    {
+      "id": "kill-switch",
+      "label": "Kill switch is active by default",
+      "pass": true,
+      "detail": "Config, HANDOFF_CLOUD_KILL_SWITCH and local KILL_CLOUD file independently stop dispatch."
+    },
+    {
+      "id": "empty-output",
+      "label": "Responses parser rejects empty output_text",
+      "pass": true,
+      "detail": "A reasoning-heavy response is parsed from output_text; empty text raises LIVE_EMPTY_OUTPUT after accounting for usage."
+    },
+    {
+      "id": "audit",
+      "label": "Per-call audit excludes content and credentials",
+      "pass": true,
+      "detail": "Only item ID/hash, Guard verdict, numeric usage, costs and status codes are recorded."
+    },
+    {
+      "id": "disabled",
+      "label": "Live dispatch remains disabled",
+      "pass": true,
+      "detail": "Meta access is still paused, budget unset and kill switch active; no cloud send occurs in preparation."
+    }
+  ],
+  "projectedCostUsd": 0.021344,
+  "reservedUpperUsd": 0.077388,
+  "tokens": {
+    "input": 2896,
+    "visibleOutput": 1696,
+    "reasoning": 896,
+    "completion": 2592,
+    "total": 5488
+  },
+  "reservedTokens": {
+    "input": 13350,
+    "completion": 8448,
+    "total": 21798
+  },
+  "defaultCaps": {
+    "calls": 1,
+    "tokens": 4096,
+    "costUsd": 0.01
+  },
+  "requiredCaps": {
+    "calls": 11,
+    "tokens": 21798,
+    "costUsd": 0.077388
+  },
+  "runFitsDefaultCaps": false,
+  "tokenCounting": {
+    "cloudModelId": "muse-spark-1.3",
+    "proxyModelId": "llama3.1:8b",
+    "algorithmRevision": "a0940f9cf7065d45bb6675660f80d305c041a754",
+    "algorithmSource": "https://github.com/meta-llama/llama3/blob/a0940f9cf7065d45bb6675660f80d305c041a754/llama/tokenizer.py",
+    "limitation": "Muse Spark has no public tokenizer in this project. Installed Llama 3.1 BPE counts are a documented proxy, not actual Muse Spark billed tokens.",
+    "sourceManifestSha256": "3fc95d284915704cf140b825abf5150af0d32fde95f55c081c9602d49d4547c0",
+    "sourceModelBlobDigest": "sha256:667b0c1932bc6ffc593ed1d03f895bf2dc8dc6df21db3042284a6f4416b06a29",
+    "metadataBytes": 7823282,
+    "tokenizerMetadataSha256": "13f2bf9183b4cc9e20e1212bb03d5cfaed1c042e7b1d63bf469d641193c4532b",
+    "files": {
+      "tokenizer.json": "b30567ac6cf7e01d43fec15e4da7d8356745ba7c1283c685de6a5a8dcfa1b1db",
+      "tokenizer_config.json": "4938ea171380bb3d797ea5c8cfe8ae79e0d11c6c23fbc77f05c147e6347b7f24"
+    },
+    "method": "documented_local_proxy",
+    "tokenizerLibrary": "@huggingface/tokenizers@0.2.0",
+    "specialTokens": "No automatic BOS/EOS or undocumented server chat framing",
+    "exactForSelectedTokenizer": true,
+    "exactProviderBillingTokens": false,
+    "remoteCountRequests": 0,
+    "cloudInferenceCalls": 0
+  },
+  "apiSemanticsSource": "https://dev.meta.ai/docs/quickstart#read-the-response",
+  "assumptions": [
+    "Muse Spark input uses the pinned installed Llama 3.1 BPE proxy, not a provider billing tokenizer.",
+    "Visible answer lengths and reasoning-token lengths are per-category planning assumptions from config/pricing.yaml.",
+    "Every completion cost includes visible plus reasoning tokens exactly once. The Meta quickstart documents reasoning_tokens as a subset of output_tokens.",
+    "USD 2 per million input tokens and USD 6 per million completion tokens are unverified planning prices.",
+    "Reservation uses UTF-8 bytes plus 256 framing tokens per request, plus the full 768-token completion cap. This is a conservative planning bound, not a verified provider invoice guarantee.",
+    "The eleven-item run exceeds tiny default caps and requires separate operator authorization; this preparation changes no access, cap, threshold or flag."
+  ],
+  "items": [
+    {
+      "id": "company-reorder-quantity-AF300-36",
+      "category": "company-data multi-doc",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "c1630526f77fe772222d1b9f150dd45b9ad6b37f094748a33469806012ee2dc0",
+      "inputHash": "47744b0cb5aff47a989c9b994a5aee06bb970a848c9d2ae0d0c899c13c31cdb7",
+      "requestHash": "89969f903625a4a732dfd7dd08b0ec080cc12800d6ece3768c626a70ee974b8f",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 298,
+        "visibleOutput": 224,
+        "reasoning": 128,
+        "completion": 352,
+        "total": 650
+      },
+      "projectedCostUsd": 0.002708,
+      "reservedTokens": {
+        "input": 1441,
+        "completion": 768,
+        "total": 2209
+      },
+      "reservedUpperUsd": 0.00749,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0294",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "1d954408991cc58c4fbe98736a24661f44a958deeb03220b46060670fd30c765",
+      "inputHash": "2d5d6dd8d9ac72d590f1f7d9c2595fcaafcf8f00230aac67013c0abb3b640de4",
+      "requestHash": "133ab2c2a3485bc6d67507afaa2c95cda2fb13a34128648678ee0baf5aeec390",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 272,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 464
+      },
+      "projectedCostUsd": 0.001696,
+      "reservedTokens": {
+        "input": 1213,
+        "completion": 768,
+        "total": 1981
+      },
+      "reservedUpperUsd": 0.007034,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0241",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "3cc3ddc6eb75c29f09a5e1ff82e777e2c4b40abf4b4fef1c8f34059475ba7c70",
+      "inputHash": "5ee7d60ea5ccdae350882c27bd9c05248359ab9761087b52021612bc291a9164",
+      "requestHash": "5d3d0e7d1a9e4061220a7f7b5b74b19db05c3e64f09f1b2494975b2a9d0354fd",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 273,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 465
+      },
+      "projectedCostUsd": 0.001698,
+      "reservedTokens": {
+        "input": 1212,
+        "completion": 768,
+        "total": 1980
+      },
+      "reservedUpperUsd": 0.007032,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0357",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "33c230683fdd3c2cb84ff76e29252bc532db19516b52411811a010b8bd9d34a1",
+      "inputHash": "2be78c1929e3bd32c90a34c3e9c442f9da9b23af58ebf5ffe0b7178b2016a8f6",
+      "requestHash": "fbca4cf8cc18146b3da05a7940e3c68cfc6f1e0c97b47ed8cef6552afb3da0f5",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 273,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 465
+      },
+      "projectedCostUsd": 0.001698,
+      "reservedTokens": {
+        "input": 1213,
+        "completion": 768,
+        "total": 1981
+      },
+      "reservedUpperUsd": 0.007034,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0360",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "0b8178e90afcb122d27e86e64f9f3fe11bea16d2ba39a27d611f8cb4028dd034",
+      "inputHash": "559d27e16bff0e0de7472fd402856abf9fa3c180c7acbc41e27f32e1b30f7ea3",
+      "requestHash": "92a67a1cdf67cdac70cfbce05702582d92b2d44fee5ef62ce1e5dea86ca983d3",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 272,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 464
+      },
+      "projectedCostUsd": 0.001696,
+      "reservedTokens": {
+        "input": 1209,
+        "completion": 768,
+        "total": 1977
+      },
+      "reservedUpperUsd": 0.007026,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0394",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "e546b6595540220355dfd0f71e0da2cc147f8037f778bbd9538409ea90dbbda0",
+      "inputHash": "5a0f0edba45e0d7fc8a78c7d30d4311fdcc20607f91183357ec2d89f616d948d",
+      "requestHash": "dde164bd5c11b6197ab2eb642ea21bf9e8d8c46a4e308b39d0a88bade69cfc2a",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 273,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 465
+      },
+      "projectedCostUsd": 0.001698,
+      "reservedTokens": {
+        "input": 1213,
+        "completion": 768,
+        "total": 1981
+      },
+      "reservedUpperUsd": 0.007034,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0571",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "8d40f50b7a693bde867de050eeffe9e8769f7a66b8697c886550d3a2689cd702",
+      "inputHash": "f92e0e80715883c59d172e642005a57baa5827b7717e94ec3cd15e57f64af186",
+      "requestHash": "294b2c6a2fe0d8638d31c67ce37fcf1405398a93c085e07bd8b632cf4bdf230e",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 274,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 466
+      },
+      "projectedCostUsd": 0.0017,
+      "reservedTokens": {
+        "input": 1218,
+        "completion": 768,
+        "total": 1986
+      },
+      "reservedUpperUsd": 0.007044,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "acme-047",
+      "category": "company-data multi-doc",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "1f0970b704b0f026851c2209e14f77e4a1114715ba14db785523eaa7c70ea03e",
+      "inputHash": "aa9d9408f2074f5bd9a221a96cc9b385fdca3d5f3f885370502eeded8e9ad141",
+      "requestHash": "0d43a4926f64a5f6c57baf3ccf05ea814c9b9b7f19a8161ac6fe8b586d46333a",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 143,
+        "visibleOutput": 224,
+        "reasoning": 128,
+        "completion": 352,
+        "total": 495
+      },
+      "projectedCostUsd": 0.002398,
+      "reservedTokens": {
+        "input": 886,
+        "completion": 768,
+        "total": 1654
+      },
+      "reservedUpperUsd": 0.00638,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0322",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "60b157255deb41453d6d811224a05f3e83f1aa20cf273e54e89799037b38a34d",
+      "inputHash": "a08b15d47a3cc61c8088cb4642632a2e74ad4d83ea60d59652614ce5fbc0d4a2",
+      "requestHash": "d9a5e589f0486a32a2f4aaac8fd332fffddbe5801dcaceaa1954443e11405076",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 272,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 464
+      },
+      "projectedCostUsd": 0.001696,
+      "reservedTokens": {
+        "input": 1209,
+        "completion": 768,
+        "total": 1977
+      },
+      "reservedUpperUsd": 0.007026,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "comparison-ad-0502",
+      "category": "privacy",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "e965ca30e5ce028715d2921608ae3b32df70702d3d90631fbf74c673fe3d1dc7",
+      "inputHash": "e1246c701df4e3503c496706acdff36dc21bdd6f0cc54868c29be3261a5533d9",
+      "requestHash": "7855065a65d92b2a6c62d2489743a5232584df8a4daec79c6ce6db7493f47a4b",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 274,
+        "visibleOutput": 128,
+        "reasoning": 64,
+        "completion": 192,
+        "total": 466
+      },
+      "projectedCostUsd": 0.0017,
+      "reservedTokens": {
+        "input": 1220,
+        "completion": 768,
+        "total": 1988
+      },
+      "reservedUpperUsd": 0.007048,
+      "actualCloudCalls": 0
+    },
+    {
+      "id": "company-safety-stock-shortfall-AF200-53",
+      "category": "company-data multi-doc",
+      "guardVerdict": "safe",
+      "sourcePayloadHash": "8699bcd6b7e2efa5b9bd719e2eda64148d4746078998f9adf6258460d1697b27",
+      "inputHash": "eb193e56ddf9d822850494f37c08e5e79b2e58611a880f998dc3f148e9491ac6",
+      "requestHash": "371cb719d578d870d0e7d2fd84474daa00ec502f85845e1f473d876199f83837",
+      "maxCompletionTokens": 768,
+      "freshGuardRequired": true,
+      "projectedTokens": {
+        "input": 272,
+        "visibleOutput": 224,
+        "reasoning": 128,
+        "completion": 352,
+        "total": 624
+      },
+      "projectedCostUsd": 0.002656,
+      "reservedTokens": {
+        "input": 1316,
+        "completion": 768,
+        "total": 2084
+      },
+      "reservedUpperUsd": 0.00724,
+      "actualCloudCalls": 0
+    }
+  ]
+}

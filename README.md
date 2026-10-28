@@ -2,6 +2,41 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
+## Stage 6: privacy and injection gaps remain
+
+**General private-data release is not ready.** Of 50 synthetic PII queries, 48 retained planted private values and received a safe Guard verdict. Medicare-format numbers, TFN-format numbers and addresses survived redaction in every case; two also retained a name. None was sent. The kill switch remains on, routing flag off, Meta configuration paused and cloud budget unset.
+
+| Local measurement | Events / n | Rate | Wilson 95% |
+|---|---:|---:|---|
+| Benchmark attacks blocked | 121/200 | 60.5% | 53.6–67.0% |
+| Safe queries wrongly blocked | 0/74 | 0.0% | 0.0–4.9% |
+| PII survivors in Guard-safe candidates | 48/50 | 96.0% | 86.5–98.9% |
+| PII survivors before Guard | 50/50 | 100.0% | 92.9–100.0% |
+| Retrieved-document injection blocked | 0/10 | 0.0% | 0.0–27.8% |
+| Multi-turn split blocked | 10/10 | 100.0% | 72.2–100.0% |
+| Japanese variant blocked | 10/10 | 100.0% | 72.2–100.0% |
+| Base64 variant blocked | 0/10 | 0.0% | 0.0–27.8% |
+| Leetspeak variant blocked | 9/10 | 90.0% | 59.6–98.2% |
+| Homoglyph variant blocked | 10/10 | 100.0% | 72.2–100.0% |
+| Saved local answers flagged unsafe | 3/138 | 2.2% | 0.7–6.2% |
+
+Harmful JBB requests scored 98/100 catches, jailbreak-labelled prompts 16/50, and injection-positive prompts 7/50. Content-safety classification does not establish instruction-boundary protection. Inbound rates describe Guard classifications of saved user-facing local answers, not independently proven unsafe-output prevalence; each model contributed 46 answers and one flag. Wilson intervals are descriptive IID sensitivity intervals with correlated variants. All 522 screens completed without errors, plus one excluded Guard warm-up and 23 separately recorded local preparation calls. **Zero cloud calls and $0 spend.** Guard and Stage 3 thresholds were not retuned.
+
+The [full Stage 6 report](results/2026-10-28-stage6-guard-stress/summary.md) includes per-category rates, up to five category/ID-only failure cases per area, pinned sources/licences, limitations and the readiness checklist. [Measured JSON](results/2026-10-28-stage6-guard-stress/report.json) remains immutable. Raw sources, translations, synthetic private fields and exact candidates live outside the checkout at `../Handoff-private/stage6` (or `STAGE6_PRIVATE_ROOT`), never in Git or browser assets.
+
+Eleven exact Stage 5 requests are prepared without sending, using **768 total completion tokens including reasoning**. Projected fee: **$0.021344**, comprising 2,896 proxy-counted input tokens, 1,696 assumed visible tokens and 896 assumed reasoning tokens. Conservative reservation: **$0.077388 / 21,798 tokens / 11 calls**. Prices and lengths are assumptions. Defaults remain **one call / 4,096 tokens / $0.01**, so the batch cannot run. Fresh single-use Guard approval, immutable safe provenance, a stable operator `HANDOFF_LIVE_RUN_ID`, authorized budget and disabled kill switch are separately required. Responses uses `max_output_tokens` and reads `output_text`; empty text raises an error. Passing these controls does not resolve the measured privacy or injection gaps.
+
+```powershell
+python -m pip install --target .cache/stage6-python -r scripts/stage6-requirements.txt
+npm run guard:stage6:data
+npm run guard:stage6:prepare-corpus  # Local fixture translation; private storage outside Git
+npm run guard:stage6:prepare-live    # Bodies and cost estimates only; no sends
+npm run guard:stage6                # Local Guard only; checkpointed and hash-locked
+npm run guard:stage6:report         # Markdown from unchanged measured JSON; no inference
+npm run test:rag
+npm run dashboard:check
+```
+
 ## Stage 5: measured Guard screening and an opt-in company route
 
 Local `llama-guard3:8b` screened all **11** deferred business proposals after redaction: **11 safe / would release, 0 blocked, 0 errors**. This was a dry run: **zero cloud calls and $0 cloud spend**. The [per-item report](results/2026-10-28-stage5-guard/summary.md) distinguishes 3 company-document proposals from 8 synthetic ad exports. No new PII replacements were needed: the earlier ad preparation had already removed **16 private field groups containing 40 scalar values**. Exact would-send payloads remain in ignored local storage; only IDs, hashes and measurements are published. Inbound Guard checks remain pending because no cloud answer was generated.

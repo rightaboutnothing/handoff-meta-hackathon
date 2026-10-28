@@ -37,6 +37,14 @@ The table combines previously valid saved checkpoints with the completed offline
 
 The full interim report, including all 300 deferred pairing/task IDs, is in [results/summary.md](results/summary.md). GPQA question text remains only in the Git-ignored local cache.
 
+## 28 October 2026: Stage 6 local stress test and disabled live safeguards
+
+Live controls committed as `d8510b0`; frozen stress harness/dashboard as `aeea210`. Independent review caught and fixed per-question budget resets: Ask requests now share a stable operator run ID and ledger. Default kill switch remains on, with one call / 4,096 total tokens / $0.01 caps, no retries, reasoning-inclusive reservations, content-free audits and explicit empty-Responses errors. Eleven exact bodies were prepared, never sent: $0.021344 projected including 896 assumed reasoning tokens; $0.077388 conservative reservation / 21,798 tokens / 11 calls. No access or routing flag was enabled.
+
+The [measured report](results/2026-10-28-stage6-guard-stress/summary.md) retains all 522 valid screens: 121/200 catches, 0/74 false blocks, 48/50 Guard-safe PII candidates with surviving values, 0/10 retrieved-document injection catches, 0/10 base64 catches and 3/138 saved local answers flagged unsafe. Medicare/TFN-format numbers and addresses survived in all 50 PII cases. **General private-data release is not ready.** There were 523 local Guard calls including warm-up, 23 separate local preparation calls, zero execution errors and zero cloud requests/spend. No Guard, redactor or locked threshold was tuned on this sample.
+
+Raw attack sets, translations, seeded fields and candidates remain outside Git. Public reports contain category/ID/hash metadata; bundle and staged-file scans check protected text without displaying it. All **363 unit tests** passed. An initial full run had one existing Windows lock-release `EPERM`; an unchanged full rerun passed 363/363. The measured JSON stays unchanged; post-measurement reporting adds interpretation and the readiness checklist to Markdown.
+
 ## 28 October 2026: Stage 5 Guard boundary and opt-in live recommendation
 
 Committed the locked runtime and local Guard runner as `e477496`. The routing flag defaults off. Opt-in uses Gemma 12B for company-document questions at the unchanged Stage 3 threshold, with citation/completeness/truncation gates; other safe questions abstain. All handoffs require redaction and a one-use Guard pass bound to the exact payload. Trusted adversarial items stay local in either flag state. Meta access remains paused.

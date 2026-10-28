@@ -36,6 +36,8 @@ Savings lets you select a recorded pipeline and monthly query volume; prices and
 
 ## Checks
 
+Stage 6 adds the measured Guard stress panel at the top of Trust, from hash-verified `/api/company/stage6` or the sanitized static fallback. It displays each rate with its denominator and Wilson interval, up to five category/ID-only failures per area, reasoning-inclusive fee assumptions and live control checks. A data-derived privacy failure alert remains separate from passing control tests. No raw prompt, output, private payload or PII value reaches public assets; the bundle scan also checks the external private corpus when available. Missing measurements stay pending.
+
 Stage 5 adds measured local Guard decisions to Trust / Privacy boundary. `/api/company/stage5` and the static `stage5-results.json` fallback use the same bounded, hash-verified aggregate; exact would-send payloads remain private. Screens are scoped to the same source report, locked policy, cohort and local model. The display separates would-release from actual delivery, new PII replacements from upstream field removal, and finite-dev certification from future traffic. Other cohorts/models remain pending.
 
 The server reports `config/rag.json`'s `lockedCompanyRoutingEnabled` state; it defaults off. To opt in to the locked Gemma 12B company route, an operator changes that setting server-side and restarts the dashboard. Browser requests cannot override it. The flag does not enable paused Meta access. No UI check invokes a model.

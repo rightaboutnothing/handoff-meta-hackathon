@@ -36,6 +36,7 @@
 .s6-failures code{font-size:9px;overflow-wrap:anywhere;color:var(--gw-ink,#142033)}
 .s6-failures li span{color:var(--gw-muted,#607086);text-align:right}
 .s6-readiness{border-top:1px solid var(--gw-line,#e4eaf1);margin-top:31px;padding-top:5px}
+.s6-privacy-failed{border:1px solid #e7b9a5;border-left:3px solid #a85031;border-radius:10px;background:var(--gw-mist,#f5f8fc);padding:20px 23px;margin:23px 0}.s6-privacy-failed .s6-eyebrow{color:#a85031}.s6-privacy-failed h4{font-size:19px;font-weight:550;letter-spacing:-.025em;line-height:1.45;color:#a85031;margin:11px 0}.s6-privacy-failed p{font-size:11px;line-height:1.85;color:var(--gw-muted,#607086);margin:0;max-width:900px}
 .s6-costs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:25px;margin:24px 0}
 .s6-costs span{display:block;color:var(--gw-muted,#607086);font-size:10px;line-height:1.7}
 .s6-costs strong{display:block;font-size:25px;font-weight:500;letter-spacing:-.035em;margin:9px 0}

@@ -19,6 +19,7 @@
     "guard:stage6:prepare-corpus": "node scripts/prepare-stage6-corpus.mjs",
     "guard:stage6:prepare-live": "node scripts/prepare-stage6-live.mjs",
     "guard:stage6": "node scripts/run-stage6-stress.mjs",
+    "guard:stage6:report": "node scripts/report-stage6.mjs",
     "comparison:prepare-tokenizers": "node scripts/prepare-tokenizers.mjs",
     "test:comparison": "node --test tests/comparison-*.test.mjs",
     "demo:build": "node scripts/generate-company-demo.mjs",
