@@ -88,6 +88,26 @@ test('Markdown renderer preserves real newlines, country strata, paired denomina
   assert.match(text,/Saved outputs blocked/);assert.match(text,/50\/50 \| 0 \| PASS \(sample only\) \| PENDING \| PENDING/);
   assert.match(text,/Pending blocks are not detection successes/);assert.match(text,/Production release/);assert.match(text,/DISABLED/);assert.match(text,/Actual cloud quality \|/);assert.match(text,/DEFERRED/);
 });
+test('presentation distinguishes unusable PII attempts and absent applications from measured successes',()=>{
+  const quality=summarizeQualityRows(Array.from({length:11},(_,i)=>({id:'quality-'+i,status:'SURROGATE_OUTPUT_BLOCKED',beforeScore:{factCoverage:.5,score:.5}})));
+  const setups=[5,6].map((available,index)=>summarizeStage6bSetup(STAGE6B_SETUPS[index],Array.from({length:50},(_,i)=>base('pii-'+i,'pii',{candidateAvailable:i<available})),{quality}));
+  const source={gitCommit:'db91254982b85998edae37e9d9ade622e4b35bdb'},report={source,setups,findings:[],caveats:[]},original=JSON.stringify(report);
+  const text=renderStage6bReport(report,{presentationRevision:true});
+  assert.equal(JSON.stringify(report),original);assert.match(text,/Presentation-only revision regenerated from unchanged report\.json/);assert.match(text,/Measurement source remains db91254/);
+  assert.match(text,/\| Meta lens \| 5 \| 45 \| 0\/5 · 0\.0% \[0\.0%–43\.4%\]/);
+  assert.match(text,/\| Google lens \| 6 \| 44 \| 0\/6 · 0\.0% \[0\.0%–39\.0%\]/);
+  assert.match(text,/0\/50 observed \| 5\/50 usable; 45 unavailable/);assert.match(text,/Unavailable attempts are not successful redactions/);
+  assert.match(text,/0\/11 complete before\/after pairs, 0\/11 scored local applications, and 0\/11 verified AES source round trips/);
+  assert.match(text,/No complete local-surrogate application was observed/);assert.match(text,/No AES source round trip was verified/);
+  assert.equal(text.includes('then applied locally to the private task with a verified AES'),false);
+  assert.match(text,/reuse one shared strict scanner/);assert.match(text,/not independent lens evaluations/);
+  assert.match(text,/no observed seed-survivor case; 45 candidate attempts unavailable/);
+});
+test('presentation does not invent conditional seed-leak counts from incomplete aggregate data',()=>{
+  const quality=summarizeQualityRows([]),rows=Array.from({length:50},(_,i)=>base('pii-'+i,'pii',{candidateAvailable:i<5,piiLeak:i===49})),setup=summarizeStage6bSetup(STAGE6B_SETUPS[0],rows,{quality});
+  const text=renderStage6bReport({setups:[setup],findings:[],caveats:[]});
+  assert.match(text,/\| Meta lens \| 5 \| 45 \| pending \|/);assert.match(text,/nonzero aggregate leaks cannot be assigned to the usable subset/);
+});
 test('the evaluation fence denies all clouds and unknown local models without dispatch',async t=>{
   let actual=0;t.mock.method(globalThis,'fetch',async()=>{actual++;return new Response('{}');});const fence=installStage6bNetworkFence();
   try{

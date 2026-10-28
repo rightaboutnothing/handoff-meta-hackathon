@@ -5,6 +5,7 @@ import {performance} from 'node:perf_hooks';
 import {sha256} from '../rag/receipts.mjs';
 import {acquireRunLock} from '../comparison/run-lock.mjs';
 import {scoreItem} from '../comparison/scoring.mjs';
+import {wilsonInterval} from '../comparison/metrics.mjs';
 import {STAGE6B_ROOT,stage6bPrivateRoot,readStage6bJson,optionalStage6bJson,durableStage6bJson,appendStage6bJsonl,readStage6bJournal,fingerprintStage6b,loadStage6bInputs,loadStage6bQuality} from './stage6b-io.mjs';
 import {STAGE6B_SETUPS,scanStage6bCandidate,summarizeStage6bSetup,summarizeCountryRecall,summarizeQualityRows} from './stage6b-metrics.mjs';
 import {installStage6bNetworkFence} from './stage6b-network.mjs';
@@ -170,8 +171,15 @@ export async function runStage6b({runId='2026-10-28-stage6b-question-boundary-r2
   }finally{fence.restore();await patterns?.closePrivacyWorker?.();pg?.closePromptGuardWorkers?.();await release();}
 }
 
-export function renderStage6bReport(report){
+export function renderStage6bReport(report,{presentationRevision=false}={}){
   const percent=value=>value==null?'pending':(value*100).toFixed(1)+'%',metric=(setup,id)=>setup.metrics.find(row=>row.id===id),format=row=>row?`${row.events}/${row.n} · ${percent(row.rate)}${row.wilson95?' ['+row.wilson95.map(percent).join('–')+']':''}`:'pending',ms=value=>Number.isFinite(value)?value.toFixed(2):'pending';
+  const usableCandidateMetric=setup=>{
+    const attempted=metric(setup,'candidate-pii'),n=setup.candidateCoverage.available;
+    // With nonzero leaks and unavailable candidates, public aggregate counts do
+    // not identify which subset contained a leak. Never invent that breakdown.
+    if(!attempted||attempted.events>0&&n!==setup.candidateCoverage.attempted)return null;
+    const events=attempted.events;return{n,events,rate:n?events/n:null,wilson95:wilsonInterval(events,n)};
+  };
   const latencyTable=rows=>[
     '| Layer | Measured n | Median ms | p95 ms | Replayed | Pending | Unavailable |',
     '|---|---:|---:|---:|---:|---:|---:|',
@@ -179,11 +187,16 @@ export function renderStage6bReport(report){
   ];
   const lines=[
     '# Stage 6b: send the question, never the data','',
+    ...(presentationRevision?[`Presentation-only revision regenerated from unchanged report.json. Measurement source remains ${report.source?.gitCommit?.slice(0,7)??'the recorded commit'}; no measurements, model settings or result JSON were changed.`,'']:[]),
     '**Offline dry run: zero cloud requests and $0 spend. Live dispatch remains disabled. Prompt Guard 2 86M and 22M are PENDING and fail closed. Pending blocks are not detection successes.**','',
     'All rates show events/n and Wilson 95% intervals where n > 0. Zero denominators stay pending. Operational blocks include missing protection; measured available-check blocks exclude pending layers and execution failures.','',
-    '| Setup | PII in pre-injection candidate | Candidate coverage | Operational attacks blocked | Available-check blocks | Safe operational false blocks | Safe available-check false blocks | Saved outputs blocked |',
+    '| Setup | Seed-survivor queries / all attempted PII cases | Candidate coverage | Operational attacks blocked | Available-check blocks | Safe operational false blocks | Safe available-check false blocks | Saved outputs blocked |',
     '|---|---|---|---|---|---|---|---|',
-    ...report.setups.map(setup=>`| ${setup.label} | ${format(metric(setup,'candidate-pii'))} | ${setup.candidateCoverage.available}/${setup.candidateCoverage.attempted} | ${format(metric(setup,'attacks-operational'))} | ${format(metric(setup,'attacks-detected'))} | ${format(metric(setup,'safe-operational'))} | ${format(metric(setup,'safe-detected'))} | ${format(metric(setup,'inbound-blocked'))} |`),'',
+    ...report.setups.map(setup=>`| ${setup.label} | ${metric(setup,'candidate-pii').events}/${metric(setup,'candidate-pii').n} observed | ${setup.candidateCoverage.available}/${setup.candidateCoverage.attempted} usable; ${setup.candidateCoverage.unavailable} unavailable | ${format(metric(setup,'attacks-operational'))} | ${format(metric(setup,'attacks-detected'))} | ${format(metric(setup,'safe-operational'))} | ${format(metric(setup,'safe-detected'))} | ${format(metric(setup,'inbound-blocked'))} |`),'',
+    '| Setup | Usable candidates | Unavailable attempts | Seed leaks among usable candidates, Wilson 95% |',
+    '|---|---:|---:|---|',
+    ...report.setups.map(setup=>`| ${setup.label} | ${setup.candidateCoverage.available} | ${setup.candidateCoverage.unavailable} | ${format(usableCandidateMetric(setup))} |`),'',
+    'No observed seed survivor is distinct from an available, privacy-safe question. Unavailable attempts are not successful redactions. Conditional leak intervals use only usable candidates; they do not certify all fifty attempted cases. A conditional breakdown stays pending if nonzero aggregate leaks cannot be assigned to the usable subset.','',
     'Saved-output blocks describe the complete local output boundary, including pending protection. They are not an unsafe-output classifier rate and no real cloud return was generated.','',
     '## Privacy gate and injection readiness','',
     '| Setup | Valid candidates | Seed-survivor queries | Necessary 0/50 privacy condition | Prompt Guard 86M | Prompt Guard 22M | Pending operational blocks | Production release |',
@@ -210,7 +223,8 @@ export function renderStage6bReport(report){
         ...countryRows.map(row=>`| ${row.country} | ${row.queries} | ${format(row.recall)} | ${format(row.allSeedRecall)} | ${format(row.validatedRecall)} | ${format(row.invalidFormatRecall)} |`),
         ...(countryRows.length?[]:['| pending | 0 | pending | pending | pending | pending |']),'');
     }
-    lines.push('Country recall is measured per planted value, not per finding. Names are outside the strict-pattern scope but remain in all-seed recall. Independently invalid frozen numbers are separated from valid references; detecting a labelled invalid number does not demonstrate checksum validation. Formats whose checksum is not publicly validated are excluded from the valid-reference column. The frozen Australian-format population and the separate multi-country population are never pooled.','');
+    lines.push(setup.lens==='presidio'?'These country tables measure the Presidio scanner only, not a complete question-rewrite pipeline.':'These country tables reuse one shared strict scanner for the Meta, Google and Google native-only rows. They are not independent lens evaluations, and do not measure the local LLM or the complete question-only pipeline.','',
+      'Country recall is measured per planted value, not per finding. Names are outside the strict-pattern scope but remain in all-seed recall. Independently invalid frozen numbers are separated from valid references; detecting a labelled invalid number does not demonstrate checksum validation. Formats whose checksum is not publicly validated are excluded from the valid-reference column. The frozen Australian-format population and the separate multi-country population are never pooled.','');
     const quality=setup.quality;
     lines.push('### Matched local-surrogate quality','');
     if(quality?.mode==='LOCAL_SURROGATE'){
@@ -224,9 +238,9 @@ export function renderStage6bReport(report){
         `| Mean fact coverage, paired cases only (n=${quality.completed}) | ${percent(quality.beforeFactCoverage)} | ${percent(quality.afterFactCoverage)} |`,
         `| Mean fact coverage, all available answers | ${percent(quality.baselineFactCoverageAll)} (n=${quality.baselineAvailable}) | ${percent(quality.applicationFactCoverageAll)} (n=${quality.applicationAvailable}) |`,'',
         '#### Baseline and local-application latency','',...latencyTable(quality.layerLatency??[]),'',
-        'Guidance was produced locally from the general question only, then applied locally to the private task with a verified AES source round trip. Paired before/after scores use the original references. Missing pairs remain unavailable. This tests the local application mechanism; it does not establish real cloud answer quality.','');
+        `Observed application results: ${quality.completed}/${quality.n} complete before/after pairs, ${quality.applicationAvailable}/${quality.n} scored local applications, and ${quality.tokenRoundTripsVerified}/${quality.n} verified AES source round trips. ${quality.completed===0?'No complete local-surrogate application was observed; answer-quality preservation was not established for this setup.':'Completed applications used locally generated general guidance; quality preservation must be judged from the paired scores above, not inferred from successful execution.'} ${quality.tokenRoundTripsVerified===0?'No AES source round trip was verified for this setup.':''} Paired scores use the original references; ${quality.unavailable}/${quality.n} unavailable pairs remain outside the paired denominator. Actual cloud answer quality is deferred.`,'');
     }else lines.push('Not applicable: Presidio is a PII comparison yardstick, without a question rewrite or local application model. Actual cloud quality remains deferred.','');
-    lines.push('Failure references: '+Object.entries(setup.failuresByArea).map(([area,rows])=>area+': '+(rows.length?rows.map(row=>row.category+' / '+row.id+' / '+row.hash).join('; '):'none')).join(' · '),'');
+    lines.push('Failure references: '+Object.entries(setup.failuresByArea).map(([area,rows])=>area+': '+(rows.length?rows.map(row=>row.category+' / '+row.id+' / '+row.hash).join('; '):area==='pii'?'no observed seed-survivor case; '+setup.candidateCoverage.unavailable+' candidate attempts unavailable':'none')).join(' · '),'');
   }
   lines.push('## Findings and limitations','',...report.findings.concat(report.caveats).map(note=>'- '+note),'');
   return lines.join('\n');
