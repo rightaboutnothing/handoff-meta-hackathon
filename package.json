@@ -13,6 +13,7 @@
     "comparison:stage1": "node scripts/run-stage1.mjs",
     "comparison:stage2": "node scripts/run-stage2.mjs",
     "comparison:stage3": "node scripts/run-stage3.mjs",
+    "comparison:stage4": "node scripts/build-stage4-report.mjs",
     "comparison:prepare-tokenizers": "node scripts/prepare-tokenizers.mjs",
     "test:comparison": "node --test tests/comparison-*.test.mjs",
     "demo:build": "node scripts/generate-company-demo.mjs",

@@ -36,3 +36,9 @@ The table combines previously valid saved checkpoints with the completed offline
 | Gemmuse (`gemma-meta`) | Ad privacy | 50 |
 
 The full interim report, including all 300 deferred pairing/task IDs, is in [results/summary.md](results/summary.md). GPQA question text remains only in the Git-ignored local cache.
+
+## 28 October 2026: Stage 4 slice reporting and submission assets
+
+Built the [single saved-results report](results/2026-10-28-stage4-slice-report/summary.md), shared dashboard view and four [1920×1080 PNG exports](results/2026-10-28-stage4-slice-report/charts/manifest.json) from Stage 3's locked decisions. No new inference, Guard screen, cloud call or paid tier ran; cloud spend was $0. Company single/multiple-document slices, overlapping arithmetic, MMLU-Pro, GPQA and other questions retain explicit sample sizes and separate models/cohorts.
+
+Gemma 12B accepts 8/8 single-document, 5/8 multiple-document and 12/14 arithmetic-overlay questions, all accepted answers full rubric credit. The company total remains 13/16; the finite-dev bound remains 3.66%, with future traffic uncertified. Llama/Gemma 4B retain abstention. Costs show dollar/percentage savings by slice and 25/50/75% company-document workloads. Privacy now counts all 24 business-data queries, including eight synthetic ad exports: 13 local answers, 11 proposed pre-Guard handoffs and zero actual cloud transfers. Guard outcomes remain pending. The dashboard and README expose the same aggregates, assumptions and chart provenance; earlier and retired evidence is preserved.

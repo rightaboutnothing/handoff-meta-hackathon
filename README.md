@@ -2,6 +2,47 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
+## Current demo results: use the right model for the workload
+
+The frozen 60-question comparison recommends **Gemma 12B for company-document questions**, using the locked company policy and every citation, completeness and truncation gate. It accepts **13/16** company questions locally, all thirteen with full automated rubric credit; the Wilson IID sensitivity interval is **77.2–100%**. Llama 8B and Gemma 4B continue to abstain. Other safe questions remain handoff candidates for Guard, redaction and Muse Spark or Gemini. Adversarial questions stay local. This is a deployment recommendation; the live Ask configuration has not been switched automatically.
+
+| Company-document slice | Gemma 12B accepted / all | Accepted full credit · Wilson 95% IID sensitivity | Escalation candidates | Median saved local pipeline |
+|---|---:|---|---:|---:|
+| Single document | 8/8 · 100% | 8/8 · 67.6–100% | 0% | 0.58s |
+| Multiple documents | 5/8 · 62.5% | 5/5 · 56.6–100% | 37.5% | 0.95s |
+| Arithmetic, overlapping subset | 12/14 · 85.7% | 12/12 · 75.8–100% | 14.3% | 0.77s |
+
+All three models abstain on the saved MMLU-Pro and GPQA slices. GPQA has **one item**, so this does not establish general hard-reasoning performance. The **3.66% upper error bound** certifies only the fixed accepted dev frame; the separate AUDIT-only bound is 15.8%, and future questions remain uncertified. Latency excludes unavailable cloud/Guard completion. The [single Stage 4 report](results/2026-10-28-stage4-slice-report/summary.md) contains every model, slice, control, cost and denominator, with [aggregate JSON](results/2026-10-28-stage4-slice-report/report.json) and a [plain-English narration](results/2026-10-28-stage4-slice-report/summary.txt).
+
+![Local acceptance, accepted accuracy with Wilson intervals, and saved local latency](results/2026-10-28-stage4-slice-report/charts/local-acceptance-quality.png)
+
+Cloud-fee projections use the actual saved provider-specific offline input counts, assumed answer lengths and prices, and identical minimal no-draft payloads for Handoff and its all-cloud baseline. At the observed question mix, Gemma 12B projects **$0.4785 vs $0.6262 per 1,000 Gemini queries** (save $0.1477 / 23.6%), or **$1.3018 vs $1.7134 with Muse Spark** (save $0.4115 / 24.0%). Local hardware allocation is excluded. These are conditional pre-Guard projections; actual calls and cloud spending are **zero**.
+
+| Company-document share of workload | Gemini: Handoff / all-cloud per 1,000 | Gemini saving: $ / % | Muse Spark: Handoff / all-cloud per 1,000 | Muse Spark saving: $ / % |
+|---|---:|---:|---:|---:|
+| 25% | $0.4853 / $0.6238 | $0.1385 / 22.2% | $1.3205 / $1.7064 | $0.3858 / 22.6% |
+| 50% | $0.3832 / $0.6602 | $0.2769 / 41.9% | $1.0399 / $1.8116 | $0.7716 / 42.6% |
+| 75% | $0.2812 / $0.6966 | $0.4154 / 59.6% | $0.7593 / $1.9168 | $1.1574 / 60.4% |
+
+Within company-document and other questions, the saved mix stays fixed; arithmetic overlaps the single/multiple-document slices. The remaining mix includes the synthetic ad exports, instructions, knowledge, GPQA and safety items. Unsafe items have zero cloud fees in both arms.
+
+Privacy covers **24 business-data queries: 16 company-document questions + 8 fake ad-account exports**. Gemma 12B answered 13 fully locally; 11 became deferred pre-Guard proposals. Three proposed payloads contain minimum redacted context and eight are context-free. All contain **no local draft**. **Zero queries reached any cloud**, and new Guard decisions remain pending. Every dataset is synthetic. “Question-only” means no draft; relevant redacted evidence can still accompany the question.
+
+![Projected cloud fee savings as company-document workload share increases](results/2026-10-28-stage4-slice-report/charts/company-workload-savings.png)
+
+Submission PNGs are **1920×1080**: [acceptance/accuracy/latency](results/2026-10-28-stage4-slice-report/charts/local-acceptance-quality.png), [fees by slice](results/2026-10-28-stage4-slice-report/charts/cloud-costs-by-slice.png), [workload scenarios](results/2026-10-28-stage4-slice-report/charts/company-workload-savings.png), and [privacy boundary](results/2026-10-28-stage4-slice-report/charts/privacy-boundary.png). Their [manifest](results/2026-10-28-stage4-slice-report/charts/manifest.json) records input/script hashes, dimensions and runtime versions. The dashboard's Benchmarks, Savings and Trust views read this same hashed aggregate and offer PNG downloads; earlier experiments remain separately labelled.
+
+```powershell
+# Rebuild from retained Stage 3 data; no model calls or paid tier.
+npm run comparison:stage4
+# Python 3.12, isolated plotting dependencies, no inference clients.
+python -m pip install --target .cache/stage4-plotting -r scripts/stage4-plot-requirements.txt
+python -B scripts/export-stage4-charts.py
+npm run dashboard:check
+```
+
+Rebuilding the private-input report requires the original ignored Stage 3 logs, payload snapshots and dataset. The committed aggregate and PNGs work without those private inputs. Thresholds remain locked, Meta access remains paused, and no new benchmark or paid tier was started.
+
 ## Private company data
 
 The gateway indexes text, Markdown, PDF, CSV and Word files into a local SQLite vector store. Ingest redacts recognized PII before embedding. An encrypted local mapping restores placeholders only on this machine. Llama answers with file and chunk citations. Low confidence, weak retrieval or invalid citations triggers the boundary: minimum redacted chunks, local Llama Guard, Muse Spark, inbound Llama Guard, then local restoration. A signed Ed25519 receipt binds the exact redacted chunk hashes and input hash.

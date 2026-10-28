@@ -13,7 +13,7 @@ npm run dashboard
 
 The dashboard opens at `http://127.0.0.1:4173`.
 
-The current Ask flow uses local Llama, Llama Guard and **Muse Spark**. The current Benchmarks view compares every Meta/Google pipeline and local, cloud and Guard OFF controls independently. Earlier Grok results appear only under **Historical (retired)**; they are read-only evidence.
+The current Ask flow uses configured local Llama, Llama Guard and **Muse Spark**. Stage 4 Benchmarks, Savings and Trust show one saved-results report with workload slices, Wilson intervals, local latency, provider fee projections and the privacy boundary. It recommends Gemma 12B for company documents; this reporting change does not automatically switch Ask's production configuration. Earlier Meta/Google matrix studies and Grok results remain separately labelled, with Grok only under **Historical (retired)**.
 
 ## Modes
 
@@ -23,6 +23,10 @@ The current Ask flow uses local Llama, Llama Guard and **Muse Spark**. The curre
 - Presentation mode hides controls and loops the three demo recordings for screen capture.
 
 ## Data
+
+The Stage 4 views read `GET /api/company/stage4`, selected by the mandatory hashed `results/stage4-latest.json` pointer. The confined loader exposes sanitized aggregates only. A standalone build falls back to `public/stage4-results.json`; development/build sync also copies the four submission PNGs to `public/stage4-charts/`. Rebuild from retained private Stage 3 data with `npm run comparison:stage4`. The committed aggregate/PNGs do not require private logs to display. No new model call is made by report building or view rendering.
+
+The primary saved60, plain50 control and dev AUDIT remain separate. Arithmetic overlaps company single/multiple-document slices. GPQA has one primary question. Costs use saved offline counts and assumed outputs/prices; pending Guard decisions and cloud quality stay pending. Privacy shows 24 business-data queries (16 company documents + 8 synthetic ad exports), accepted local answers, proposed handoffs, zero actual remote delivery and no local drafts. PNG downloads are available below the results view.
 
 `scripts/sync-results.mjs` reads the committed `results/summary.md` and creates `public/benchmark-data.json` before development and production builds. Protected benchmark prompts are never read into dashboard data.
 

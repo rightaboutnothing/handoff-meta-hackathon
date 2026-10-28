@@ -5,11 +5,13 @@ import { getRound, formatCount, formatLatency, formatMoney, formatPercent, type 
 import './GatewaySavings.css';
 import { ComparisonSavings } from './ComparisonSavings';
 import type { ComparisonReport } from '../comparisonTypes';
+import {Stage4Results} from './Stage4Results';
+import type {Stage4Report} from '../stage4Types';
 
 const usable = (value: number | null | undefined): value is number => typeof value === 'number' && Number.isFinite(value);
 
-export function GatewaySavings({ data, comparison = null }: { data: GatewayResults | null; comparison?: ComparisonReport | null }) {
-  return <><ComparisonSavings report={comparison}/><details className="cmp-legacy"><summary>Earlier company-data cost evidence</summary><LegacySavings data={data}/></details></>;
+export function GatewaySavings({ data, comparison = null, stage4 }: { data: GatewayResults | null; comparison?: ComparisonReport | null; stage4?: Stage4Report | null }) {
+  return <>{stage4===undefined?<ComparisonSavings report={comparison}/>:<><Stage4Results report={stage4} initialTab="costs"/><details className="cmp-legacy"><summary>Earlier model matrix and cost audit</summary><ComparisonSavings report={comparison}/></details></>}<details className="cmp-legacy"><summary>Earlier company-data cost evidence</summary><LegacySavings data={data}/></details></>;
 }
 function LegacySavings({ data }: { data: GatewayResults | null }) {
   const round = getRound(data, 2);

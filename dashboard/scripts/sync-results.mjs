@@ -1,7 +1,8 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, copyFile, lstat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadTraceSummary } from "./trace-summary.mjs";
+import { readStage4Results } from "../server/stage4-results.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dashboardRoot = path.resolve(here, "..");
@@ -96,3 +97,19 @@ try {
 } catch (error) { if (error.code !== 'ENOENT') throw error; }
 if (!unchanged) await writeFile(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 console.log(unchanged ? 'Historical pairing snapshot unchanged; kept read-only.' : `Synced ${pairings.length} pairings from results/summary.md`);
+
+// A standalone dashboard build can load the same sanitized Stage 4 aggregate.
+// Raw responses, private contexts and gated tasks never enter public assets.
+const stage4=await readStage4Results(),stage4File=path.join(dashboardRoot,'public','stage4-results.json');
+const stage4Body=JSON.stringify(stage4,null,2)+'\n';
+let previousStage4;try{previousStage4=await readFile(stage4File,'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
+if(previousStage4!==stage4Body)await writeFile(stage4File,stage4Body,'utf8');
+if(stage4){
+  const source=path.join(repoRoot,'results',stage4.runId,'charts'),destination=path.join(dashboardRoot,'public','stage4-charts');
+  const chartFiles=['local-acceptance-quality.png','cloud-costs-by-slice.png','company-workload-savings.png','privacy-boundary.png','manifest.json'];
+  for(const name of chartFiles){
+    const file=path.join(source,name);let info;try{info=await lstat(file);}catch(error){if(error.code==='ENOENT')continue;throw error;}
+    if(!info.isFile()||info.isSymbolicLink())throw new Error('Submission charts must be regular files');
+    await mkdir(destination,{recursive:true});await copyFile(file,path.join(destination,name));
+  }
+}

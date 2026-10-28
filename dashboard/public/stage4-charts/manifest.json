@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-28-stage4-slice-report",
+  "population": "frozen-saved60",
+  "exportedAt": "2026-10-28T10:24:49.750495+00:00",
+  "sourceReportSha256": "0bffff83edc19d59cf20f7159e5d2438c08a2a01cae20e3358d3e7d15662c865",
+  "sourceReport": "report.json",
+  "scriptSha256": "5572c1642f7b1cfe8b836940229a179830f6d731c58982ff63af6126405238a1",
+  "requirementsSha256": "b0fa10fc954d006a1decb0081e006c0aad5aadd55254cc0d9495122e2b7910be",
+  "sourceHashMethod": "SHA-256 of UTF-8 bytes normalized to LF",
+  "pythonVersion": "3.12.14",
+  "libraries": {
+    "matplotlib": "3.10.3",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.68.0",
+    "kiwisolver": "1.5.1",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pillow": "13.0.0",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "six": "1.17.0",
+    "tzdata": "2026.6"
+  },
+  "renderer": "matplotlib Agg",
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "files": [
+    {
+      "file": "cloud-costs-by-slice.png",
+      "sha256": "c6e6f7285beea860afaa1949a43aaeb99a40fbddb12089700344702fc3e8db25",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "company-workload-savings.png",
+      "sha256": "6297a9a142b8d667b00d66eef8170d164606734574c2eb43578703a7aa126298",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "local-acceptance-quality.png",
+      "sha256": "3a5a6692bb73c9f635b4222a8706a3106f9d30e379f13e016aec957c3269e291",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "privacy-boundary.png",
+      "sha256": "8ded96504dc1684cf11e5e66e5088b2ddcd576899119feab4a3ea485042491da",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "limits": [
+    "Wilson intervals are IID sensitivity; future accuracy is uncertified.",
+    "Company arithmetic overlaps company single/multi-document categories.",
+    "Cloud fees use offline input counts and assumed output lengths/prices.",
+    "Proposed handoffs are not cloud deliveries; Guard outcomes remain pending.",
+    "Business-data privacy counts include company documents and synthetic ad exports; the workload-mix company share means company-document queries."
+  ]
+}
