@@ -54,7 +54,7 @@ async function ollama(endpoint, body) {
     body: JSON.stringify({ ...body, stream: false, keep_alive: COMPARISON_SETTINGS.keepAlive }), signal: AbortSignal.timeout(180000) });
   if (!response.ok) throw new Error(`Local inference returned HTTP ${response.status}`);
   const data = await response.json();
-  return { text: data.message?.content ?? data.response ?? '', modelId: body.model, latencyMs: performance.now() - started, tokens: tokenCounts(data),
+  return { text: data.message?.content ?? data.response ?? '', modelId: body.model, latencyMs: performance.now() - started, tokens: tokenCounts(data), doneReason: data.done_reason ?? null,
     settings: { ...COMPARISON_SETTINGS, maxTokens: body.options.num_predict, json: body.format === 'json' || typeof body.format === 'object', schemaConstrained: Boolean(body.format && typeof body.format === 'object') },
     ollamaTiming: { totalDurationNs: data.total_duration, loadDurationNs: data.load_duration, promptDurationNs: data.prompt_eval_duration, evalDurationNs: data.eval_duration } };
 }
