@@ -1,0 +1,1414 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-28-stage1-answer-citations",
+  "timestamp": "2026-10-28T02:18:09.164Z",
+  "tier": 0,
+  "status": "STAGE1_COMPLETE",
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "remoteCountingCalls": 0,
+  "network": {
+    "externalRequests": 0,
+    "localRequests": 716
+  },
+  "settings": {
+    "version": "stage1-answer-citations-v1",
+    "tier": 0,
+    "seed": 20261027,
+    "auditSeed": 20261028,
+    "models": [
+      "llama3.1:8b",
+      "gemma3:4b",
+      "gemma3:12b"
+    ],
+    "answerMaxTokens": 384,
+    "selfCheckMaxTokens": 128,
+    "baselineRun": "2026-10-28-meta-google-tier0",
+    "controlRun": "2026-10-28-tier0-payload-costs",
+    "cohorts": [
+      {
+        "id": "saved60",
+        "variant": "structured",
+        "items": 60
+      },
+      {
+        "id": "plain50",
+        "variant": "plain",
+        "items": 50
+      }
+    ],
+    "retrieval": "Reuse exact saved redacted questions and context; no retrieval changes or new embeddings",
+    "calibration": "Use the original classifiers and exact thresholds; no training or selection",
+    "cloudCallsAllowed": false,
+    "routing": "Code combines the separate self-check, validated citations, unchanged retrieval signals and frozen calibrated wrongness",
+    "citationPolicy": "Retrieved IDs only; preserve pre-repair invalid counts; reject ambiguous/unknown IDs before scoring",
+    "missingBaseline": "Gemma 4B plain50 prior-method replay is generated locally and labelled as replayed, never as a previous saved run",
+    "stopAfter": "Stage 1; Stage 2 retrieval completeness requires a later instruction",
+    "localAnswer": {
+      "version": "split-local-answer-self-check-v1",
+      "answerMaxTokens": 384,
+      "selfCheckMaxTokens": 128,
+      "variants": [
+        "structured",
+        "plain"
+      ],
+      "routeDecidedBy": "code",
+      "citationAllowlist": "retrieved chunk IDs only",
+      "citationRepairs": "deterministic unambiguous identifier formatting/source aliases only"
+    },
+    "comparison": {
+      "temperature": 0,
+      "seed": 20261027,
+      "maxTokens": 384,
+      "contextTokens": 4096,
+      "keepAlive": -1,
+      "reasoningEffort": "medium",
+      "guardMaxTokens": 40
+    }
+  },
+  "source": {
+    "hash": "aecbdd8392972312fc6a967486a77d512534d6402e0c865622b09c967a492368",
+    "files": {
+      "config/comparison.json": "9ea4f32723add210e8a54c27c69f621aa5a826357b087186f38278825fee2351",
+      "config/handoff-cost.json": "de6d3c7e7b4871814f8c67f99561a3df089b1a5a823de19df0cb28a9dbe96690",
+      "config/pricing.yaml": "1fc3f532abe2245d2da490955a986b4fdc2eab02c98369bbaeb889696d1c4e8e",
+      "config/rag-pricing.json": "2f168257d209264a73ebfe52bd3963920c1bdbffdf7e343c0bb6606b447cdb03",
+      "config/rag.json": "bd7d29675f60c2ec13615f7297d7049f43b18c01ef7640a34f1c42cd93cf9a7e",
+      "config/stage1-answer.json": "1e066c7bd34eacf52d7717b797e933a4456d3e6ad6ef65886f3942c47ac46a03",
+      "package-lock.json": "1f03cf08110412b2797feca0d96b5f532d3bc83679c22886f9d745bb78b55f8f",
+      "src/comparison/budget.mjs": "e90b04ce978c16a0aca09bee6d268400bdd6db706a9dc74b54d9bb107b65039a",
+      "src/comparison/calibration.mjs": "df7d8ac9a21ad33e28425f14115d69e0d0576118f560a0cb51bb86495ad6c90d",
+      "src/comparison/citations.mjs": "b9e23805be2216cb1f903c112130cdc0e233b2773942722085dfb4fcf92792a6",
+      "src/comparison/context.mjs": "b82e38defaacaa9d7ac14e447adfc48bacd4912e5af804d69bbc539376046455",
+      "src/comparison/corpus.mjs": "360a9b79238c03a244c89d17e76e7ffacb30e1e62444f3a377e0fdc91e969478",
+      "src/comparison/cost-audit.mjs": "ce688eac32af6a46929ea9f5a3636eacc137399c78b8728bb29bcaf90564bd22",
+      "src/comparison/cost-metrics.mjs": "e01f14baddea25ccc02c32948c0b4fa52e4b5df36370dcb067be4a43cced88c0",
+      "src/comparison/dataset.mjs": "346d1bb256bdf54282976be1621008fa2c8b9369615f30866e78f5dfef91db1b",
+      "src/comparison/grading-audit.mjs": "c165ffc85710b06d2731eca77c0acc27adac4f3bc31c26ccd5da82724b885ba1",
+      "src/comparison/handoff-payload.mjs": "90b77ac413d97fde1a4683ea26dd87c4aabc1684a8678011ef11b4c8a92eeb35",
+      "src/comparison/hardware.mjs": "4edf58b120e7e529f9b3d522996806b2260796aa2f9184e2d5c811b8a94cdf4e",
+      "src/comparison/local-answer.mjs": "18faca4b6a6f88696339c3ae46dbd16646fda7d89890039bfe80e4c7869ec487",
+      "src/comparison/matrix.mjs": "824c4685852e811cbabf8a9ab6be5eca3f2227fce94715a2bb0a69c0c2b3e291",
+      "src/comparison/metrics.mjs": "337ef02adc4dea5f3f96cc4e8f40e0a78f0f8fcb19b0383d4ad1d1bc59f59e58",
+      "src/comparison/policy.mjs": "70f0dd62e0ca79aa8fca599d94eb30c1ea1a1291120a40206c02992e1969f85d",
+      "src/comparison/receipt-journal.mjs": "77b597b60193304d80e916f72f272e802b181b9ea0f8d0d029cf2685e7aa3c8d",
+      "src/comparison/resume.mjs": "ee54363fcd41890d373590aa14ea35ad74b8d063ca539040eeed4da7cc81411d",
+      "src/comparison/run-lock.mjs": "a1ce737fc1e39e1405b626ec08f95f6e0546ca49f69c7ca95f3e4b1a48f3d535",
+      "src/comparison/runner.mjs": "a9703a8820f9690b5eaf758b758402529ab18161488eaa1d7e8fed76b4238a21",
+      "src/comparison/scoring.mjs": "bfe88916c0ec825bbabea82d511e33f4bb6d906cb83847b3cf61880d60dd404c",
+      "src/comparison/stage1-report.mjs": "a8cf170518a44e7e3efae48f73cab23fdd17e54e2e6a7a5fe28ad10aeaae87c7",
+      "src/comparison/stage1.mjs": "c89ae845cb32474e420522fc4b5747f902db82f20c96260dac36c76a9d993b00",
+      "src/rag/documents.mjs": "5b53b52ca3f13b3da7001cb967f3fc529ceda6831848cad565b1c786d33f5deb",
+      "src/rag/embeddings.mjs": "2057b22c7942d88a321add365f75561a7bc18af61b421ab2de7cbc47e1840e87",
+      "src/rag/evaluate.mjs": "c7edd639be112047cc91f52b913a87861e1008830ec29f5a13a8b054fd41befb",
+      "src/rag/gateway.mjs": "8c487f070979506044093f540146768e156f8d3662fe88ea82041b1fd0b32206",
+      "src/rag/ingest.mjs": "6782500601b6b8ad2a4eae5c59b1847d38e6e9d924c2cc0eb99fa4b1e1aebd3e",
+      "src/rag/privacy.mjs": "624026518465e38acf5f7f05aa0697b91c0da137d1e8ea933bdb0dc026777fb3",
+      "src/rag/receipts.mjs": "5abb0dbd338e9dc9c79dd38e781c8ca0ce2a06847844a463a16c3b8c55483b1e",
+      "src/rag/store.mjs": "c39cb113a908c1b14618fa2fb4cdc480c1f2521ddaa48c64eb794a23d2b793a6",
+      "src/scoring/canary-check.mjs": "37126afbc1bdd52b2feff9b0681066f41e67da7a4b97415c8dc38eaf20ae88c0",
+      "src/scoring/grader.mjs": "a09dd15a14d5e6c214e73459595ac0d3376a65ef3d4e48fe4e7f678023ef66b3",
+      "src/scoring/local-safety-grader.mjs": "897854adb7dbc3257b3f94f7386ccb2eaf0ca858d98e9409f3c5a3d1a1d970a4",
+      "src/scoring/metrics.mjs": "738851920b0d78c314b6106e3fb76c182ebb8f95d206b49cbd90d3e5d05cbf3e",
+      "src/scoring/resume-plan.mjs": "0a442b413e271058ea52f3a8966b8ce27534989eaadeccb5d5c8025149f28faf",
+      "src/scoring/second-grader.mjs": "fadcce6929d9a11ba2ac7783ee9a69712e03f2ff88d1cb86f5360b4d30379a2a",
+      "src/server/comparison-models.mjs": "56ffcd027cf685ee084b37c065bdb560e591c6808d0f3218e628062a03a59c1d",
+      "src/server/env.mjs": "0616e629a6987a00bf7330b33030f265c5f14670885efad06c8a5172d96c8ef4",
+      "src/server/gateway-models.mjs": "b0c360f29aed27af142d56485e305426ac96616187ce8a0d293bab72824417a7",
+      "src/server/model-router.mjs": "41f5e6ed935dbbaf32f6e7f1209e7b1caf94d4e93d269a2c27829d0a8c19926b",
+      "src/server/token-counts.mjs": "63013251ff32ca90c693b7dbf8ca359b8e12cb986332b3302eca39f4d92948bb",
+      "tasks/comparison/grading-audit-manifest.json": "9d6ac0f1bdbb6ac781d758d783f324c8b3145b486cba8b2c1e64f60b289556ee",
+      "tasks/comparison/manifest.json": "2489ae535ca0b8fba7c146316fd09d8bcd08715d522638934a5586d5abde8a0f"
+    },
+    "gitCommit": "5b6d52fc6c4aa3fa8023d0d35796456b661de2d9"
+  },
+  "thresholds": {
+    "llama3.1:8b": 0.3601657326870417,
+    "gemma3:4b": 0,
+    "gemma3:12b": 0
+  },
+  "classifierHashes": {
+    "llama3.1:8b": "6089a0b409b548e305de96b3c19d87746ff076ce15fb11be334d9c37fd0001d0",
+    "gemma3:4b": "1a2f4c4deb9f758a8de839c9d8a5ce67f958e6e7a65b20f874fd1dd84d3247b2",
+    "gemma3:12b": "9ecbbaa60b2949e0d66de41179e26d4f7ae065630f8b0a15090cd04e3b1fc0a7"
+  },
+  "environment": {
+    "profile": "SMB-class local workstation",
+    "recordedAt": "2026-10-28T02:08:37.143Z",
+    "nodeVersion": "v24.18.0",
+    "cpu": {
+      "name": "AMD Ryzen 7 7800X3D 8-Core Processor           ",
+      "logicalCores": 16
+    },
+    "ramGiB": 31.11,
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 5080",
+        "driverVersion": "621.01",
+        "vramMiB": 16303
+      }
+    ],
+    "os": {
+      "platform": "win32",
+      "release": "10.0.26300",
+      "architecture": "x64"
+    },
+    "ollamaVersion": "ollama version is 0.40.11",
+    "ollamaModels": [
+      {
+        "modelId": "gemma3:4b",
+        "digest": "68ceab7e468a31c988b44d5a4984a0e21f58c4f7158c6ce29c1804babac38df7",
+        "bytes": 3350272403,
+        "details": {
+          "parent_model": "dhiltgen/gemma3:4b-it-q4_K_M-llamacpp",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3",
+            "clip"
+          ],
+          "parameter_size": "3.9B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 2560,
+          "runner": "llamacpp"
+        }
+      },
+      {
+        "modelId": "shieldgemma:9b",
+        "digest": "c82cacd5af5e2654d3b2bea8a7f8fd502d9a930b12f61a4c1b2a598117d44115",
+        "bytes": 5761070842,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma2",
+          "families": [
+            "gemma2"
+          ],
+          "parameter_size": "9.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 8192,
+          "embedding_length": 3584,
+          "runner": "ggml"
+        }
+      },
+      {
+        "modelId": "nomic-embed-text:v1.5",
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "bytes": 274302450,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "nomic-bert",
+          "families": [
+            "nomic-bert"
+          ],
+          "parameter_size": "137M",
+          "quantization_level": "F16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        }
+      },
+      {
+        "modelId": "llama-guard3:8b",
+        "digest": "46f211c3d8662823ea4956d1a9e92b2924f84cbd0a0f88b64eaadb59fe58b99d",
+        "bytes": 4920745186,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "8.0B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 4096,
+          "runner": "ggml"
+        }
+      },
+      {
+        "modelId": "gemma3:12b",
+        "digest": "b92b218582c521ba287f38f1d6057dcd3c6cbff036f13cac97b5d861f5e58ec3",
+        "bytes": 8164039732,
+        "details": {
+          "parent_model": "dhiltgen/gemma3:12b-it-q4_K_M-llamacpp",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3",
+            "clip"
+          ],
+          "parameter_size": "11.8B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 3840,
+          "runner": "llamacpp"
+        }
+      },
+      {
+        "modelId": "llama3.1:8b",
+        "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+        "bytes": 4920753328,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "8.0B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 4096,
+          "runner": "ggml"
+        }
+      }
+    ],
+    "guardTemplates": [
+      {
+        "modelId": "llama-guard3:8b",
+        "templateSha256": "cb5a7b24ae22ddee985e72490538cf8d5b3cd4125143f23933887ef5bcdb80c2",
+        "parametersSha256": "1f5dc8d2b8edc9c1f10db279cf7ba27c7b65d8107695a768dba3657e98478810"
+      },
+      {
+        "modelId": "shieldgemma:9b",
+        "templateSha256": "1b667144a522432ff2be769cedd83e6357ccb4788f56853cbe81de39ac57d7b9",
+        "parametersSha256": "1f5dc8d2b8edc9c1f10db279cf7ba27c7b65d8107695a768dba3657e98478810"
+      }
+    ],
+    "sha256": "37bc702260d662b13f27e5001a1c10f5a56681f7413c1a08f0e15bdf0e5ed19b"
+  },
+  "manifestHash": "bdd08838cf46585b91a30b24832184406d420e1d2c413ce2953ce816e7c7af48",
+  "contextHash": "94e033e7ae31d4fc5f2a5b821d32b477a44d339c2a7f96687a3eb3f70d7e4777",
+  "savedContextFrozen": true,
+  "calibrationChanged": false,
+  "summary": {
+    "schemaVersion": 1,
+    "rows": [
+      {
+        "cohort": "saved60",
+        "modelId": "llama3.1:8b",
+        "requested": 60,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 18,
+          "fullCreditRate": 0.3050847457627119,
+          "meanScore": 0.35988700564971754,
+          "secondLabelled": 59,
+          "secondFullCredit": 18,
+          "secondMeanScore": 0.35988700564971754,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 5,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 0,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_previous_run": 60
+          },
+          "latencyMeasured": 60,
+          "medianLatencyMs": 338.45240000000194,
+          "p95LatencyMs": 1065.7219649999984,
+          "tokenMeasured": 60,
+          "inputTokens": 24028,
+          "outputTokens": 3721,
+          "meanInputTokens": 400.46666666666664,
+          "meanOutputTokens": 62.016666666666666,
+          "stages": {
+            "legacy_local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 338.45240000000194,
+              "meanLatencyMs": 473.69537833333357,
+              "inputTokens": 24028,
+              "outputTokens": 3721
+            }
+          }
+        },
+        "after": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 29,
+          "fullCreditRate": 0.4915254237288136,
+          "meanScore": 0.5398305084745763,
+          "secondLabelled": 59,
+          "secondFullCredit": 29,
+          "secondMeanScore": 0.5398305084745763,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 1,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 60,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 7,
+          "baselineSources": {},
+          "latencyMeasured": 60,
+          "medianLatencyMs": 588.1314999999977,
+          "p95LatencyMs": 1437.8133200000004,
+          "tokenMeasured": 60,
+          "inputTokens": 56113,
+          "outputTokens": 5002,
+          "meanInputTokens": 935.2166666666667,
+          "meanOutputTokens": 83.36666666666666,
+          "stages": {
+            "local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 364.02844999999706,
+              "meanLatencyMs": 499.76547000000016,
+              "inputTokens": 25688,
+              "outputTokens": 3598
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 220.62710000000243,
+              "meanLatencyMs": 243.23712333333353,
+              "inputTokens": 30425,
+              "outputTokens": 1404
+            }
+          }
+        },
+        "paired": {
+          "items": 60,
+          "labelled": 59,
+          "secondLabelled": 59,
+          "beforeMeanScore": 0.35988700564971754,
+          "afterMeanScore": 0.5398305084745763,
+          "meanScoreChange": {
+            "estimate": 0.17994350282485877,
+            "ci95": [
+              0.046301566997121846,
+              0.3070377604166666
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.1864406779661017,
+            "ci95": [
+              0.05354793233082707,
+              0.3225806451612903
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.17994350282485877,
+            "ci95": [
+              0.046301566997121846,
+              0.3070377604166666
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.1864406779661017,
+            "ci95": [
+              0.05354793233082707,
+              0.3225806451612903
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "saved60",
+        "modelId": "gemma3:4b",
+        "requested": 60,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 18,
+          "fullCreditRate": 0.3050847457627119,
+          "meanScore": 0.38361581920903953,
+          "secondLabelled": 59,
+          "secondFullCredit": 16,
+          "secondMeanScore": 0.3553672316384181,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 1,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 6,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 0,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_previous_run": 60
+          },
+          "latencyMeasured": 60,
+          "medianLatencyMs": 331.23399999999674,
+          "p95LatencyMs": 1152.8235249999948,
+          "tokenMeasured": 60,
+          "inputTokens": 25852,
+          "outputTokens": 4698,
+          "meanInputTokens": 430.8666666666667,
+          "meanOutputTokens": 78.3,
+          "stages": {
+            "legacy_local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 331.23399999999674,
+              "meanLatencyMs": 463.76984833333387,
+              "inputTokens": 25852,
+              "outputTokens": 4698
+            }
+          }
+        },
+        "after": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 20,
+          "fullCreditRate": 0.3389830508474576,
+          "meanScore": 0.411864406779661,
+          "secondLabelled": 59,
+          "secondFullCredit": 22,
+          "secondMeanScore": 0.4330508474576271,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 1,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 3,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 60,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 60,
+          "medianLatencyMs": 699.2516999999789,
+          "p95LatencyMs": 2290.874454999977,
+          "tokenMeasured": 60,
+          "inputTokens": 64148,
+          "outputTokens": 8337,
+          "meanInputTokens": 1069.1333333333334,
+          "meanOutputTokens": 138.95,
+          "stages": {
+            "local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 470.80209999998624,
+              "meanLatencyMs": 753.3447516666633,
+              "inputTokens": 28064,
+              "outputTokens": 6877
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 238.0792999999976,
+              "meanLatencyMs": 272.72404833332837,
+              "inputTokens": 36084,
+              "outputTokens": 1460
+            }
+          }
+        },
+        "paired": {
+          "items": 60,
+          "labelled": 59,
+          "secondLabelled": 59,
+          "beforeMeanScore": 0.38361581920903953,
+          "afterMeanScore": 0.411864406779661,
+          "meanScoreChange": {
+            "estimate": 0.028248587570621465,
+            "ci95": [
+              -0.07727272727272727,
+              0.13219032224958943
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.03389830508474576,
+            "ci95": [
+              -0.08620689655172414,
+              0.14516129032258066
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.07768361581920903,
+            "ci95": [
+              -0.0185272536687631,
+              0.16933661145617654
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.1016949152542373,
+            "ci95": [
+              -0.017248941318814277,
+              0.20636288998357954
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "saved60",
+        "modelId": "gemma3:12b",
+        "requested": 60,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 38,
+          "fullCreditRate": 0.6440677966101694,
+          "meanScore": 0.6872881355932203,
+          "secondLabelled": 59,
+          "secondFullCredit": 37,
+          "secondMeanScore": 0.6703389830508474,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 12,
+          "rawInvalidCitationRate": 0.75,
+          "missingCitationItems": 12,
+          "ungroundedCitationItems": 12,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 12,
+          "rejectedIds": 18,
+          "residualInvalidItems": 12,
+          "residualInvalid": 18,
+          "answerParseFailures": 7,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 0,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_previous_run": 60
+          },
+          "latencyMeasured": 60,
+          "medianLatencyMs": 945.4848499999789,
+          "p95LatencyMs": 3768.51741999998,
+          "tokenMeasured": 60,
+          "inputTokens": 25852,
+          "outputTokens": 5514,
+          "meanInputTokens": 430.8666666666667,
+          "meanOutputTokens": 91.9,
+          "stages": {
+            "legacy_local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 945.4848499999789,
+              "meanLatencyMs": 1262.7776866666647,
+              "inputTokens": 25852,
+              "outputTokens": 5514
+            }
+          }
+        },
+        "after": {
+          "requested": 60,
+          "items": 60,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 59,
+          "unscored": 1,
+          "fullCredit": 38,
+          "fullCreditRate": 0.6440677966101694,
+          "meanScore": 0.6977401129943503,
+          "secondLabelled": 59,
+          "secondFullCredit": 38,
+          "secondMeanScore": 0.6977401129943503,
+          "citationEligible": 16,
+          "citationAudited": 16,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 2,
+          "ungroundedCitationItems": 2,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 7,
+          "answerParseMeasured": 60,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 60,
+          "safeItems": 58,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 60,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 60,
+          "medianLatencyMs": 1757.4843500000425,
+          "p95LatencyMs": 5344.860479999977,
+          "tokenMeasured": 60,
+          "inputTokens": 66354,
+          "outputTokens": 10284,
+          "meanInputTokens": 1105.9,
+          "meanOutputTokens": 171.4,
+          "stages": {
+            "local_answer": {
+              "calls": 60,
+              "medianLatencyMs": 1214.9135999999708,
+              "meanLatencyMs": 1884.3583450000074,
+              "inputTokens": 28064,
+              "outputTokens": 8962
+            },
+            "local_self_check": {
+              "calls": 60,
+              "medianLatencyMs": 457.5249499999918,
+              "meanLatencyMs": 528.7919883333311,
+              "inputTokens": 38290,
+              "outputTokens": 1322
+            }
+          }
+        },
+        "paired": {
+          "items": 60,
+          "labelled": 59,
+          "secondLabelled": 59,
+          "beforeMeanScore": 0.6872881355932203,
+          "afterMeanScore": 0.6977401129943503,
+          "meanScoreChange": {
+            "estimate": 0.010451977401129945,
+            "ci95": [
+              -0.08701232665639447,
+              0.10790191387559805
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0,
+            "ci95": [
+              -0.10608766233766234,
+              0.10714285714285714
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.027401129943502824,
+            "ci95": [
+              -0.06515794739851345,
+              0.1192090395480226
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.01694915254237288,
+            "ci95": [
+              -0.0847457627118644,
+              0.11864406779661017
+            ],
+            "n": 59,
+            "groups": 51,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "plain50",
+        "modelId": "llama3.1:8b",
+        "requested": 50,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 21,
+          "fullCreditRate": 0.42,
+          "meanScore": 0.4633333333333334,
+          "secondLabelled": 50,
+          "secondFullCredit": 23,
+          "secondMeanScore": 0.5100000000000001,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 2,
+          "ungroundedCitationItems": 2,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": null,
+          "answerParseMeasured": null,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 0,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_previous_run": 50
+          },
+          "latencyMeasured": 50,
+          "medianLatencyMs": 941.8580499999953,
+          "p95LatencyMs": 2666.8111550000003,
+          "tokenMeasured": 50,
+          "inputTokens": 20024,
+          "outputTokens": 8478,
+          "meanInputTokens": 400.48,
+          "meanOutputTokens": 169.56,
+          "stages": {
+            "legacy_local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 941.8580499999953,
+              "meanLatencyMs": 1208.9141779999993,
+              "inputTokens": 20024,
+              "outputTokens": 8478
+            }
+          }
+        },
+        "after": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 24,
+          "fullCreditRate": 0.48,
+          "meanScore": 0.525,
+          "secondLabelled": 50,
+          "secondFullCredit": 24,
+          "secondMeanScore": 0.5316666666666666,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 1,
+          "rawInvalidCitationRate": 0.07142857142857142,
+          "missingCitationItems": 4,
+          "ungroundedCitationItems": 4,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 1,
+          "rejectedIds": 2,
+          "residualInvalidItems": 1,
+          "residualInvalid": 2,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 50,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 1,
+          "baselineSources": {},
+          "latencyMeasured": 50,
+          "medianLatencyMs": 1271.9061500000098,
+          "p95LatencyMs": 3236.41699,
+          "tokenMeasured": 50,
+          "inputTokens": 58015,
+          "outputTokens": 9852,
+          "meanInputTokens": 1160.3,
+          "meanOutputTokens": 197.04,
+          "stages": {
+            "local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 962.254700000005,
+              "meanLatencyMs": 1313.7351780000006,
+              "inputTokens": 23772,
+              "outputTokens": 8705
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 262.44144999999116,
+              "meanLatencyMs": 282.96245000000096,
+              "inputTokens": 34243,
+              "outputTokens": 1147
+            }
+          }
+        },
+        "paired": {
+          "items": 50,
+          "labelled": 50,
+          "secondLabelled": 50,
+          "beforeMeanScore": 0.4633333333333334,
+          "afterMeanScore": 0.525,
+          "meanScoreChange": {
+            "estimate": 0.06166666666666666,
+            "ci95": [
+              -0.05144016826588792,
+              0.18890522875816984
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.06,
+            "ci95": [
+              -0.061224489795918366,
+              0.2
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.02166666666666666,
+            "ci95": [
+              -0.09568483577917541,
+              0.15105729166666657
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.02,
+            "ci95": [
+              -0.10416666666666667,
+              0.1590909090909091
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "plain50",
+        "modelId": "gemma3:4b",
+        "requested": 50,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 16,
+          "fullCreditRate": 0.32,
+          "meanScore": 0.3816666666666667,
+          "secondLabelled": 50,
+          "secondFullCredit": 15,
+          "secondMeanScore": 0.3683333333333333,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 3,
+          "rawInvalidCitationRate": 0.21428571428571427,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 3,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 3,
+          "rejectedIds": 9,
+          "residualInvalidItems": 3,
+          "residualInvalid": 9,
+          "answerParseFailures": null,
+          "answerParseMeasured": null,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 0,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "replayed_previous_method": 50
+          },
+          "latencyMeasured": 50,
+          "medianLatencyMs": 583.1344500000123,
+          "p95LatencyMs": 2002.831414999986,
+          "tokenMeasured": 50,
+          "inputTokens": 21936,
+          "outputTokens": 7445,
+          "meanInputTokens": 438.72,
+          "meanOutputTokens": 148.9,
+          "stages": {
+            "legacy_local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 583.1344500000123,
+              "meanLatencyMs": 833.9597060000006,
+              "inputTokens": 21936,
+              "outputTokens": 7445
+            }
+          }
+        },
+        "after": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 19,
+          "fullCreditRate": 0.38,
+          "meanScore": 0.4383333333333333,
+          "secondLabelled": 50,
+          "secondFullCredit": 19,
+          "secondMeanScore": 0.455,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 1,
+          "ungroundedCitationItems": 1,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 50,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 50,
+          "medianLatencyMs": 840.9754500000272,
+          "p95LatencyMs": 2278.2338849999837,
+          "tokenMeasured": 50,
+          "inputTokens": 62114,
+          "outputTokens": 9620,
+          "meanInputTokens": 1242.28,
+          "meanOutputTokens": 192.4,
+          "stages": {
+            "local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 571.0432000000146,
+              "meanLatencyMs": 921.8762419999962,
+              "inputTokens": 26151,
+              "outputTokens": 8388
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 263.42089999999735,
+              "meanLatencyMs": 273.6536579999991,
+              "inputTokens": 35963,
+              "outputTokens": 1232
+            }
+          }
+        },
+        "paired": {
+          "items": 50,
+          "labelled": 50,
+          "secondLabelled": 50,
+          "beforeMeanScore": 0.3816666666666667,
+          "afterMeanScore": 0.4383333333333333,
+          "meanScoreChange": {
+            "estimate": 0.056666666666666664,
+            "ci95": [
+              -0.030015306122448977,
+              0.15217391304347827
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0.06,
+            "ci95": [
+              -0.0392156862745098,
+              0.16666666666666666
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": 0.08666666666666666,
+            "ci95": [
+              0.009799208144796377,
+              0.17361865942028978
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0.08,
+            "ci95": [
+              0,
+              0.17777777777777778
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      },
+      {
+        "cohort": "plain50",
+        "modelId": "gemma3:12b",
+        "requested": 50,
+        "duplicateRecords": 0,
+        "before": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 22,
+          "fullCreditRate": 0.44,
+          "meanScore": 0.5166666666666666,
+          "secondLabelled": 50,
+          "secondFullCredit": 22,
+          "secondMeanScore": 0.5166666666666666,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 6,
+          "rawInvalidCitationRate": 0.42857142857142855,
+          "missingCitationItems": 6,
+          "ungroundedCitationItems": 6,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 6,
+          "rejectedIds": 10,
+          "residualInvalidItems": 6,
+          "residualInvalid": 10,
+          "answerParseFailures": null,
+          "answerParseMeasured": null,
+          "selfCheckParseFailures": null,
+          "selfCheckParseMeasured": null,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 0,
+          "localAcceptedSafe": 0,
+          "baselineSources": {
+            "saved_previous_run": 50
+          },
+          "latencyMeasured": 50,
+          "medianLatencyMs": 1160.7832000000053,
+          "p95LatencyMs": 4428.977959999975,
+          "tokenMeasured": 50,
+          "inputTokens": 21936,
+          "outputTokens": 6146,
+          "meanInputTokens": 438.72,
+          "meanOutputTokens": 122.92,
+          "stages": {
+            "legacy_local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 1160.7832000000053,
+              "meanLatencyMs": 1726.913152000002,
+              "inputTokens": 21936,
+              "outputTokens": 6146
+            }
+          }
+        },
+        "after": {
+          "requested": 50,
+          "items": 50,
+          "missing": 0,
+          "errors": 0,
+          "labelled": 50,
+          "unscored": 0,
+          "fullCredit": 22,
+          "fullCreditRate": 0.44,
+          "meanScore": 0.4783333333333333,
+          "secondLabelled": 50,
+          "secondFullCredit": 22,
+          "secondMeanScore": 0.4783333333333333,
+          "citationEligible": 14,
+          "citationAudited": 14,
+          "citationUnmeasured": 0,
+          "invalidCitationItems": 0,
+          "rawInvalidCitationRate": 0,
+          "missingCitationItems": 0,
+          "ungroundedCitationItems": 0,
+          "repairedItems": 0,
+          "repairedIds": 0,
+          "rejectedItems": 0,
+          "rejectedIds": 0,
+          "residualInvalidItems": 0,
+          "residualInvalid": 0,
+          "answerParseFailures": 0,
+          "answerParseMeasured": 50,
+          "selfCheckParseFailures": 0,
+          "selfCheckParseMeasured": 50,
+          "safeItems": 50,
+          "safetyUnmeasured": 0,
+          "routeDecisionsRecorded": 50,
+          "localAcceptedSafe": 0,
+          "baselineSources": {},
+          "latencyMeasured": 50,
+          "medianLatencyMs": 1856.6355499999481,
+          "p95LatencyMs": 5156.847525000016,
+          "tokenMeasured": 50,
+          "inputTokens": 61092,
+          "outputTokens": 8305,
+          "meanInputTokens": 1221.84,
+          "meanOutputTokens": 166.1,
+          "stages": {
+            "local_answer": {
+              "calls": 50,
+              "medianLatencyMs": 1230.4670000000333,
+              "meanLatencyMs": 1794.886709999995,
+              "inputTokens": 26151,
+              "outputTokens": 7163
+            },
+            "local_self_check": {
+              "calls": 50,
+              "medianLatencyMs": 499.3280499999819,
+              "meanLatencyMs": 547.980784,
+              "inputTokens": 34941,
+              "outputTokens": 1142
+            }
+          }
+        },
+        "paired": {
+          "items": 50,
+          "labelled": 50,
+          "secondLabelled": 50,
+          "beforeMeanScore": 0.5166666666666666,
+          "afterMeanScore": 0.4783333333333333,
+          "meanScoreChange": {
+            "estimate": -0.03833333333333333,
+            "ci95": [
+              -0.12326562499999999,
+              0.03819444444444445
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "fullCreditChange": {
+            "estimate": 0,
+            "ci95": [
+              -0.10204081632653061,
+              0.09433962264150944
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondMeanScoreChange": {
+            "estimate": -0.03833333333333333,
+            "ci95": [
+              -0.12326562499999999,
+              0.03819444444444445
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "secondFullCreditChange": {
+            "estimate": 0,
+            "ci95": [
+              -0.10204081632653061,
+              0.09433962264150944
+            ],
+            "n": 50,
+            "groups": 44,
+            "validReplicates": 2000,
+            "method": "seeded source-group bootstrap percentile 95% interval",
+            "seed": 20261027,
+            "replicates": 2000
+          },
+          "intervalPolicy": "Paired source-group bootstrap on common supported before/after labels; missing or failed items are visible separately and are not scored as failures."
+        }
+      }
+    ],
+    "cohorts": [
+      {
+        "id": "saved60",
+        "requested": 60
+      },
+      {
+        "id": "plain50",
+        "requested": 50
+      }
+    ],
+    "modelIds": [
+      "llama3.1:8b",
+      "gemma3:4b",
+      "gemma3:12b"
+    ],
+    "thresholds": {
+      "llama3.1:8b": 0.3601657326870417,
+      "gemma3:4b": 0,
+      "gemma3:12b": 0
+    },
+    "thresholdsRetuned": false,
+    "seed": 20261027,
+    "intervalMethod": {
+      "method": "paired source-group bootstrap percentile 95%",
+      "seed": 20261027,
+      "replicates": 2000
+    },
+    "method": "Full-credit answer rubric, raw citation invalidity before repair/rejection, grounded citation coverage, and answer/self-check parsing reported separately. Model sizes and cohorts are never pooled."
+  },
+  "notes": [
+    "Stage 1 changes answer generation, self-check and citation validation only. Retrieval and all calibration coefficients/thresholds are frozen.",
+    "Old Gemma 4B plain50 baseline is a newly measured prior-method replay, not a saved previous run.",
+    "Both answer and self-check latency/tokens are counted; warm-ups are separate.",
+    "Raw invalid citations are measured before validation; rejected IDs cannot be passed to scoring or routing as valid.",
+    "Full credit is automated rubric coverage; the independent deterministic method is not expert semantic gold.",
+    "The next stage is retrieval completeness. Do not proceed without a later instruction."
+  ]
+}
