@@ -1,5 +1,5 @@
 {
-  "methodVersion": "private-gateway-rag-v1",
+  "methodVersion": "private-gateway-rag-stage2-v2",
   "seed": 20261027,
   "localModel": "llama3.1:8b",
   "guardModel": "llama-guard3:8b",
@@ -7,6 +7,9 @@
   "metaAccess": "paused",
   "embeddingModel": "nomic-embed-text:v1.5",
   "topK": 4,
+  "completeRetrievalTopK": 8,
+  "localContextTokenBudget": 1800,
+  "structuredAnswerMaxTokens": 768,
   "cloudMaxChunks": 2,
   "cloudContextMaxTokens": 1400,
   "confidenceThreshold": 0.8,

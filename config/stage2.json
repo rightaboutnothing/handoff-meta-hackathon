@@ -1,0 +1,19 @@
+{
+  "version": "stage2-complete-evidence-calculators-v1",
+  "tier": 0,
+  "seed": 20261027,
+  "models": ["llama3.1:8b", "gemma3:4b", "gemma3:12b"],
+  "baselineRun": "2026-10-28-stage1-answer-citations",
+  "sourceRun": "2026-10-28-tier0-payload-costs",
+  "structuredMaxTokens": 768,
+  "plainMaxTokens": 384,
+  "selfCheckMaxTokens": 128,
+  "retrievalTopK": 8,
+  "retrievalTokenBudget": 1800,
+  "retrievalCompletenessThreshold": 1,
+  "capPilot": "Re-run only the 11 prior structured failures with the original saved context and Stage 1 schema at 768; diagnostic subset, not a representative new score",
+  "contextBudgetCounter": "Maximum of offline Llama BPE and Google SDK-selected local tokenizer; conservative shared text budget, not provider billing",
+  "inference": "Local Ollama only; no cloud generation, remote grading or remote token counting",
+  "calibration": "Freeze the complete Stage 1 classifier objects and thresholds; no fitting or selection",
+  "stopAfter": "Stage 2; do not start Stage 3 dev calibration"
+}

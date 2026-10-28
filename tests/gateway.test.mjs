@@ -36,7 +36,7 @@ const localSteps = (answer, confidence = 0.95, citations = ['chunk-001'], comple
   inspect(messages, options);
   const check = Boolean(options.schema?.properties?.confidence);
   return { modelId: 'test-local-model', latencyMs: check ? 3 : 2, tokens: { input: 30, output: 20, total: 50 },
-    text: JSON.stringify(check ? { confidence, evidenceSupported: complete, answerComplete: complete, issues: complete ? [] : ['incomplete_answer'] } : { answer, citations }) };
+    text: JSON.stringify(check ? { confidence, evidenceSupported: complete, answerComplete: complete, issues: complete ? [] : ['incomplete_answer'] } : { claims: [{ text: answer, citations }] }) };
 };
 
 const guardResponse = safe => ({
@@ -50,7 +50,8 @@ const chunk = (index, text, score = 0.9) => ({
 });
 
 function retrieveFixture(chunks) {
-  return async () => ({ chunks, quality: 0.9, latencyMs: 1, embeddingModel: 'test-local-embedding' });
+  return async () => ({ chunks, quality: 0.9, latencyMs: 1, embeddingModel: 'test-local-embedding',
+    completeness: { score: 1, requiredFacets: ['fixture-source'], coveredFacets: ['fixture-source'], missingFacets: [], method: 'Synthetic fixture requirements' } });
 }
 
 test('offline handoffs never call the cloud and produce a verifiable deferred receipt', async t => {
@@ -60,6 +61,7 @@ test('offline handoffs never call the cloud and produce a verifiable deferred re
   const result = await askRag('Analyse the synthetic warranty and suggest improvements.', {
     dataDir, offlineMeta: true,
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, 'Synthetic warranty lasts 24 months.')]),
       localChat: localSteps('More reasoning is needed.', 0.2, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
@@ -88,6 +90,7 @@ test('unsafe outbound content is blocked locally before any cloud call', async t
   const result = await askRag('Synthetic test request classified unsafe by the local guard.', {
     dataDir, offlineMeta: false,
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, 'SYNTHETIC TEST EVIDENCE')]),
       localChat: localSteps('Escalation required.', 0.1, ['chunk-001'], false),
       guardText: async () => guardResponse(false),
@@ -113,6 +116,7 @@ test('local answers restore private placeholders and retain local source citatio
   const result = await askRag('Who owns the warranty process?', {
     dataDir,
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, redacted.text)]),
       localChat: localSteps(`${contact} owns the warranty process; the warranty is 24 months.`, 0.95, ['chunk-001'], true, messages => {
         assert.equal(messages[1].content.includes('Avery Chen'), false);
@@ -124,7 +128,7 @@ test('local answers restore private placeholders and retain local source citatio
   });
   assert.equal(result.route, 'local');
   assert.equal(result.status, 'ok');
-  assert.equal(result.answer, 'Avery Chen owns the warranty process; the warranty is 24 months.');
+  assert.equal(result.answer, 'Avery Chen owns the warranty process; the warranty is 24 months. [cite: chunk-001]');
   assert.equal(cloudCalls, 0);
   assert.equal(guardCalls, 0);
   assert.equal(result.citations.length, 1);
@@ -137,6 +141,8 @@ test('local answers restore private placeholders and retain local source citatio
   assert.ok(result.events.findIndex(event => event.type === 'self_check') < result.events.findIndex(event => event.type === 'confidence'));
   assert.equal(result.metrics.answerParseFailures, 0);
   assert.equal(result.metrics.selfCheckParseFailures, 0);
+  assert.equal(result.metrics.evidenceCompleteness, 1);
+  assert.equal(result.metrics.missingClaimCitations, 0);
 });
 
 test('the cloud payload contains at most two redacted chunks, no local filenames, and matching signed hashes', async t => {
@@ -150,6 +156,7 @@ test('the cloud payload contains at most two redacted chunks, no local filenames
   const result = await askRag('Compare the warranty evidence for Avery Chen.', {
     dataDir, offlineMeta: false,
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture(chunks),
       localChat: localSteps('More reasoning is needed.', 0.2, chunks.map(value => value.chunkId), false),
       guardText: async (...args) => { guardInputs.push(args); return guardResponse(true); },
@@ -184,6 +191,7 @@ test('local-only evaluations cannot call cloud models even if the guard would pe
   const result = await askRag('Synthetic local-only evaluation request.', {
     dataDir: await workspace(t), offlineMeta: false, localOnly: true,
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, 'SYNTHETIC TEST EVIDENCE')]),
       localChat: localSteps('More reasoning is needed.', 0.2, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
@@ -203,6 +211,7 @@ test('a residual private value in retrieved evidence blocks outbound before clou
   await assert.rejects(askRag('Analyse this synthetic evidence.', {
     dataDir: await workspace(t), offlineMeta: false,
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, 'Contact: accidentally-unredacted@example.invalid')]),
       localChat: localSteps('More reasoning is needed.', 0.1, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
@@ -218,17 +227,19 @@ test('Company Ask separates constrained answering from self-check and preserves 
   const result = await askRag('What is the synthetic warranty?', {
     dataDir: await workspace(t),
     dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, 'SYNTHETIC warranty: 24 months.')]), localChat: local,
       guardText: async () => { throw new Error('Validated local answers do not escalate'); },
       callMuse: async () => { throw new Error('Cloud is forbidden'); },
     },
   });
   assert.equal(calls.length, 2);
-  assert.deepEqual(calls[0].options.schema.properties.citations.items.enum, ['chunk-001']);
-  assert.deepEqual(calls[0].options.schema.required, ['answer', 'citations']);
+  assert.deepEqual(calls[0].options.schema.properties.claims.items.properties.citations.items.enum, ['chunk-001']);
+  assert.deepEqual(calls[0].options.schema.required, ['claims']);
+  assert.equal(calls[0].options.maxTokens, 768);
   assert.equal(Object.hasOwn(calls[0].options.schema.properties, 'confidence'), false);
   assert.equal(Object.hasOwn(calls[1].options.schema.properties, 'answer'), false);
-  assert.ok(calls[1].messages[1].content.includes('PROPOSED ANSWER:\nThe warranty is 24 months.'));
+  assert.ok(calls[1].messages[1].content.includes('PROPOSED ANSWER:\nThe warranty is 24 months. [cite: chunk-001]'));
   assert.equal(result.route, 'local');
   assert.equal(result.citations[0].chunkId, 'chunk-001');
   assert.equal(result.metrics.invalidCitationItems, 1);
@@ -238,16 +249,17 @@ test('Company Ask separates constrained answering from self-check and preserves 
 });
 
 test('invalid citations and malformed split contracts fail closed despite a confident self-check', async t => {
-  const validAnswer = { answer: 'The warranty is 24 months.', citations: ['chunk-001'] };
+  const validAnswer = { claims: [{ text: 'The warranty is 24 months.', citations: ['chunk-001'] }] };
   const validCheck = { confidence: 1, evidenceSupported: true, answerComplete: true, issues: [] };
   for (const [answer, check, expected] of [
-    [{ ...validAnswer, citations: ['chunk-001', 'invented-source'] }, validCheck, 'citation'],
+    [{ claims: [{ text: 'The warranty is 24 months.', citations: ['chunk-001', 'invented-source'] }] }, validCheck, 'citation'],
     [validAnswer, { ...validCheck, decision: 'local' }, 'self-check'],
     [{ ...validAnswer, confidence: 1, needsCloud: false }, validCheck, 'answer'],
   ]) {
     const result = await askRag('What is the synthetic warranty?', {
       dataDir: await workspace(t), localOnly: true,
       dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
         retrieve: retrieveFixture([chunk(1, 'SYNTHETIC warranty: 24 months.')]),
         localChat: async (_model, _messages, options) => ({ modelId: 'test-local', latencyMs: 1, tokens: { input: 5, output: 5, total: 10 }, text: JSON.stringify(options.schema?.properties?.confidence ? check : answer) }),
         guardText: async () => { throw new Error('Local-only request must not create an outbound stage'); },
@@ -261,4 +273,83 @@ test('invalid citations and malformed split contracts fail closed despite a conf
     if (expected === 'self-check') assert.equal(result.metrics.selfCheckParseFailures, 1);
     if (expected === 'answer') assert.equal(result.metrics.answerParseFailures, 1);
   }
+});
+
+test('high best-match similarity does not override incomplete source evidence', async t => {
+  let guardCalls = 0, cloudCalls = 0, retrievedOptions;
+  const result = await askRag('Give a synthetic product price and shipping condition.', {
+    dataDir: await workspace(t), localOnly: true,
+    dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
+      retrieve: async (_question, options) => { retrievedOptions = options; return { chunks: [chunk(1, 'Synthetic price: AUD 100.')], quality: .99, bestMatchScore: .99, latencyMs: 1,
+        completeness: { score: .5, missingFacets: ['shipping-policy'], method: 'Synthetic source requirements' }, queryCount: 3, tokenCount: 12, tokenBudget: 1800 }; },
+      localChat: localSteps('The price is AUD 100.', 1),
+      guardText: async () => { guardCalls++; throw new Error('Local-only evaluation must not screen outbound'); },
+      callMuse: async () => { cloudCalls++; throw new Error('Cloud is forbidden'); },
+    },
+  });
+  assert.equal(retrievedOptions.topK, 8); assert.equal(retrievedOptions.tokenBudget, 1800);
+  assert.equal(result.evidenceCompleteness, .5); assert.equal(result.metrics.bestMatchScore, .99);
+  assert.deepEqual(result.metrics.missingEvidenceFacets, ['shipping-policy']);
+  assert.equal(result.route, 'deferred_cloud'); assert.match(result.reason, /evidence is incomplete/);
+  assert.equal(guardCalls, 0); assert.equal(cloudCalls, 0);
+});
+
+test('one globally valid citation cannot cover a separate uncited factual claim', async t => {
+  const result = await askRag('State the synthetic warranty and freight.', {
+    dataDir: await workspace(t), localOnly: true,
+    dependencies: {
+      calculateLocal: async () => ({ status: 'not_applicable' }),
+      retrieve: retrieveFixture([chunk(1, 'SYNTHETIC warranty: 24 months. Freight: AUD 35.')]),
+      localChat: async (_model, _messages, options) => ({ modelId: 'synthetic-local', latencyMs: 1, tokens: { input: 10, output: 10, total: 20 },
+        text: JSON.stringify(options.schema?.properties?.confidence ? { confidence: 1, evidenceSupported: true, answerComplete: true, issues: [] } : { claims: [
+          { text: 'The warranty is 24 months.', citations: ['chunk-001'] }, { text: 'Freight is AUD 35.', citations: [] },
+        ] }) }),
+      guardText: async () => { throw new Error('Local-only boundary must not create outbound work'); },
+      callMuse: async () => { throw new Error('Cloud is forbidden'); },
+    },
+  });
+  assert.equal(result.metrics.factualClaimCount, 2); assert.equal(result.metrics.citedClaimCount, 1);
+  assert.equal(result.metrics.missingClaimCitations, 1); assert.equal(result.metrics.claimCitationCoverage, .5);
+  assert.equal(result.route, 'deferred_cloud'); assert.equal(result.metrics.tokensSentToCloud, 0);
+});
+
+const computedFixture = () => ({ status: 'computed', arithmeticIntent: 'subtotal', toolId: 'deterministic-local-calculator', latencyMs: 2,
+  sourceChunkIds: ['chunk-001'], calculations: [{ expression: 'quantity * price', result: 200, unit: 'AUD cents', sourceChunkIds: ['chunk-001'], operands: [{ value: 100, sourceChunkIds: ['chunk-001'] }, { value: 2, origin: 'question' }] }],
+  claims: [{ text: 'The subtotal is AUD 2.00.', sourceChunkIds: ['chunk-001'] }] });
+
+test('a computed local tool result is cited and checked without model answer generation', async t => {
+  const calls = [];
+  const result = await askRag('Calculate a synthetic subtotal for two products.', {
+    dataDir: await workspace(t),
+    dependencies: {
+      calculateLocal: async () => computedFixture(), retrieve: retrieveFixture([chunk(1, 'SYNTHETIC unit price: AUD 1.00.')]),
+      localChat: localSteps('This model draft must never be requested.', .95, ['chunk-001'], true, (_messages, options) => calls.push(options)),
+      guardText: async () => { throw new Error('Verified local answer must not escalate'); },
+      callMuse: async () => { throw new Error('Cloud is forbidden'); },
+    },
+  });
+  assert.equal(calls.length, 1); assert.ok(calls[0].schema.properties.confidence); assert.equal(calls[0].maxTokens, 128);
+  assert.equal(result.route, 'local'); assert.equal(result.metrics.calculatorUsed, true);
+  assert.match(result.answer, /AUD 2\.00/); assert.match(result.answer, /\[cite: calc:/);
+  assert.equal(result.citations.length, 2); assert.ok(result.citations.some(cite => cite.chunkId.startsWith('calc:')));
+  assert.deepEqual(result.metrics.stages.filter(stage => stage.stage.startsWith('local_')).map(stage => stage.stage), ['local_calculator', 'local_self_check']);
+  assert.deepEqual(result.metrics.localTokens, { input: 30, output: 20, total: 50 });
+});
+
+test('calculator evidence and proof metadata stay local even when its self-check defers', async t => {
+  permitInjectedCloud(t); const inputs = [];
+  const result = await askRag('Calculate a synthetic subtotal and analyse uncertainty.', {
+    dataDir: await workspace(t), offlineMeta: false,
+    dependencies: {
+      calculateLocal: async () => computedFixture(), retrieve: retrieveFixture([chunk(1, 'SYNTHETIC unit price: AUD 1.00.')]),
+      localChat: localSteps('Must not generate a model answer.', .1, ['chunk-001'], false),
+      guardText: async () => guardResponse(true),
+      callMuse: async input => { inputs.push(input); return { ...modelResponse('The synthetic price is AUD 1.00.', .95, ['chunk-001']), responseId: 'synthetic-cloud-response', providerCostUsd: .001 }; },
+    },
+  });
+  assert.equal(inputs.length, 1); assert.equal(result.route, 'cloud');
+  for (const privateMetadata of ['calc:', 'VERIFIED LOCAL CALCULATOR', 'quantity * price', 'operands', 'sourceChunkIds', 'provenance']) assert.equal(inputs[0].includes(privateMetadata), false);
+  assert.deepEqual(result.outbound.chunks.map(value => value.id), ['chunk-001']);
+  assert.equal(result.metrics.calculatorUsed, true); assert.equal(result.receipt.payload.actualChunksSent, 1);
 });

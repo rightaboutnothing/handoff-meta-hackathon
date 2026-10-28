@@ -116,9 +116,10 @@ test('an unsafe incoming cloud answer is withheld and its actual handoff gets a 
   const result = await askRag('Analyse this synthetic warranty.', {
     dataDir, offlineMeta: false,
     dependencies: {
-      retrieve: async () => ({ chunks: [chunk], quality: 0.95, latencyMs: 1, embeddingModel: 'synthetic-embedding' }),
+      retrieve: async () => ({ chunks: [chunk], quality: 0.95, latencyMs: 1, embeddingModel: 'synthetic-embedding', completeness: { score: 1, missingFacets: [], method: 'Synthetic fixture requirements' } }),
+      calculateLocal: async () => ({ status: 'not_applicable' }),
       localChat: async (_model, _messages, options) => ({ modelId: 'synthetic-local', latencyMs: 1, tokens,
-        text: JSON.stringify(options.schema?.properties?.confidence ? { confidence: 0.1, evidenceSupported: false, answerComplete: false, issues: ['incomplete_answer'] } : { answer: 'Needs further reasoning.', citations: [chunk.chunkId] }) }),
+        text: JSON.stringify(options.schema?.properties?.confidence ? { confidence: 0.1, evidenceSupported: false, answerComplete: false, issues: ['incomplete_answer'] } : { claims: [{ text: 'Needs further reasoning.', citations: [chunk.chunkId] }] }) }),
       guardText: async (...args) => {
         guardInputs.push(args);
         return { safe: guardInputs.length === 1, modelId: 'synthetic-guard', latencyMs: 1, tokens, reason: 'Synthetic boundary classification' };

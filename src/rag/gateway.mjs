@@ -5,12 +5,21 @@ import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { ragConfig, localChat, guardText, callMuse, metaAccessEnabled } from '../server/gateway-models.mjs';
 import { generateLocalAnswer } from '../comparison/local-answer.mjs';
-import { retrieve } from './ingest.mjs';
+import { createLocalTokenCounters } from '../server/token-counts.mjs';
+import { retrieveComplete } from './complete-retrieval.mjs';
+import { calculateLocal } from './calculators.mjs';
 import { createPrivacyVault, countPlaceholders, assertNoResidualPii } from './privacy.mjs';
 import { signReceipt, verifyReceipt, appendReceipt, recordOutboundPayload, sha256 } from './receipts.mjs';
 
 export const estimateTokens = text => Math.ceil(String(text).length / 4);
 const logDirectory = fileURLToPath(new URL('../../.logs/gateway/', import.meta.url));
+let budgetCounter;
+async function localBudgetCounter() {
+  budgetCounter ??= createLocalTokenCounters().then(counters => text => Math.max(counters.countText('muse-spark', text), counters.countText('gemini', text))).catch(() => null);
+  // Missing local tokenizer assets use the retriever's conservative byte upper
+  // bound; this helper never downloads assets or calls a counting endpoint.
+  return budgetCounter;
+}
 function capEvidence(text, tokenBudget) {
   const end = Math.min(text.length, tokenBudget * 4);
   const cut = text.slice(0, end);
@@ -38,26 +47,38 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
   };
   await emit('received', 1, 'Your question stays on this machine');
   await emit('thinking', 3, 'Llama is searching your local documents');
-  const retrieval = retrievalEnabled ? await (dependencies.retrieve ?? retrieve)(redacted.text, { dataDir, topK: ragConfig.topK, vault }) : { chunks: [], quality: 0, latencyMs: 0, embeddingModel: 'control-no-retrieval' };
+  const countTokens = dependencies.countTokens ?? (!dependencies.retrieve && retrievalEnabled ? await localBudgetCounter() : undefined);
+  const retrieval = retrievalEnabled ? await (dependencies.retrieve ?? retrieveComplete)(redacted.text, {
+    dataDir, topK: ragConfig.completeRetrievalTopK ?? 8, tokenBudget: ragConfig.localContextTokenBudget ?? 1800, vault, ...(countTokens ? { countTokens } : {}),
+  }) : { chunks: [], quality: 0, latencyMs: 0, embeddingModel: 'control-no-retrieval', completeness: { score: 0, requiredFacets: [], coveredFacets: [], missingFacets: [] } };
   const chunks = retrieval.chunks;
+  const completeness = Number.isFinite(retrieval.completeness?.score) ? retrieval.completeness.score : 0;
+  Object.assign(metric, { evidenceCompleteness: completeness, evidenceCompletenessMethod: retrieval.completeness?.method ?? 'not measured',
+    retrievalQueryCount: retrieval.queryCount ?? 0, retrievalTokenCount: retrieval.tokenCount ?? null,
+    retrievalTokenBudget: retrieval.tokenBudget ?? ragConfig.localContextTokenBudget ?? 1800,
+    missingEvidenceFacets: retrieval.completeness?.missingFacets ?? [], bestMatchScore: retrieval.bestMatchScore ?? retrieval.quality });
   metric.piiItemsRedacted += chunks.reduce((sum, chunk) => sum + countPlaceholders(chunk.text), 0);
   stages.push({ stage: 'retrieval', modelId: retrieval.embeddingModel?.model ?? retrieval.embeddingModel, latencyMs: retrieval.latencyMs, tokens: { input: 0, output: 0, total: 0 } });
   await emit('thinking', 3, 'Llama is answering from the retrieved evidence');
   const context = chunks.map(chunk => `[${chunk.chunkId}]\n${chunk.text}`).join('\n\n');
+  const toolResult = await (dependencies.calculateLocal ?? calculateLocal)(redacted.text, chunks);
   const generated = await generateLocalAnswer(ragConfig.localModel, {
     question: redacted.text, chunks, retrievalScore: retrieval.quality,
-    sourceDocCount: new Set(chunks.map(chunk => chunk.file)).size,
+    sourceDocCount: new Set(chunks.map(chunk => chunk.file)).size, completeness: retrieval.completeness,
   }, {
     item: { category: 'company-data', suite: 'company-rag' },
+    answerMaxTokens: ragConfig.structuredAnswerMaxTokens ?? 768, requireClaimCitations: true, toolResult,
     dependencies: { call: dependencies.localChat ?? localChat },
     onStage: async stage => {
       stages.push(stage);
-      if (stage.stage === 'local_answer') await emit('thinking', 4, 'Llama is checking its answer against the local evidence');
+      if (stage.stage === 'local_answer' || stage.stage === 'local_calculator') await emit('thinking', 4, 'Llama is checking its answer against the local evidence');
     },
   });
   const parsed = generated.answer;
+  const localEvidence = generated.prepared?.chunks ?? chunks;
   const citedIds = new Set(parsed.citations.map(citation => citation.chunkId));
-  const validCitations = chunks.filter(chunk => citedIds.has(chunk.chunkId));
+  const validCitations = localEvidence.filter(chunk => citedIds.has(chunk.chunkId));
+  const originalSourceCitations = chunks.filter(chunk => citedIds.has(chunk.chunkId));
   const grounded = parsed.features.hasValidCitations;
   Object.assign(metric, {
     localAnswerVersion: generated.version, localRoutingSource: parsed.routingSource,
@@ -65,7 +86,12 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
     invalidCitationItems: Number(parsed.citationAudit.hadInvalidIds), invalidCitationIds: parsed.citationAudit.invalidIds.length + parsed.citationAudit.malformedCount,
     repairedCitationIds: parsed.citationAudit.repaired.length, rejectedCitationIds: parsed.citationAudit.remainingInvalidCount,
     missingRequiredCitations: Number(parsed.citationAudit.missingRequired),
-    localAnswerLatencyMs: generated.stages[0].latencyMs, localSelfCheckLatencyMs: generated.stages[1].latencyMs,
+    missingClaimCitations: parsed.claimAudit?.missingClaimCount ?? null, factualClaimCount: parsed.claimAudit?.factualClaimCount ?? null,
+    citedClaimCount: parsed.claimAudit?.coveredClaimCount ?? null, claimCitationCoverage: parsed.claimAudit?.coverage ?? null,
+    calculatorStatus: toolResult.status, calculatorIntent: toolResult.arithmeticIntent ?? null,
+    calculatorSourceCount: toolResult.sourceChunkIds?.length ?? 0, calculatorUsed: Boolean(generated.calculator),
+    localAnswerLatencyMs: generated.stages.find(stage => stage.stage === 'local_answer' || stage.stage === 'local_calculator')?.latencyMs ?? null,
+    localSelfCheckLatencyMs: generated.stages.find(stage => stage.stage === 'local_self_check')?.latencyMs ?? null,
     localTokens: generated.stages.reduce((sum, stage) => ({ input: sum.input + (stage.tokens?.input ?? 0), output: sum.output + (stage.tokens?.output ?? 0), total: sum.total + (stage.tokens?.total ?? 0) }), { input: 0, output: 0, total: 0 }),
   });
   await emit('self_check', 4, 'The separate local self-check is complete', 'local', {
@@ -74,8 +100,8 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
     issues: parsed.selfCheck.issues,
     invalidCitations: metric.invalidCitationIds, repairedCitations: metric.repairedCitationIds,
   });
-  const routeLocal = parsed.confidence >= ragConfig.confidenceThreshold && retrieval.quality >= ragConfig.retrievalQualityThreshold && grounded && parsed.needsCloud !== true;
-  const reason = routeLocal ? 'Local self-check, retrieval quality and validated citations passed' : !parsed.parseValid ? 'Local answer format failed validation' : !parsed.selfCheckParseValid ? 'Local self-check format failed validation' : !grounded ? 'No valid grounded citations' : retrieval.quality < ragConfig.retrievalQualityThreshold ? 'Retrieval quality is below threshold' : parsed.needsCloud ? 'The local self-check found an unsupported or incomplete answer' : 'Local self-check confidence is below threshold';
+  const routeLocal = parsed.confidence >= ragConfig.confidenceThreshold && retrieval.quality >= ragConfig.retrievalQualityThreshold && completeness >= 1 && grounded && parsed.needsCloud !== true;
+  const reason = routeLocal ? 'Local self-check, evidence completeness, retrieval quality and claim citations passed' : !parsed.parseValid ? 'Local answer format failed validation' : !parsed.selfCheckParseValid ? 'Local self-check format failed validation' : completeness < 1 ? 'Required local source evidence is incomplete' : !grounded || parsed.claimAudit?.complete === false ? 'A factual claim lacks valid local evidence citations' : retrieval.quality < ragConfig.retrievalQualityThreshold ? 'Retrieval quality is below threshold' : parsed.needsCloud ? 'The local self-check found an unsupported or incomplete answer' : 'Local self-check confidence is below threshold';
   await emit('confidence', 4, 'Llama checked its confidence and source coverage', 'local', { confidence: parsed.confidence, reason });
   const prices = JSON.parse(await readFile(new URL('../../config/rag-pricing.json', import.meta.url), 'utf8'));
   const inputPrice = prices.museInputPerMillionUsd;
@@ -86,14 +112,16 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
   metric.allCloudCostUsdAssumption = price(metric.estimatedAllCloudInputTokens, prices.expectedOutputTokens);
   metric.estimatedCloudInputTokens = 0;
   metric.projectedHandoffCostUsd = 0;
-  let receipt, outbound = { question: '', chunks: [] }, answer = parsed.answer, route = 'local', status = 'ok', citationChunks = validCitations;
+  let receipt, outbound = { question: '', chunks: [] }, answer = parsed.renderedAnswer ?? parsed.answer, route = 'local', status = 'ok', citationChunks = validCitations;
   if (routeLocal || localOnly) {
     if (!routeLocal) { route = 'deferred_cloud'; status = 'deferred_cloud'; answer = 'The local evidence is insufficient for a reliable answer. Cloud assistance is deferred.'; citationChunks = []; }
     await emit('decision', 5, routeLocal ? 'The answer stays local' : 'This local-only task will not reach a cloud API', 'local', { route: routeLocal ? 'local' : 'deferred_cloud', reason });
   } else {
     route = 'deferred_cloud';
     let remaining = ragConfig.cloudContextMaxTokens;
-    const minimum = [...(validCitations.length ? validCitations : chunks.filter(chunk => chunk.score >= ragConfig.retrievalQualityThreshold))].sort((a, b) => b.score - a.score);
+    // Calculator results, proof metadata and tool chunks remain local. Only
+    // original redacted company source chunks can enter a cloud handoff.
+    const minimum = [...(originalSourceCitations.length ? originalSourceCitations : chunks.filter(chunk => chunk.score >= ragConfig.retrievalQualityThreshold))].sort((a, b) => b.score - a.score);
     for (const chunk of minimum) {
       if (outbound.chunks.length >= ragConfig.cloudMaxChunks || remaining <= 0) break;
       const text = capEvidence(chunk.text, remaining);
@@ -153,7 +181,7 @@ export async function askRag(question, { dataDir = path.resolve('.handoff'), off
   }
   metric.latencyMs = Math.round(performance.now() - started);
   const citations = citationChunks.map(({ file, chunkId, location, hash }) => ({ file, chunkId, location, hash }));
-  const result = { runId, status, route, answer: vault.restore(answer), citations, confidence: parsed.confidence, retrievalQuality: retrieval.quality, reason, metrics: metric, receipt, outbound, events, retrievalChunks: chunks.length };
+  const result = { runId, status, route, answer: vault.restore(answer), citations, confidence: parsed.confidence, retrievalQuality: retrieval.quality, evidenceCompleteness: completeness, reason, metrics: metric, receipt, outbound, events, retrievalChunks: chunks.length };
   await emit('answered', 6, status === 'ok' ? 'A cited answer is ready on your machine' : 'The boundary decision is recorded locally', route === 'cloud' ? 'cloud' : 'local', { answer: result.answer, route, latencyMs: metric.latencyMs });
   await mkdir(logDirectory, { recursive: true });
   await appendFile(path.join(logDirectory, 'events.jsonl'), JSON.stringify({ timestamp: new Date().toISOString(), runId, modelId: ragConfig.localModel, cloudModelId: ragConfig.cloudModel, questionHash: sha256(question), route, status, confidence: parsed.confidence, retrievalQuality: retrieval.quality, reason, metrics: metric, settings: ragConfig, chunkHashes: outbound.chunks.map(chunk => chunk.hash), receiptSignature: receipt?.signature }) + '\n');

@@ -49,6 +49,13 @@ export class LocalVectorStore {
     return Object.fromEntries(this.database.prepare("SELECT key, value FROM index_metadata").all().map(row => [row.key, JSON.parse(row.value)]));
   }
 
+  /** Read the local source catalogue without exposing stored embedding bytes. */
+  listChunks() {
+    return this.database.prepare("SELECT chunk_id, file, location, text, hash, pii_count FROM chunks ORDER BY file, chunk_id").all().map(row => ({
+      chunkId: row.chunk_id, file: row.file, location: row.location, text: row.text, hash: row.hash, piiCount: Number(row.pii_count),
+    }));
+  }
+
   replaceChunks(chunks, embedding, metadata = {}) {
     if (!chunks.length || chunks.length !== embedding.vectors.length) throw new Error("Each indexed chunk needs one embedding");
     if (embedding.vectors.some(vector => vector.length !== embedding.dimensions)) throw new Error("Index embedding dimensions are inconsistent");
