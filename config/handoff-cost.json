@@ -1,0 +1,12 @@
+{
+  "version": "lean-handoff-v2",
+  "defaultVariant": "question-only",
+  "variants": ["question-only", "with-draft"],
+  "topK": 2,
+  "contextTokenBudget": 768,
+  "draftTokenBudget": 192,
+  "budgetTokenizer": "maximum of provider-selected Gemini text tokenizer and labelled Llama 3.1 BPE proxy",
+  "systemCaching": "Stable system prefix first; Meta automatic cache with a shared system-hash key, Gemini automatic implicit cache. No cache creation or assumed cache discount in Tier 0.",
+  "headline": "Cloud fees averaged over all queries; local answers, blocked and ineligible items contribute zero cloud fees. Local hardware allocation is separate.",
+  "qualityPerDollar": "pending until Tier 1"
+}

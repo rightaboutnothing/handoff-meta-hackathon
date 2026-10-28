@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { formatCount, formatLatency, formatMoney, formatPercent } from '../gatewayTypes';
 import { categoryMetrics, valueOf, type ComparisonReport, type ComparisonPipeline, type Measurement, type CategoryWinner } from '../comparisonTypes';
 import './Comparison.css';
+import { Tier0CostAudit } from './Tier0CostAudit';
+import { GradingAudit } from './GradingAudit';
 
 const stateLabel = (value?: string) => value?.replaceAll('_', ' ') ?? 'Pending';
 const displayKind = (kind: string) => ({ hybrid: 'Guarded gateway', 'local-only': 'Local-only control', local_only: 'Local-only control', 'cloud-only': 'Cloud-only control', cloud_only: 'Cloud-only control', 'guard-off': 'Guard OFF · safe only', guard_off: 'Guard OFF · safe only' }[kind] ?? stateLabel(kind));
@@ -38,6 +40,8 @@ export function ComparisonBenchmarks({ report }: { report?: ComparisonReport | n
     <div className="cmp-heading"><div><span className="gb-eyebrow">Meta × Google · current comparison</span><h2 id="cmp-title">One gateway. Every combination.</h2><p>Compare each local model, safety boundary and direct cloud service on the same questions. Finkd is the hero pipeline; the evidence determines where each pipeline wins.</p></div><span className="cmp-state">{report ? `Tier ${report.tier} · ${stateLabel(report.status)}` : 'Comparison pending'}</span></div>
     <div className="cmp-status-strip"><span><strong>{report ? formatCount(report.pipelines.length) : 'Pending'}</strong> pipelines recorded</span><span><strong>{formatCount(report?.cloudCalls)}</strong> actual cloud calls</span><span><strong>{report?.runId ?? 'Pending'}</strong> saved run</span></div>
     <p className="cmp-scope">{tierZero ? 'Tier 0 is a free local dry run. Cloud answers, end-to-end cloud latency and a fair overall quality ranking remain pending. Handoff latency is reconstructed from local stages; the cloud has not answered.' : report ? 'Measured coverage and confidence intervals are shown separately for every pipeline. Incomplete pipelines cannot establish an overall winner.' : 'Run Tier 0 to populate the local measurements and cost plan. No missing measurement is treated as zero.'}</p>
+    <Tier0CostAudit report={report}/>
+    <GradingAudit report={report}/>
     <div className="cmp-table-heading"><label htmlFor="cmp-category">Measurement slice<select id="cmp-category" value={category} onChange={event => setCategory(event.target.value)}><option value="overall">All sampled categories</option>{categories.map(value => <option key={value} value={value}>{value}</option>)}</select></label><span>{report ? 'Intervals in brackets are 95% CIs.' : 'Confidence intervals pending.'} Missing or unestimable values remain Pending.</span></div>
     <div className="cmp-table-scroll"><table className="gb-table cmp-table"><caption className="gb-sr-only">Current Meta and Google pipelines, reported individually with measurement coverage</caption><thead><tr><th scope="col">Pipeline</th><th scope="col">Scored accuracy</th><th scope="col">Local answers</th><th scope="col">Handoffs</th><th scope="col">Median</th><th scope="col">p95</th><th scope="col">Guard time</th><th scope="col">Evidence</th></tr></thead><tbody>{report?.pipelines.length ? report.pipelines.map(row => {
       const metrics = categoryMetrics(row, category);

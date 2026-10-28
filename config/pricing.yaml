@@ -5,9 +5,21 @@
   "assumptions": true,
   "label": "Illustrative planning assumptions, not verified provider invoice prices",
   "recordedAt": "2026-10-28",
-  "tokenEstimate": "Expected tokens: ceil(characters/4). Reservation: UTF-8 bytes plus 256 framing tokens, maximum output and conservative thinking allowance. No cloud token-count request in Tier 0.",
-  "expectedOutputTokens": 200,
-  "expectedReasoningTokens": 256,
+  "tokenEstimate": "Input content is counted offline with Google's SDK-selected Gemini tokenizer and a labelled Llama 3.1 BPE proxy for Muse Spark. Server framing is unknown; headline projections assume zero extra framing, with sensitivity reported separately. No remote countTokens or generation requests.",
+  "outputProjectionLabel": "Per-item-category answer and reasoning lengths are assumptions, not observed cloud output. Their sum never exceeds the shared output cap.",
+  "outputProjections": {
+    "reasoning": {"answerTokens":224,"reasoningTokens":128},
+    "knowledge": {"answerTokens":128,"reasoningTokens":64},
+    "instruction-following": {"answerTokens":192,"reasoningTokens":48},
+    "safety-boundary": {"answerTokens":96,"reasoningTokens":32},
+    "privacy": {"answerTokens":128,"reasoningTokens":64},
+    "company-data single-doc": {"answerTokens":128,"reasoningTokens":48},
+    "company-data multi-doc": {"answerTokens":224,"reasoningTokens":128}
+  },
+  "serverFramingTokensAssumed": 0,
+  "serverFramingTokensMeasured": null,
+  "framingSensitivityTokensPerRequest": [0,32,64],
+  "cacheHitRateAssumed": 0,
   "localAllocationUsdPerQuery": 0.0002,
   "clouds": {
     "muse-spark": {

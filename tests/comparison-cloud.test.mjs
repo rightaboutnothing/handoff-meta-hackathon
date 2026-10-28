@@ -6,6 +6,7 @@ import os from 'node:os';
 import { createCloudPolicyRegistry, isCloudEligible } from '../src/comparison/policy.mjs';
 import { createCloudBudget } from '../src/comparison/budget.mjs';
 import { directCloud, loadPricing, estimateRequest, comparisonLocal, comparisonGuard, parseGuardResponse, llamaGuardPrompt, CLOUD_MODELS, COMPARISON_SETTINGS } from '../src/server/comparison-models.mjs';
+import { LEAN_SYSTEM_PROMPT, serializeLeanUserPayload, semanticLeanWireText } from '../src/comparison/handoff-payload.mjs';
 
 const item = { id: 'mock-safe-1', suite: 'mmlu-pro', category: 'knowledge', prompt: 'Say hello', safety: { kind: 'safe', cloudEligible: true } };
 const registry = createCloudPolicyRegistry([item]);
@@ -87,13 +88,20 @@ test('cloud dispatch requires CLOUD_BUDGET_USD above zero inside the client', as
   try { await assert.rejects(directCloud({ cloudId: 'gemini', item, registry, input: 'Hello', tier: 1, offline: false }), { code: 'CLOUD_BUDGET_EXHAUSTED' }); }
   finally { process.env.CLOUD_BUDGET_USD = previous; }
 });
-test('conservative UTF8 reservation exceeds character/4 and includes reasoning', () => {
+test('missing tokenizer leaves point costs pending while byte bounds apply only to reservation', () => {
   const input = '复杂🦙'.repeat(30);
   const estimate = estimateRequest('gemini', input, { pricing });
   assert.equal(estimate.upperTokens.input, Buffer.byteLength(input, 'utf8') + 256);
-  assert(estimate.upperTokens.input > estimate.estimatedTokens.input);
+  assert.equal(estimate.estimatedTokens.input,null);assert.equal(estimate.estimatedCostUsd,null);assert.equal(estimate.countingStatus,'pending_tokenizer');
   assert.equal(estimate.upperTokens.reasoning, 65536);
-  assert(estimate.reservedUpperUsd > estimate.estimatedCostUsd);
+  assert(estimate.reservedUpperUsd > 0);
+});
+test('counted input and item-category answer/reasoning assumptions determine the forecast without character estimates',()=>{
+  const counted={inputTokens:17,serverFramingTokens:null,metadata:{method:'mock-counted-tokenizer'}};
+  const estimate=estimateRequest('gemini','A very long payload '.repeat(100),{pricing,tokenCounts:counted,category:'knowledge'});
+  assert.equal(estimate.estimatedTokens.input,17);assert.equal(estimate.estimatedTokens.output,pricing.outputProjections.knowledge.answerTokens);assert.equal(estimate.estimatedTokens.reasoning,pricing.outputProjections.knowledge.reasoningTokens);
+  assert.equal(estimate.serverFramingTokens,null);assert.equal(estimate.outputProjection.assumption,true);assert.equal(estimate.countingStatus,'counted_content_tokens');
+  assert.ok(estimate.estimatedTokens.output+estimate.estimatedTokens.reasoning<=COMPARISON_SETTINGS.maxTokens);assert.ok(estimate.estimatedCostUsd>0);
 });
 test('budget requires positive cap and blocks before projected overspend', async () => {
   assert.throws(() => createCloudBudget({ directory: 'unused', capUsd: 0 }), { code: 'CLOUD_BUDGET_EXHAUSTED' });
@@ -156,6 +164,23 @@ test('Meta official Responses request uses explicit key, no retries, output_text
     assert.equal(request.temperature, COMPARISON_SETTINGS.temperature); assert.equal(request.reasoning.effort, COMPARISON_SETTINGS.reasoningEffort); assert.equal(result.text, 'Hello'); assert.equal(result.modelVersion, 'muse-spark-1.3');
     assert.equal(result.settings.seedSupported, false); assert.equal(result.providerReportedCostUsd, null);
   } finally { names.forEach((name, i) => { if (old[i] === undefined) delete process.env[name]; else process.env[name] = old[i]; }); }
+});
+test('structured Google handoff sends the same short system and lean user text, with local state absent',async()=>{
+  const payload={system:LEAN_SYSTEM_PROMPT,query:'What is the warranty?',context:[{chunkId:'doc:page-1:0001',text:'Warranty is 24 months.'}],draft:null};
+  const ledger=await budget(1),old=process.env.GEMINI_API_KEY;process.env.GEMINI_API_KEY='unit-test-placeholder';let request;
+  try{const result=await directCloud({cloudId:'gemini',item,registry,payload,tokenCounts:{inputTokens:31,serverFramingTokens:null},budget:ledger,tier:1,offline:false,dependencies:{fetch:async(url,options)=>{request=JSON.parse(options.body);return fakeGoogle();}}});
+    assert.deepEqual(request.systemInstruction,{parts:[{text:LEAN_SYSTEM_PROMPT}]});assert.equal(request.contents[0].parts[0].text,serializeLeanUserPayload(payload));
+    assert.ok(!JSON.stringify(request).includes('guardVerdict'));assert.ok(!JSON.stringify(request).includes('receiptMetadata'));assert.ok(!JSON.stringify(request).includes('piiMap'));assert.equal(result.inputHash,await import('../src/rag/receipts.mjs').then(module=>module.sha256(semanticLeanWireText(payload))));
+    assert.equal(result.tokens.cachedInput,null);
+  }finally{if(old===undefined)delete process.env.GEMINI_API_KEY;else process.env.GEMINI_API_KEY=old;}
+});
+test('structured Meta handoff uses instructions and stable shared cache key without storing response state',async()=>{
+  const payload={system:LEAN_SYSTEM_PROMPT,query:'Question',context:[],draft:'Unverified local answer.'};
+  const ledger=await budget(1),names=['MODEL_API_KEY','META_ACCESS_STATUS','HANDOFF_META_ACCESS_CONFIRMED'],old=names.map(name=>process.env[name]);Object.assign(process.env,{MODEL_API_KEY:'unit-test-placeholder',META_ACCESS_STATUS:'live',HANDOFF_META_ACCESS_CONFIRMED:'true'});let request;
+  try{await directCloud({cloudId:'muse-spark',item,registry,payload,tokenCounts:{inputTokens:23,serverFramingTokens:null},budget:ledger,tier:1,offline:false,dependencies:{createMetaClient:()=>({responses:{create:async body=>{request=body;return{output_text:'Answer',usage:{input_tokens:23,output_tokens:4,total_tokens:27}};}}})}});
+    assert.equal(request.instructions,LEAN_SYSTEM_PROMPT);assert.equal(request.input,serializeLeanUserPayload(payload));assert.equal(request.store,false);assert.match(request.prompt_cache_key,/^handoff-system-[a-f0-9]{32}$/);
+    assert.ok(!JSON.stringify(request).includes('confidence'));assert.ok(!JSON.stringify(request).includes('receiptMetadata'));
+  }finally{names.forEach((name,index)=>{if(old[index]===undefined)delete process.env[name];else process.env[name]=old[index];});}
 });
 test('provider-specific guard verdict parsing and inbound role fail closed', () => {
   assert.equal(parseGuardResponse('shieldgemma:9b', 'No. This is safe.').safe, true);

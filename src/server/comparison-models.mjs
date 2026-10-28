@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { assertCloudEligible } from '../comparison/policy.mjs';
+import { assertLeanWire, serializeLeanUserPayload, semanticLeanWireText } from '../comparison/handoff-payload.mjs';
 
 // Resolve .env against the project, regardless of the command's working directory.
 dotenv.config({ path: new URL('../../.env', import.meta.url), quiet: true });
@@ -21,17 +22,21 @@ export function estimateCloudCost(cloudId, { inputTokens = 0, outputTokens = 0, 
   if (!rate) throw new Error('Unsupported direct cloud provider');
   return (inputTokens * rate.inputUsdPerMillion + (outputTokens + reasoningTokens) * rate.outputUsdPerMillion) / 1e6;
 }
-export function estimateRequest(cloudId, input, { maxTokens = COMPARISON_SETTINGS.maxTokens, pricing } = {}) {
+export function estimateRequest(cloudId, input, { maxTokens = COMPARISON_SETTINGS.maxTokens, pricing, tokenCounts, category } = {}) {
   if (!pricing) throw new Error('Explicit pricing assumptions required');
   const rate = pricing.clouds[cloudId];
   if (!rate) throw new Error('Unsupported direct cloud provider');
-  const estimatedTokens = { input: Math.ceil(input.length / 4), output: pricing.expectedOutputTokens, reasoning: pricing.expectedReasoningTokens };
-  const upperTokens = { input: Buffer.byteLength(input, 'utf8') + 256, output: maxTokens, reasoning: rate.maxReasoningTokensReserved };
+  const projection=pricing.outputProjections?.[category];
+  const hasCounts=Number.isFinite(tokenCounts?.inputTokens)&&tokenCounts.inputTokens>=0;
+  const hasProjection=projection&&Number.isFinite(projection.answerTokens)&&Number.isFinite(projection.reasoningTokens)&&projection.answerTokens>=0&&projection.reasoningTokens>=0&&projection.answerTokens+projection.reasoningTokens<=maxTokens;
+  const estimatedTokens = { input: hasCounts?tokenCounts.inputTokens:null, output: hasProjection?projection.answerTokens:null, reasoning:hasProjection?projection.reasoningTokens:null };
+  const reservationText=typeof input==='string'?input:semanticLeanWireText(input);
+  const upperTokens = { input: Buffer.byteLength(reservationText, 'utf8') + 256, output: maxTokens, reasoning: rate.maxReasoningTokensReserved };
   if (upperTokens.input > rate.maximumInputTokens) throw new Error('Cloud payload exceeds conservative input limit');
   return { estimatedTokens, upperTokens,
-    estimatedCostUsd: estimateCloudCost(cloudId, { inputTokens: estimatedTokens.input, outputTokens: estimatedTokens.output, reasoningTokens: estimatedTokens.reasoning }, pricing),
+    estimatedCostUsd:hasCounts&&hasProjection?estimateCloudCost(cloudId, { inputTokens: estimatedTokens.input, outputTokens: estimatedTokens.output, reasoningTokens: estimatedTokens.reasoning }, pricing):null,
     reservedUpperUsd: estimateCloudCost(cloudId, { inputTokens: upperTokens.input, outputTokens: upperTokens.output, reasoningTokens: upperTokens.reasoning }, pricing),
-    assumptions: true, inputHash: sha(input), modelId: CLOUD_MODELS[cloudId] };
+    assumptions: true, inputHash: sha(reservationText), modelId: CLOUD_MODELS[cloudId],countingStatus:hasCounts?'counted_content_tokens':'pending_tokenizer',tokenCounting:tokenCounts?.metadata??null,serverFramingTokens:tokenCounts?.serverFramingTokens??null,outputProjection:hasProjection?{...projection,category,assumption:true}:null };
 }
 function localBase() {
   const host = process.env.OLLAMA_HOST || 'http://localhost:11434';
@@ -107,15 +112,19 @@ function assertRedacted(input) {
   }
 }
 /** The ONLY new cloud inference path. Policy and Tier 0 gates precede keys/network. */
-export async function directCloud({ cloudId, item, registry, input, budget, pricing,
+export async function directCloud({ cloudId, item, registry, input, payload, tokenCounts, budget, pricing,
   tier = 0, offline = true, maxTokens = COMPARISON_SETTINGS.maxTokens, requestId = randomUUID(),
   dependencies = {} } = {}) {
   assertCloudEligible(item, registry);
   if (!Object.hasOwn(CLOUD_MODELS, cloudId)) throw new Error('Unsupported direct cloud provider');
+  const structured=payload??(input&&typeof input==='object'?input:null);
+  let system='',semanticInput;
+  if(structured){try{const wire=assertLeanWire(structured.wire??{system:structured.system,query:structured.query,context:structured.context.map(({chunkId,text})=>({chunkId,text})),draft:structured.draft??null});system=wire.system;input=serializeLeanUserPayload(wire);semanticInput=semanticLeanWireText(wire);}catch{throw Object.assign(new Error('Cloud boundary denied: invalid lean payload or residual private fields'),{code:'UNREDACTED_PAYLOAD'});}}
   if (typeof input !== 'string' || !input) throw new Error('Cloud input must be a redacted text payload');
-  assertRedacted(input);
+  semanticInput??=input;
+  assertRedacted(`${system}\n${input}`);
   const rates = pricing ?? await loadPricing();
-  const estimate = estimateRequest(cloudId, input, { maxTokens, pricing: rates });
+  const estimate = estimateRequest(cloudId, semanticInput, { maxTokens, pricing: rates, tokenCounts, category:item.category });
   if (tier === 0 || offline) return { status: 'deferred_tier0', cloudId, modelId: CLOUD_MODELS[cloudId], ...estimate, zeroCloudCalls: true };
   if (![1, 2].includes(tier)) throw new Error('Unknown comparison tier');
   if (cloudId === 'muse-spark' && !metaAccessEnabled()) return { status: 'deferred_meta', cloudId, modelId: CLOUD_MODELS[cloudId], ...estimate, zeroCloudCalls: true };
@@ -129,16 +138,16 @@ export async function directCloud({ cloudId, item, registry, input, budget, pric
     if (cloudId === 'muse-spark') {
       const clientOptions = { apiKey, baseURL: 'https://api.meta.ai/v1', maxRetries: 0, timeout: 120000 };
       const client = dependencies.createMetaClient?.(clientOptions) ?? new OpenAI(clientOptions);
-      const response = await client.responses.create({ model: CLOUD_MODELS[cloudId], input, temperature: COMPARISON_SETTINGS.temperature,
+      const response = await client.responses.create({ model: CLOUD_MODELS[cloudId], input,...(system?{instructions:system,prompt_cache_key:`handoff-system-${sha(system).slice(0,32)}`} : {}),store:false, temperature: COMPARISON_SETTINGS.temperature,
         reasoning: { effort: COMPARISON_SETTINGS.reasoningEffort }, max_output_tokens: maxTokens });
       text = response.output_text ?? ''; responseId = response.id; modelVersion = response.model ?? CLOUD_MODELS[cloudId];
       tokens = { input: response.usage?.input_tokens, output: response.usage?.output_tokens,
-        reasoning: response.usage?.output_tokens_details?.reasoning_tokens ?? 0, total: response.usage?.total_tokens };
+        reasoning: response.usage?.output_tokens_details?.reasoning_tokens ?? 0, total: response.usage?.total_tokens,cachedInput:response.usage?.input_tokens_details?.cached_tokens??null };
       if (Number.isFinite(response.usage?.cost)) providerReportedCostUsd = response.usage.cost;
     } else {
       const response = await (dependencies.fetch ?? fetch)(`https://generativelanguage.googleapis.com/v1beta/models/${CLOUD_MODELS[cloudId]}:generateContent`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: input }] }], generationConfig: {
+        body: JSON.stringify({...(system?{systemInstruction:{parts:[{text:system}]}}:{}), contents: [{ role: 'user', parts: [{ text: input }] }], generationConfig: {
           temperature: COMPARISON_SETTINGS.temperature, seed: COMPARISON_SETTINGS.seed, maxOutputTokens: maxTokens, thinkingConfig: { thinkingLevel: COMPARISON_SETTINGS.reasoningEffort.toUpperCase(), includeThoughts: false },
         } }), signal: AbortSignal.timeout(120000) });
       if (!response.ok) { const error = new Error(`Gemini returned HTTP ${response.status}`); error.status = response.status; throw error; }
@@ -147,7 +156,7 @@ export async function directCloud({ cloudId, item, registry, input, budget, pric
       responseId = body.responseId; modelVersion = body.modelVersion ?? CLOUD_MODELS[cloudId];
       const usage = body.usageMetadata;
       tokens = { input: usage?.promptTokenCount, output: usage?.candidatesTokenCount,
-        reasoning: usage?.thoughtsTokenCount ?? 0, total: usage?.totalTokenCount };
+        reasoning: usage?.thoughtsTokenCount ?? 0, total: usage?.totalTokenCount,cachedInput:usage?.cachedContentTokenCount??null };
     }
     // Meta output_tokens already includes reasoning; Google candidatesTokenCount does not.
     const usageKnown = validUsage(tokens.input, tokens.output, tokens.reasoning);
@@ -159,7 +168,7 @@ export async function directCloud({ cloudId, item, registry, input, budget, pric
       latencyMs: performance.now() - started, tokens, meteredCostUsd: meteredUsd, providerReportedCostUsd, budget: budgetStatus,
       settings: { ...COMPARISON_SETTINGS, maxTokens, seedSupported: cloudId === 'gemini',
         seedNote: cloudId === 'gemini' ? 'Requested via generationConfig.seed; determinism is not guaranteed' : 'Responses API has no seed parameter',
-        sdkRetries: 0, pricingAssumptions: true }, inputHash: estimate.inputHash };
+        sdkRetries: 0, pricingAssumptions: true,leanPayloadVersion:structured?.version??null,systemCaching:system?'Shared stable system prefix; provider automatic cache opportunities; no assumed discount':'Legacy unstructured input; no shared cache prefix'}, inputHash: estimate.inputHash };
   } catch (original) {
     await budget.markUnknown(requestId);
     // Do not echo provider response bodies, prompts, keys, or SDK request headers.

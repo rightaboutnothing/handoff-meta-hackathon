@@ -25,7 +25,9 @@ export function createCloudBudget({ directory, capUsd = Number(process.env.CLOUD
   if (!directory) throw new Error('Cloud budget requires a durable checkpoint directory');
   const file = path.join(directory, 'cloud-budget.json');
   const lock = `${file}.lock`;
-  async function transaction(fn) {
+  let transactions=Promise.resolve();
+  function transaction(fn){const operation=transactions.then(()=>lockedTransaction(fn));transactions=operation.catch(()=>{});return operation;}
+  async function lockedTransaction(fn) {
     await mkdir(directory, { recursive: true });
     const release = await acquireRunLock(lock, { attempts: 300, delayMs: 20 }).catch(() => { throw new CloudBudgetError('Budget checkpoint lock is busy; no cloud request dispatched'); });
     try {

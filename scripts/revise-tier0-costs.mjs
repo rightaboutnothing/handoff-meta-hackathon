@@ -1,0 +1,4 @@
+import { reviseTier0Costs } from '../src/comparison/cost-audit.mjs';
+import { writeFile } from 'node:fs/promises';
+const args=process.argv.slice(2),at=args.indexOf('--run-id');
+try{const report=await reviseTier0Costs({runId:at<0?undefined:args[at+1]});console.table(report.costPlan.map(row=>({pipeline:row.pipelineId,inputTokensPerQuery:row.cloudInputTokensPerQuery,cloudFeesPer1000:row.costPer1000Usd,cloudOnly:row.cloudOnlyCostPer1000Usd,saving:row.savingRateAllQueries,qualityPerDollar:'pending Tier 1'})));console.log(`Tier 0 complete. Cloud inference/counting requests: 0. Actual spend: $0. results/${report.runId}/summary.md. STOP before Tier 1.`);}catch(error){await writeFile('.logs/tier0-cost-audit-error.json',JSON.stringify({name:error.name,code:error.code??null,message:error.message,stack:error.stack},null,2)).catch(()=>{});console.error('Tier 0 audit failed; private diagnostic and checkpoints retained. No cloud inference was enabled.');process.exitCode=1;}

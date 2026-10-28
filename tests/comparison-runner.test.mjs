@@ -157,14 +157,16 @@ test('planning cannot turn a failed missing-cost observation into free projected
   assert.equal(plan.costPer1000Usd, null);
 });
 
-test('core weighting accounts for local-only unsafe work without imputing unsafe cloud calls', () => {
+test('core weighting makes local and unsafe cloud fees zero and keeps local allocation separate', () => {
   const pipeline = buildPipelineMatrix().find(row => row.id === 'llama8b+llamaguard+gemini');
   const harmful = { ...safe, id: 'harmful', safety: { kind: 'harmful', cloudEligible: false } };
   const row = { id: safe.id, pipelineId: pipeline.id, category: safe.category, status: 'deferred_cloud', handoff: true,
     plan: { estimatedCostUsd: .003, estimatedTokens: { input: 30, output: 20, reasoning: 10 } },
     metrics: { allCloudCostUsd: .004, allCloudInputTokens: 40, actualCloudSpendUsd: 0, meteredCloudSpendUsd: 0 } };
   const plan = buildCostPlan([pipeline], [row], [safe, harmful], [safe, harmful], pricing)[0];
-  assert.ok(Math.abs(plan.costPer1000Usd - 1.7) < 1e-12);
+  assert.ok(Math.abs(plan.costPer1000Usd - 1.5) < 1e-12);
+  assert.equal(plan.localAllocationPer1000Usd,.2);assert.equal(plan.localAllocationIncluded,0);assert.equal(plan.headlineCloudFeesOnly,true);
+  assert.equal(plan.costPer1000HandedOffQueriesUsd,3);assert.equal(plan.cloudOnlyCostPer1000HandedOffQueriesUsd,4);
   assert.equal(plan.cloudOnlyCostPer1000Usd, 2);
   assert.equal(plan.expectedInputTokensPer1000, 15000);
   assert.equal(plan.expectedAllCloudInputTokensPer1000, 20000);

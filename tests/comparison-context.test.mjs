@@ -4,7 +4,7 @@ import { mkdtemp } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { prepareContext, parseAnswer, attachRestorer } from '../src/comparison/context.mjs';
+import { prepareContext, parseAnswer, parseCloudAnswer, attachRestorer } from '../src/comparison/context.mjs';
 
 const directory = async () => mkdtemp(path.join(os.tmpdir(), 'handoff-context-'));
 const sha = text => createHash('sha256').update(text).digest('hex');
@@ -83,4 +83,11 @@ test('answer parsing fails closed for malformed output and does not restore befo
   assert.equal(valid.answer, 'opaque-token'); assert.equal(valid.restore(), 'Local original'); assert.equal(valid.features.hasValidCitations, true);
   const invalid = parseAnswer('{"answer":"truncated', prepared);
   assert.equal(invalid.parseValid, false); assert.equal(invalid.confidence, 0); assert.equal(invalid.needsCloud, true); assert.deepEqual(invalid.citations, []);
+});
+test('cloud answers need no local confidence or route fields and retain valid and invented citations',()=>{
+  const prepared={chunks,restore:text=>text.replace('opaque-token','Local original')};
+  const plain=parseCloudAnswer('The price is 100. [product-1] [invented-id] [[PII_EMAIL_0123456789abcdef]]',prepared);
+  assert.equal(plain.format,'plain-text');assert.equal(plain.citations.length,2);assert.equal(plain.citations[0].valid,true);assert.equal(plain.citations[1].valid,false);assert.equal(plain.invalidCitationCount,1);assert.equal(plain.confidence,null);
+  const json=parseCloudAnswer('{"answer":"opaque-token","citations":["product-1"]}',prepared);
+  assert.equal(json.answer,'opaque-token');assert.equal(json.format,'json-answer');assert.equal(json.citations[0].valid,true);assert.equal(json.needsCloud,false);
 });

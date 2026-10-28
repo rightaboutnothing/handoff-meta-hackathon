@@ -1,0 +1,2 @@
+import {prepareTokenizerAssets} from '../src/server/token-counts.mjs';
+try{const manifest=await prepareTokenizerAssets();console.log(JSON.stringify({prepared:true,gemini:{repository:manifest.gemini.repository,revision:manifest.gemini.revision},museSparkProxy:{modelId:manifest['muse-spark'].proxyModelId,sourceManifestSha256:manifest['muse-spark'].sourceManifestSha256},cloudInferenceCalls:0,countEndpointCalls:0}));}catch(error){console.error(error.message);process.exitCode=1;}

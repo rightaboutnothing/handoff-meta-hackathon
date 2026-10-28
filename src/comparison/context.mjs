@@ -137,3 +137,14 @@ export function parseAnswer(text, prepared) {
     parseValid: parsed, invalidCitationCount: citations.length - validCount,
     restore: () => prepared?.restore ? prepared.restore(value.answer) : value.answer };
 }
+
+/** Cloud answers have no routing/confidence task. Accept plain cited text or an
+ * answer/citations JSON object without requiring local-only control fields. */
+export function parseCloudAnswer(text,prepared){
+  const raw=String(text??'').trim();let answer=raw,ids=[],format='plain-text';
+  try{const value=JSON.parse(raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,''));if(typeof value?.answer==='string'){answer=value.answer;ids=(value.citations??[]).map(citation=>typeof citation==='string'?citation:citation?.chunkId??citation?.id).filter(id=>typeof id==='string');format='json-answer';}}catch{}
+  if(format==='plain-text')ids=[...answer.replace(/\[\[PII_[^\]]+\]\]/g,'').matchAll(/\[([A-Za-z0-9_.:-]{1,160})\]/g)].map(match=>match[1]);
+  const byId=new Map((prepared?.chunks??[]).map(chunk=>[chunk.chunkId,chunk]));
+  const citations=[...new Set(ids)].map(chunkId=>{const chunk=byId.get(chunkId);return chunk?{file:chunk.file??null,chunkId,hash:chunk.hash,valid:true}:{file:null,chunkId,valid:false};});
+  return{answer,citations,format,confidence:null,needsCloud:false,invalidCitationCount:citations.filter(citation=>!citation.valid).length};
+}

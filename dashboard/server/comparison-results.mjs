@@ -5,6 +5,16 @@ import { fileURLToPath } from 'node:url';
 import { sanitizePublicResult } from '../../src/evaluation/publish-results.mjs';
 
 const root = fileURLToPath(new URL('../../results/', import.meta.url));
+// Numeric token-component fields may be named query/localDraft. Their text
+// counterparts and raw request collections must never escape this aggregate API.
+function stripPayloadText(value,key='') {
+  if(value==null||typeof value==='number'||typeof value==='boolean')return value;
+  if(/^(?:payloads|requests|records|raw|rawPayload|rawPayloads|localRecords|answerRecords)$/i.test(key))return undefined;
+  if(typeof value==='string'&&/^(?:system|systemPrompt|systemInstruction|query|redactedQuery|draft|localDraft|context|retrievedContext)$/i.test(key))return undefined;
+  if(Array.isArray(value))return value.map(entry=>stripPayloadText(entry,key)).filter(entry=>entry!==undefined);
+  if(typeof value==='object')return Object.fromEntries(Object.entries(value).map(([name,entry])=>[name,stripPayloadText(entry,name)]).filter(([,entry])=>entry!==undefined));
+  return value;
+}
 async function regularFile(file, parent) {
   const info = await lstat(file);
   if (!info.isFile() || info.isSymbolicLink()) throw new Error('Comparison reports must be regular local files');
@@ -32,6 +42,6 @@ export async function readComparisonResults({ resultsDir = root } = {}) {
   if (expectedHash && createHash('sha256').update(text).digest('hex') !== expectedHash) throw new Error('Comparison report hash mismatch');
   const report = JSON.parse(text);
   if (report.schemaVersion !== 1 || !Array.isArray(report.pipelines) || !Array.isArray(report.costPlan)) throw new Error('Unsupported comparison report');
-  const allowed = ['schemaVersion', 'runId', 'timestamp', 'tier', 'status', 'cloudCalls', 'baseline', 'pipelines', 'costPlan', 'calibration', 'environment', 'selection', 'categories', 'categoryWinners', 'notes', 'pricing', 'dataset', 'provenance'];
-  return sanitizePublicResult(Object.fromEntries(allowed.filter(key => Object.hasOwn(report, key)).map(key => [key, report[key]])));
+  const allowed = ['schemaVersion', 'runId', 'timestamp', 'tier', 'status', 'cloudCalls', 'baseline', 'pipelines', 'costPlan', 'costPlanVariants', 'costAudit', 'calibration', 'environment', 'selection', 'categories', 'categoryWinners', 'notes', 'pricing', 'dataset', 'provenance'];
+  return stripPayloadText(sanitizePublicResult(Object.fromEntries(allowed.filter(key => Object.hasOwn(report, key)).map(key => [key, report[key]]))));
 }

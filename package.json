@@ -9,6 +9,8 @@
     "handoff": "node bin/handoff.mjs",
     "comparison:dataset": "node scripts/build-comparison-dataset.mjs",
     "comparison:tier0": "node scripts/run-comparison.mjs --tier 0",
+    "comparison:cost-audit": "node scripts/revise-tier0-costs.mjs",
+    "comparison:prepare-tokenizers": "node scripts/prepare-tokenizers.mjs",
     "test:comparison": "node --test tests/comparison-*.test.mjs",
     "demo:build": "node scripts/generate-company-demo.mjs",
     "test:rag": "node --test tests/*.test.mjs",
@@ -31,6 +33,7 @@
     "test:routing-confidence": "node scripts/test-routing-confidence.mjs"
   },
   "dependencies": {
+    "@huggingface/tokenizers": "0.2.0",
     "@huggingface/transformers": "^4.3.2",
     "csv-parse": "^7.0.3",
     "dotenv": "^18.0.9",
