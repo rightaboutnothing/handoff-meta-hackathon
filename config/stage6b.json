@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "method": "question-only-layered-privacy-v1",
+  "seed": 20261027,
+  "temperature": 0,
+  "keepAlive": -1,
+  "contextTokens": 4096,
+  "rewriteMaxTokens": 192,
+  "checkMaxTokens": 256,
+  "applyMaxTokens": 768,
+  "maxQuestionCharacters": 320,
+  "permitMaxAgeMs": 30000,
+  "cloudDispatchEnabled": false,
+  "meta": {"rewriteModel": "llama3.2:3b", "guardModel": "llama-guard3:8b", "guardMaxTokens": 40},
+  "google": {"rewriteModel": "gemma3:4b", "guardModel": "shieldgemma:2b", "guardMaxTokens": 192},
+  "promptGuard": {
+    "status": "PENDING",
+    "threshold": 0.5,
+    "maxWindowTokens": 512,
+    "overlapTokens": 64,
+    "positiveLabel": "MALICIOUS",
+    "variants": {
+      "86m": {"modelId": "meta-llama/Llama-Prompt-Guard-2-86M", "directory": ".cache/models/prompt-guard-2-86m"},
+      "22m": {"modelId": "meta-llama/Llama-Prompt-Guard-2-22M", "directory": ".cache/models/prompt-guard-2-22m"}
+    }
+  }
+}

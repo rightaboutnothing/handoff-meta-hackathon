@@ -6,6 +6,7 @@ import test from 'node:test';
 import { callMuse, guardText, localChat, ragConfig } from '../src/server/gateway-models.mjs';
 import { askRag } from '../src/rag/gateway.mjs';
 import { sha256, verifyReceipt } from '../src/rag/receipts.mjs';
+import {questionBoundaryFixture} from './helpers/question-boundary.mjs';
 
 function liveFlags(t) {
   for (const [key, value] of [['META_ACCESS_STATUS', 'live'], ['HANDOFF_META_ACCESS_CONFIRMED', 'true']]) {
@@ -115,10 +116,13 @@ test('an unsafe incoming cloud answer is withheld and its actual handoff gets a 
   const chunk = { chunkId: 'synthetic-chunk-001', file: 'synthetic.md', location: 'page:1', text: 'SYNTHETIC warranty: 24 months.', score: 0.95, hash: sha256('SYNTHETIC warranty: 24 months.') };
   const cloudAnswer = JSON.stringify({ answer: 'UNTRUSTED_CLOUD_ANSWER', confidence: 0.9, citations: [chunk.chunkId] });
   const tokens = { input: 30, output: 10, total: 40 };
-  const guardInputs = []; let cloudCalls = 0;
+  const guardInputs = [],incomingInputs=[]; let cloudCalls = 0;
+  const privacy=questionBoundaryFixture({outputSafe:false});
   const result = await askRag('Analyse this synthetic warranty.', {
     dataDir, offlineMeta: false,
     dependencies: {
+      ...privacy,
+      checkIncomingAnswer:async(prepared,text)=>{incomingInputs.push(text);return privacy.checkIncomingAnswer(prepared,text);},
       retrieve: async () => ({ chunks: [chunk], quality: 0.95, latencyMs: 1, embeddingModel: 'synthetic-embedding', completeness: { score: 1, missingFacets: [], method: 'Synthetic fixture requirements' } }),
       calculateLocal: async () => ({ status: 'not_applicable' }),
       localChat: async (_model, _messages, options) => ({ modelId: 'synthetic-local', latencyMs: 1, tokens,
@@ -132,8 +136,8 @@ test('an unsafe incoming cloud answer is withheld and its actual handoff gets a 
   });
   assert.equal(networkCalls, 0);
   assert.equal(cloudCalls, 1);
-  assert.equal(guardInputs.length, 2);
-  assert.equal(guardInputs[1][1], cloudAnswer);
+  assert.equal(guardInputs.length, 1);
+  assert.deepEqual(incomingInputs,[cloudAnswer]);
   assert.equal(result.route, 'blocked_local');
   assert.equal(result.status, 'blocked_local');
   assert.equal(result.answer.includes('UNTRUSTED_CLOUD_ANSWER'), false);
@@ -141,9 +145,9 @@ test('an unsafe incoming cloud answer is withheld and its actual handoff gets a 
   assert.deepEqual(result.citations, []);
   assert.equal(result.metrics.guardBlocks, 1);
   assert.equal(result.metrics.tokensSentToCloud, tokens.input);
-  assert.equal(result.metrics.outboundChunks, 1);
+  assert.equal(result.metrics.outboundChunks, 0);
   assert.equal(result.receipt.payload.status, 'inbound_blocked');
-  assert.equal(result.receipt.payload.actualChunksSent, 1);
+  assert.equal(result.receipt.payload.actualChunksSent, 0);
   assert.equal(result.receipt.payload.guardInbound, 'unsafe');
   assert.equal(result.receipt.payload.responseHash, sha256(cloudAnswer));
   assert.equal(result.metrics.receiptVerified, true);

@@ -3,10 +3,13 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { askRag, estimateTokens } from '../src/rag/gateway.mjs';
+import { askRag as askRagActual, estimateTokens } from '../src/rag/gateway.mjs';
+import {questionBoundaryFixture} from './helpers/question-boundary.mjs';
 import { createPrivacyVault } from '../src/rag/privacy.mjs';
 import { sha256, verifyReceipt } from '../src/rag/receipts.mjs';
 import { ragConfig } from '../src/server/gateway-models.mjs';
+
+const askRag=(question,options)=>askRagActual(question,{...options,dependencies:{...questionBoundaryFixture(),...options?.dependencies}});
 
 async function workspace(t) {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'handoff-gateway-test-'));
@@ -145,7 +148,7 @@ test('local answers restore private placeholders and retain local source citatio
   assert.equal(result.metrics.missingClaimCitations, 0);
 });
 
-test('the cloud payload contains at most two redacted chunks, no local filenames, and matching signed hashes', async t => {
+test('the cloud payload contains only a general question, no private chunks or filenames, and matching signed hashes', async t => {
   permitInjectedCloud(t);
   const dataDir = await workspace(t);
   const vault = await createPrivacyVault(dataDir);
@@ -168,16 +171,19 @@ test('the cloud payload contains at most two redacted chunks, no local filenames
   });
   assert.equal(cloudInputs.length, 1);
   assert.equal(result.route, 'cloud');
-  assert.equal(result.outbound.chunks.length, 2);
+  assert.equal(result.outbound.chunks.length, 0);
+  assert.deepEqual(Object.keys(JSON.parse(cloudInputs[0])).sort(),['question','system']);
+  assert.equal(cloudInputs[0].includes('24 months'),false);
   assert.ok(result.outbound.chunks.reduce((sum, value) => sum + estimateTokens(value.text), 0) <= ragConfig.cloudContextMaxTokens);
   for (const privateValue of ['Avery Chen', 'avery@example.invalid', '+61 400 000 001', 'private/', '.md']) {
     assert.equal(cloudInputs[0].includes(privateValue), false);
   }
-  assert.equal(guardInputs.length, 2);
+  assert.equal(guardInputs.length, 1);
+  assert.ok(result.metrics.stages.some(stage=>stage.stage==='privacy_inbound_harmful_content'&&stage.status==='PASS'));
   assert.equal(guardInputs[0][0], cloudInputs[0]);
   for (const value of result.outbound.chunks) assert.equal(value.hash, sha256(value.text));
   assert.deepEqual(result.receipt.payload.chunks, result.outbound.chunks.map(value => ({ chunkId: value.id, hash: sha256(value.text) })));
-  assert.equal(result.receipt.payload.actualChunksSent, 2);
+  assert.equal(result.receipt.payload.actualChunksSent, 0);
   assert.equal(result.receipt.payload.inputHash, sha256(cloudInputs[0]));
   assert.equal(result.receipt.payload.status, 'completed');
   assert.equal(await verifyReceipt(result.receipt, { dataDir }), true);
@@ -205,19 +211,22 @@ test('local-only evaluations cannot call cloud models even if the guard would pe
   assert.equal(result.receipt, undefined);
 });
 
-test('a residual private value in retrieved evidence blocks outbound before cloud or guard calls', async t => {
+test('a residual private value in a proposed outgoing question blocks before cloud or guard calls', async t => {
   permitInjectedCloud(t);
   let cloudCalls = 0, guardCalls = 0;
-  await assert.rejects(askRag('Analyse this synthetic evidence.', {
+  const result=await askRag('Analyse this synthetic evidence.', {
     dataDir: await workspace(t), offlineMeta: false,
     dependencies: {
+      ...questionBoundaryFixture({question:'Who should contact accidentally-unredacted@example.invalid?'}),
       calculateLocal: async () => ({ status: 'not_applicable' }),
       retrieve: retrieveFixture([chunk(1, 'Contact: accidentally-unredacted@example.invalid')]),
       localChat: localSteps('More reasoning is needed.', 0.1, ['chunk-001'], false),
       guardText: async () => { guardCalls += 1; return guardResponse(true); },
       callMuse: async () => { cloudCalls += 1; throw new Error('Unredacted evidence reached cloud'); },
     },
-  }), /private data/);
+  });
+  assert.equal(result.route,'blocked_local');
+  assert.equal(result.receipt,undefined);
   assert.equal(cloudCalls, 0);
   assert.equal(guardCalls, 0);
 });
@@ -350,6 +359,7 @@ test('calculator evidence and proof metadata stay local even when its self-check
   });
   assert.equal(inputs.length, 1); assert.equal(result.route, 'cloud');
   for (const privateMetadata of ['calc:', 'VERIFIED LOCAL CALCULATOR', 'quantity * price', 'operands', 'sourceChunkIds', 'provenance']) assert.equal(inputs[0].includes(privateMetadata), false);
-  assert.deepEqual(result.outbound.chunks.map(value => value.id), ['chunk-001']);
-  assert.equal(result.metrics.calculatorUsed, true); assert.equal(result.receipt.payload.actualChunksSent, 1);
+  assert.deepEqual(result.outbound.chunks, []);
+  assert.equal(inputs[0].includes('AUD 1.00'),false);
+  assert.equal(result.metrics.calculatorUsed, true); assert.equal(result.receipt.payload.actualChunksSent, 0);
 });

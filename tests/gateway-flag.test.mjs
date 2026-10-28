@@ -3,10 +3,13 @@ import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {askRag} from '../src/rag/gateway.mjs';
+import {askRag as askRagActual} from '../src/rag/gateway.mjs';
+import {questionBoundaryFixture} from './helpers/question-boundary.mjs';
 import {ragConfig,screenForCloud,assertCloudRelease,callMuse,guardText} from '../src/server/gateway-models.mjs';
 import {sha256} from '../src/rag/receipts.mjs';
 import {LOCKED_POLICY_HASH} from '../src/rag/locked-routing.mjs';
+
+const askRag=(question,options)=>askRagActual(question,{...options,dependencies:{...questionBoundaryFixture(),...options?.dependencies}});
 
 async function directory(t){const p=await mkdtemp(path.join(os.tmpdir(),'handoff-flag-test-'));t.after(async()=>{assert.equal(path.dirname(path.resolve(p)),path.resolve(os.tmpdir()));assert.ok(path.basename(p).startsWith('handoff-flag-test-'));await rm(p,{recursive:true,force:true});});return p;}
 function liveAccess(t){for(const [key,value]of [['META_ACCESS_STATUS','live'],['HANDOFF_META_ACCESS_CONFIRMED','true']]){const before=process.env[key];process.env[key]=value;t.after(()=>{if(before===undefined)delete process.env[key];else process.env[key]=before;});}}
@@ -34,13 +37,13 @@ test('flag on uses Gemma 12B and accepts a sourced tool answer only under the lo
 test('a confident company answer above the locked risk threshold escalates through Guard without forwarding its draft',async t=>{
   const calls=[],inputs=[];let cloudCalls=0;
   const result=await askRag('What is our synthetic AF100 product price?',{dataDir:await directory(t),lockedCompanyRouting:true,offlineMeta:true,dependencies:{retrieve,countTokens,calculateLocal:async()=>({status:'not_applicable'}),localChat:local(calls,.99),guardText:async input=>{inputs.push(input);return guard(true);},callMuse:async()=>{cloudCalls++;throw Error('Dry run cannot call cloud');}}});
-  assert.equal(calls.length,2);assert.ok(calls.every(c=>c.model==='gemma3:12b'));assert.equal(result.route,'deferred_cloud');assert.equal(inputs.length,1);assert.equal(result.metrics.wouldReleaseToCloud,true);assert.equal(result.metrics.localDraftSent,false);assert.equal(result.metrics.handoffVariant,'question-only');assert.ok(result.metrics.lockedRouting.predictedWrongness>=result.metrics.lockedRouting.threshold);assert.equal(cloudCalls,0);assert.equal(result.receipt.payload.actualChunksSent,0);
-  const wire=JSON.parse(inputs[0]);assert.deepEqual(Object.keys(wire).sort(),['system','user']);assert.doesNotMatch(wire.user,/Draft \(unverified\)/);assert.equal(wire.user.includes('The synthetic AF100 unit price is AUD 1.00.'),false);
+  assert.equal(calls.length,2);assert.ok(calls.every(c=>c.model==='gemma3:12b'));assert.equal(result.route,'deferred_cloud');assert.equal(inputs.length,1);assert.equal(result.metrics.wouldReleaseToCloud,true);assert.equal(result.metrics.localDraftSent,false);assert.equal(result.metrics.handoffVariant,'general-question-only');assert.ok(result.metrics.lockedRouting.predictedWrongness>=result.metrics.lockedRouting.threshold);assert.equal(cloudCalls,0);assert.equal(result.receipt.payload.actualChunksSent,0);
+  const wire=JSON.parse(inputs[0]);assert.deepEqual(Object.keys(wire).sort(),['question','system']);assert.doesNotMatch(wire.question,/Draft \(unverified\)/);assert.equal(wire.question.includes('The synthetic AF100 unit price is AUD 1.00.'),false);
 });
 test('flag-on general questions skip local draft generation, redact PII, and do not send unrelated company chunks',async t=>{
   let models=0,cloudCalls=0;const inputs=[];
   const result=await askRag('Explain binary search. Email: private-person@example.invalid',{dataDir:await directory(t),lockedCompanyRouting:true,offlineMeta:true,dependencies:{retrieve,countTokens,calculateLocal:async()=>{throw Error('General task must not call a company calculator');},localChat:async()=>{models++;throw Error('The general policy abstains without a draft');},guardText:async input=>{inputs.push(input);return guard(true);},callMuse:async()=>{cloudCalls++;throw Error('Cloud is forbidden');}}});
-  assert.equal(models,0);assert.equal(cloudCalls,0);assert.equal(result.route,'deferred_cloud');assert.equal(result.metrics.generationSkipped,true);assert.equal(result.localModelId,'code-policy-abstention');assert.equal(result.outbound.chunks.length,0);assert.equal(inputs.length,1);assert.doesNotMatch(inputs[0],/private-person@example\.invalid|unit price|shipping is/);assert.ok(inputs[0].includes('PII_EMAIL_'));assert.equal(result.metrics.piiItemsRedacted,1);
+  assert.equal(models,0);assert.equal(cloudCalls,0);assert.equal(result.route,'deferred_cloud');assert.equal(result.metrics.generationSkipped,true);assert.equal(result.localModelId,'code-policy-abstention');assert.equal(result.outbound.chunks.length,0);assert.equal(inputs.length,1);assert.doesNotMatch(inputs[0],/private-person@example\.invalid|unit price|shipping is/);assert.equal(inputs[0].includes('PII_EMAIL_'),false);assert.equal(result.metrics.piiItemsRedacted,1);
 });
 test('unsafe, invalid or inconsistent Guard verdicts cannot reach any cloud dependency even with live access flags',async t=>{
   liveAccess(t);

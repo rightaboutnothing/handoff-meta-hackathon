@@ -7,6 +7,7 @@ import {assertNoRawPrivatePatterns} from '../comparison/handoff-payload.mjs';
 import {sha256} from '../rag/receipts.mjs';
 import {assertCloudEligible} from '../comparison/policy.mjs';
 import {readLiveMuseConfig,buildMuseRequest,reserveMuseRequest,createMuseRunBudget,isMuseKilled,parseMuseResponse} from './live-muse.mjs';
+import {assertQuestionOnlyRelease,assertQuestionDispatchEnabled} from '../privacy/question-boundary.mjs';
 
 export const ragConfig = JSON.parse(await readFile(new URL('../../config/rag.json', import.meta.url), 'utf8'));
 const configuredHost = process.env.OLLAMA_HOST || 'http://localhost:11434';
@@ -78,7 +79,7 @@ export function assertMuseItem(item,registry){
   assertCloudEligible(item,registry);
   if(item.attackSet||item.attack||item.piiTest||[item.suite,item.category,item.type,item.sourceKind].some(value=>/attack|jailbreak|injection|evasion|guard[-_ ]?stress|pii[-_ ]?test|harmful|red[-_ ]?team|poison|strongreject/i.test(String(value??''))))throw Object.assign(new Error('Attack and privacy-test sets are structurally local-only'),{code:'LOCAL_ONLY_ITEM'});
 }
-export async function callMuse(input, { offlineMeta = true,releasePermit,item,registry,liveRunId=process.env.HANDOFF_LIVE_RUN_ID,dataDir,dependencies={} } = {}) {
+export async function callMuse(input, { offlineMeta = true,releasePermit,questionReleasePermit,item,registry,liveRunId=process.env.HANDOFF_LIVE_RUN_ID,dataDir,dependencies={} } = {}) {
   if (offlineMeta || !metaAccessEnabled()) throw new Error('Meta access is paused; cloud request deferred');
   const config=await readLiveMuseConfig(dependencies.configFile);
   // The permit is consumed even if a later safety/budget gate blocks dispatch.
@@ -86,6 +87,8 @@ export async function callMuse(input, { offlineMeta = true,releasePermit,item,re
   assertCloudRelease(input,releasePermit,{maxAgeMs:config.guardPermitMaxAgeMs});
   assertMuseItem(item,registry);
   if(await isMuseKilled(config,{dataDir}))throw Object.assign(new Error('The live cloud kill switch is active'),{code:'LIVE_KILL_SWITCH'});
+  assertQuestionOnlyRelease(input,questionReleasePermit);
+  await assertQuestionDispatchEnabled(dependencies.client&&dependencies.questionPolicyFile?dependencies.questionPolicyFile:undefined);
   const body=buildMuseRequest(input,config),budget=await createMuseRunBudget({runId:liveRunId,dataDir,config}),reservation=reserveMuseRequest(input,config);
   const ticket=await budget.reserve({itemId:item.id,inputHash:sha256(input),guardVerdict:'safe',reservation});
   // No SDK retry can bypass per-call reservations. Failed/unknown calls keep

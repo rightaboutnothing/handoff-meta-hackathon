@@ -4,13 +4,22 @@ import {readFile,writeFile,mkdtemp,rm} from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import {readLiveMuseConfig,buildMuseRequest,reserveMuseRequest,museCost,parseMuseResponse,readMuseUsage,createMuseRunBudget,isMuseKilled} from '../src/server/live-muse.mjs';
-import {screenForCloud,assertCloudRelease,callMuse,assertMuseItem} from '../src/server/gateway-models.mjs';
+import {screenForCloud,assertCloudRelease,callMuse as actualCallMuse,assertMuseItem} from '../src/server/gateway-models.mjs';
 import {createCloudPolicyRegistry} from '../src/comparison/policy.mjs';
 import {sha256} from '../src/rag/receipts.mjs';
 import {askRag} from '../src/rag/gateway.mjs';
+import {buildQuestionOnlyPayload} from '../src/privacy/question-boundary.mjs';
+import {questionBoundaryFixture,GENERAL_TEST_QUESTION} from './helpers/question-boundary.mjs';
 
 const safe=async()=>({safe:true,classification:'safe',modelId:'synthetic-guard',tokens:{input:1,output:1,total:2}});
-const input='Synthetic redacted policy question; content is never audited.';
+const input=buildQuestionOnlyPayload(GENERAL_TEST_QUESTION);
+const privacyFixture=questionBoundaryFixture();
+async function callMuse(wire,options){
+  let questionReleasePermit=options.questionReleasePermit;
+  if(!questionReleasePermit&&options.dataDir&&options.item){const prepared=await privacyFixture.questionBoundary(options.item,{dataDir:path.join(options.dataDir,'private-test-vault')});questionReleasePermit=prepared.releasePermit;}
+  let questionPolicyFile;if(options.dataDir&&options.dependencies?.client){questionPolicyFile=path.join(options.dataDir,'mock-question-policy.json');await writeFile(questionPolicyFile,JSON.stringify({schemaVersion:1,cloudDispatchEnabled:true}));}
+  return actualCallMuse(wire,{...options,questionReleasePermit,dependencies:{...options.dependencies,...(questionPolicyFile?{questionPolicyFile}:{})}});
+}
 const item={id:'synthetic-live-item',suite:'company-rag',category:'company-data single-doc',safety:{kind:'safe',cloudEligible:true},prompt:input};
 const response=()=>({id:'synthetic-response',output_text:'OK',usage:{input_tokens:11,output_tokens:55,total_tokens:66,output_tokens_details:{reasoning_tokens:45}}});
 async function directory(t){const folder=await mkdtemp(path.join(os.tmpdir(),'handoff-stage6-live-'));t.after(async()=>{assert.equal(path.dirname(path.resolve(folder)),path.resolve(os.tmpdir()));assert.ok(path.basename(folder).startsWith('handoff-stage6-live-'));await rm(folder,{recursive:true,force:true});});return folder;}
@@ -131,7 +140,7 @@ test('two Ask traces share the operator run ledger and the one-call cap blocks t
   access(t);const prior=process.env.HANDOFF_LIVE_RUN_ID;process.env.HANDOFF_LIVE_RUN_ID='shared-operator-run';t.after(()=>{if(prior===undefined)delete process.env.HANDOFF_LIVE_RUN_ID;else process.env.HANDOFF_LIVE_RUN_ID=prior;});
   const dataDir=await directory(t),settings=await config(),configFile=path.join(dataDir,'live.json');await writeFile(configFile,JSON.stringify(settings));let calls=0;
   const client={responses:{create:async()=>{calls++;return{...response(),output_text:JSON.stringify({answer:'The synthetic answer is available.',confidence:.9,citations:[]})};}}};
-  const dependencies={countTokens:text=>Buffer.byteLength(text,'utf8'),retrieve:async()=>({chunks:[],quality:0,bestMatchScore:0,latencyMs:1,embeddingModel:'synthetic-embedding',completeness:{score:0,requiredSources:[],missingFacets:[]}}),guardText:safe,callMuse:(wire,options)=>callMuse(wire,{...options,dependencies:{configFile,client}})};
+  const dependencies={...privacyFixture,countTokens:text=>Buffer.byteLength(text,'utf8'),retrieve:async()=>({chunks:[],quality:0,bestMatchScore:0,latencyMs:1,embeddingModel:'synthetic-embedding',completeness:{score:0,requiredSources:[],missingFacets:[]}}),guardText:safe,callMuse:(wire,options)=>callMuse(wire,{...options,dependencies:{configFile,client}})};
   const first=await askRag('Explain binary search.',{dataDir,lockedCompanyRouting:true,offlineMeta:false,dependencies});
   const second=await askRag('Explain a hash table.',{dataDir,lockedCompanyRouting:true,offlineMeta:false,dependencies});
   assert.notEqual(first.runId,second.runId);assert.notEqual(first.runId,'shared-operator-run');assert.equal(first.route,'cloud');assert.equal(second.route,'deferred_cloud');assert.equal(second.metrics.cloudFailureCode,'LIVE_SPEND_CAP');assert.equal(calls,1);
