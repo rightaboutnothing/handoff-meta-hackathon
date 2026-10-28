@@ -2,7 +2,25 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
-## Stage 6: privacy and injection gaps remain
+## Stage 6b: send the question, never the data
+
+The new boundary prepares a short, general question locally. Retrieved records, drafts, Guard verdicts, receipts, PII maps and local replacement tokens are excluded from the cloud body. General guidance is checked before a local model applies it to the original evidence. **Live dispatch is disabled, with zero cloud calls authorized.** Prompt Guard 2 **86M and 22M remain PENDING**; missing weights block every full-lens handoff. The Google native-only comparison omits injection protection and cannot authorize a send.
+
+The ordered checks are decoding, country-specific strict patterns and checksums, local rewriting and residual privacy checks, AES-backed tokenisation, Prompt Guard, harmful-content screening, then inbound checks before local application. Meta uses `llama3.2:3b` and `llama-guard3:8b`; Google uses `gemma3:4b` and text `shieldgemma:2b`. Rules live in [config/privacy-rules](config/privacy-rules). New AES keys stay under `%LOCALAPPDATA%/Handoff/privacy-keys`, outside this synced checkout; mappings and private evaluation snapshots remain local and excluded from Git. Presidio is a Python 3.12 comparison yardstick, never a live-path dependency for redaction decisions.
+
+```powershell
+npm run privacy:setup       # Set HANDOFF_PYTHON312 if Python 3.12 is elsewhere
+npm run privacy:preflight   # Metadata and local dependency checks; no inference
+npm run privacy:stage6b     # Frozen local-only evaluation; resumable private checkpoints
+# Only after local Prompt Guard weights are available:
+npm run privacy:prompt-guard # Replay this layer only; no downloads or cloud access
+```
+
+The frozen 522-item Stage 6 corpus is unchanged. Sixty separate synthetic multi-country cases test ten country rule files; they are not pooled with the Australian frozen PII sample. A successful necessary privacy gate requires **50/50 usable outgoing questions and zero independently scanned private-value survivors**, measured before the pending injection layer. Zero releases from an unavailable layer do not satisfy it. Quality uses eleven matched **local-surrogate** comparisons; actual cloud answer quality remains deferred. [METHOD.md](METHOD.md#stage-6b-question-only-privacy-boundary) records the checks, scope and limitations. Measured results are added after the frozen run completes.
+
+Neither reviewed open local model stack supplies a dedicated PII redactor. Meta's experimental PII detector is distinct from redaction; Google's local Gemma/ShieldGemma stack has no native injection detector in this comparison. This does not describe all Google products: hosted [Model Armor](https://docs.cloud.google.com/model-armor/overview) includes injection and sensitive-data filters. These synthetic tests are not a compliance claim; context clues can identify people, small models miss details, and tokenisation protects only detected values.
+
+## Stage 6: historical privacy and injection gaps
 
 **General private-data release is not ready.** Of 50 synthetic PII queries, 48 retained planted private values and received a safe Guard verdict. Medicare-format numbers, TFN-format numbers and addresses survived redaction in every case; two also retained a name. None was sent. The kill switch remains on, routing flag off, Meta configuration paused and cloud budget unset.
 

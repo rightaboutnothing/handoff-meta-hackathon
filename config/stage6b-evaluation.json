@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-28-stage6b-question-boundary",
+  "seed": 20261027,
+  "sourceRun": "2026-10-28-stage6-guard-stress",
+  "sourceCorpusItems": 522,
+  "qualitySourceRun": "2026-10-28-stage5-guard",
+  "qualityItems": 11,
+  "maxRetries": 3,
+  "backoffMs": [1000, 2000, 4000],
+  "shadowEvaluation": true,
+  "cloudCallsAllowed": false,
+  "surrogateModelId": "gemma3:4b",
+  "qualityMaxTokens": 768,
+  "setups": ["meta-lens", "google-lens", "presidio-baseline", "google-native-only"],
+  "notes": [
+    "The frozen 522 corpus is never edited. Multi-country synthetic tests are a separate population.",
+    "Both Prompt Guard 2 sizes are pending and fail closed. Pending blocks are not detection successes.",
+    "The Stage 7 necessary privacy gate uses nonempty pre-injection candidate coverage and independent planted-value scans, not the zero releases caused by pending injection protection.",
+    "Google native-only is a local comparison control and can never authorize a live send.",
+    "Quality uses local cloud-surrogate guidance and a matched local baseline. Actual cloud answer quality remains deferred."
+  ]
+}
