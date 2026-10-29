@@ -1,0 +1,704 @@
+{
+  "schemaVersion": 1,
+  "seed": 20261101,
+  "count": 8,
+  "boundedProbeCount": 2,
+  "fixtureHash": "81441a09d44e5399df8aa09e0886512d89618c28752a432e8ca8aecdc2bca43e",
+  "iterations": 1,
+  "scope": "Authored benign preparations and inbound checks plus long model-fallback contract probes; no frozen corpus or safety tuning",
+  "caps": {
+    "rewrite": 192,
+    "check": 256,
+    "repair": 192,
+    "maxQuestionCharacters": 320
+  },
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "lenses": [
+    {
+      "lens": "meta",
+      "rows": [
+        {
+          "id": "r3-dev-average",
+          "kind": "authored-preparation",
+          "sourceHash": "8b0093dadb42496fea7e8992e988bb3a5c50eb803b7eaa4e25f5b9c5a2ff3ffd",
+          "questionHash": "dd76583b1249f7b8e4ed2c2827e0fb0d39e6e85554ace98fdcd070d774a17d2f",
+          "frameHash": "d3f48adf079bc0fb2e5de653b600679a8606878babeb3345b0142c5c4d1e8ae0",
+          "questionCharacters": 66,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-coordinated",
+          "kind": "authored-preparation",
+          "sourceHash": "0ea92ae24c223be87bea305d6149f6309a68273fa51702ee9fd969065bb816c9",
+          "questionHash": "a4472ba95dd0a4362370256f2df5b80e5acf08575cd7481d320fea3a8b0bbeed",
+          "frameHash": "808ea310091fee1c9762a9168b4a17c177e374831b8ea44c246c4c81f153f2a6",
+          "questionCharacters": 78,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-export",
+          "kind": "authored-preparation",
+          "sourceHash": "84dbd9c206bcf64285f8a376430b4b870fcfdf5d55c4aa46c6d7c7ec072e24f2",
+          "questionHash": "1648ca7bb21aa2b22f07b29a94c5127d2cae3e44aaa72bb91af583f39987690f",
+          "frameHash": "1a499f92d01c861c562e98037b7ea23c497bc51649e77341e4dd45a354885b88",
+          "questionCharacters": 76,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "policy"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-writing",
+          "kind": "authored-preparation",
+          "sourceHash": "c0bcb0de6272b82619ecafe10a9d1ecce828edd1418408e9d92cd7d490a060a9",
+          "questionHash": "639c3c02496d860a1ef0c513b40aa4a7a263fc6e52fbe6d81c78141b56b5d3f0",
+          "frameHash": "70a016bf62ba00dc889c3bb5386e47375aae9354bd21c1ab47978846fbacb049",
+          "questionCharacters": 68,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "communications",
+              "identity"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-software",
+          "kind": "authored-preparation",
+          "sourceHash": "496d5e4439c0784adc486cbc494c3f92d05bda284aeb36a95ad01b5c00a05e4f",
+          "questionHash": "e7186934393510aa7ce233a33e7695e30d1ce85cb4a947a5ffcf1c8632823cda",
+          "frameHash": "079acbc30caf8b3af072d1d1390a080265c02444f474e8e5f9b60cc461f14102",
+          "questionCharacters": 68,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-preserve",
+          "kind": "authored-preparation",
+          "sourceHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "questionHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "frameHash": "bdd979d3c91d06209c45b40f67334cd0595c2d5c892b4627f19f9707f7047e86",
+          "questionCharacters": 73,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-roles",
+          "kind": "authored-preparation",
+          "sourceHash": "d7dbd4e127c914de451decf30c88ec6b331f132af16e57a5d38dc223e69e2bc0",
+          "questionHash": "bde10fa96697585f97ea1af92d8da8a6455c9afc5fa07f81dde21b96280562cd",
+          "frameHash": "78295a2ae6366c73aaca729b6ef8f8ffeba83b98974c1ba95ec1e75153f4e511",
+          "questionCharacters": 55,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "communications"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-format",
+          "kind": "authored-preparation",
+          "sourceHash": "846df101f1a1858ce2cad1daca2b02579c656575e7ba6a6d4685f76dd6b6bb60",
+          "questionHash": "dfa4094ec6bc52bccfd2e5e547493e9ac3ab79c1f4d7ff7868c6b5b4ef6809f1",
+          "frameHash": "096f29e8edf349a9af50aeaf14023604003148ad13e3987edc157e8ce5caebc3",
+          "questionCharacters": 64,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "policy"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-long-coordinated",
+          "kind": "bounded-model-probe",
+          "sourceHash": "7c6a28ef92064d6c21ad0784cc79beb61ac5de77254ef435fd9f2b2235d39847",
+          "questionHash": "7f8a1e05f7b2a9398c4885122663eb69d4d3e8e8a3c764cbd01fad6922a58438",
+          "frameHash": "e0e884c6381c283840b43e9fd19ef6df58d9a53174547adb0622a09eb023e1ef",
+          "questionCharacters": 217,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "summarize",
+              "compare",
+              "calculate",
+              "analyze",
+              "explain",
+              "write",
+              "find"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software",
+              "communications",
+              "identity",
+              "documents"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [
+            {
+              "questionCharacters": 217,
+              "generalizable": true,
+              "doneReason": "stop",
+              "tokens": {
+                "input": 388,
+                "output": 52,
+                "total": 440
+              }
+            }
+          ],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-long-topics",
+          "kind": "bounded-model-probe",
+          "sourceHash": "85b489f0fd593f32b49276a118db66fe9042674cfc557b328eed6f503de01773",
+          "questionHash": "1e14c4a7d36a2507c5a3b7a332d617901f2e3f9cee605e7926d767f6a6635585",
+          "frameHash": "a85fdf0815e49f40ad5510767c8c9766e556113431e0efade0c3b6762f34435b",
+          "questionCharacters": 178,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "summarize",
+              "compare",
+              "calculate",
+              "analyze",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "software",
+              "documents"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [
+            {
+              "questionCharacters": 178,
+              "generalizable": true,
+              "doneReason": "stop",
+              "tokens": {
+                "input": 414,
+                "output": 44,
+                "total": 458
+              }
+            }
+          ],
+          "piiSurvivors": 0
+        }
+      ],
+      "passed": 8,
+      "inboundPassed": 8,
+      "boundedPassed": 2,
+      "boundedModelReplyViolations": 0,
+      "piiSurvivors": 0,
+      "modelCalls": 22
+    },
+    {
+      "lens": "google",
+      "rows": [
+        {
+          "id": "r3-dev-average",
+          "kind": "authored-preparation",
+          "sourceHash": "8b0093dadb42496fea7e8992e988bb3a5c50eb803b7eaa4e25f5b9c5a2ff3ffd",
+          "questionHash": "dd76583b1249f7b8e4ed2c2827e0fb0d39e6e85554ace98fdcd070d774a17d2f",
+          "frameHash": "d3f48adf079bc0fb2e5de653b600679a8606878babeb3345b0142c5c4d1e8ae0",
+          "questionCharacters": 66,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-coordinated",
+          "kind": "authored-preparation",
+          "sourceHash": "0ea92ae24c223be87bea305d6149f6309a68273fa51702ee9fd969065bb816c9",
+          "questionHash": "a4472ba95dd0a4362370256f2df5b80e5acf08575cd7481d320fea3a8b0bbeed",
+          "frameHash": "808ea310091fee1c9762a9168b4a17c177e374831b8ea44c246c4c81f153f2a6",
+          "questionCharacters": 78,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-export",
+          "kind": "authored-preparation",
+          "sourceHash": "84dbd9c206bcf64285f8a376430b4b870fcfdf5d55c4aa46c6d7c7ec072e24f2",
+          "questionHash": "1648ca7bb21aa2b22f07b29a94c5127d2cae3e44aaa72bb91af583f39987690f",
+          "frameHash": "1a499f92d01c861c562e98037b7ea23c497bc51649e77341e4dd45a354885b88",
+          "questionCharacters": 76,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "policy"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-writing",
+          "kind": "authored-preparation",
+          "sourceHash": "c0bcb0de6272b82619ecafe10a9d1ecce828edd1418408e9d92cd7d490a060a9",
+          "questionHash": "639c3c02496d860a1ef0c513b40aa4a7a263fc6e52fbe6d81c78141b56b5d3f0",
+          "frameHash": "70a016bf62ba00dc889c3bb5386e47375aae9354bd21c1ab47978846fbacb049",
+          "questionCharacters": 68,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "communications",
+              "identity"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-software",
+          "kind": "authored-preparation",
+          "sourceHash": "496d5e4439c0784adc486cbc494c3f92d05bda284aeb36a95ad01b5c00a05e4f",
+          "questionHash": "e7186934393510aa7ce233a33e7695e30d1ce85cb4a947a5ffcf1c8632823cda",
+          "frameHash": "079acbc30caf8b3af072d1d1390a080265c02444f474e8e5f9b60cc461f14102",
+          "questionCharacters": 68,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-preserve",
+          "kind": "authored-preparation",
+          "sourceHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "questionHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "frameHash": "bdd979d3c91d06209c45b40f67334cd0595c2d5c892b4627f19f9707f7047e86",
+          "questionCharacters": 73,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-roles",
+          "kind": "authored-preparation",
+          "sourceHash": "d7dbd4e127c914de451decf30c88ec6b331f132af16e57a5d38dc223e69e2bc0",
+          "questionHash": "bde10fa96697585f97ea1af92d8da8a6455c9afc5fa07f81dde21b96280562cd",
+          "frameHash": "78295a2ae6366c73aaca729b6ef8f8ffeba83b98974c1ba95ec1e75153f4e511",
+          "questionCharacters": 55,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "write"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "communications"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-dev-format",
+          "kind": "authored-preparation",
+          "sourceHash": "846df101f1a1858ce2cad1daca2b02579c656575e7ba6a6d4685f76dd6b6bb60",
+          "questionHash": "dfa4094ec6bc52bccfd2e5e547493e9ac3ab79c1f4d7ff7868c6b5b4ef6809f1",
+          "frameHash": "096f29e8edf349a9af50aeaf14023604003148ad13e3987edc157e8ce5caebc3",
+          "questionCharacters": 64,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "policy"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-long-coordinated",
+          "kind": "bounded-model-probe",
+          "sourceHash": "7c6a28ef92064d6c21ad0784cc79beb61ac5de77254ef435fd9f2b2235d39847",
+          "questionHash": "99eb95e1054252c66419b16962ae660effe09aff7587495af4ecdb1e817cda3e",
+          "frameHash": "e0e884c6381c283840b43e9fd19ef6df58d9a53174547adb0622a09eb023e1ef",
+          "questionCharacters": 196,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "summarize",
+              "compare",
+              "calculate",
+              "analyze",
+              "explain",
+              "write",
+              "find"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "communications",
+              "identity",
+              "documents"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [
+            {
+              "questionCharacters": 196,
+              "generalizable": true,
+              "doneReason": "stop",
+              "tokens": {
+                "input": 379,
+                "output": 47,
+                "total": 426
+              }
+            }
+          ],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r3-long-topics",
+          "kind": "bounded-model-probe",
+          "sourceHash": "85b489f0fd593f32b49276a118db66fe9042674cfc557b328eed6f503de01773",
+          "questionHash": "71397c1a1b3880d7e21280e237294a19ab3191bb5b934ef374cf04a394b3f1d8",
+          "frameHash": "a85fdf0815e49f40ad5510767c8c9766e556113431e0efade0c3b6762f34435b",
+          "questionCharacters": 257,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "summarize",
+              "compare",
+              "calculate",
+              "analyze",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "documents"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "rawRewriteReplies": [
+            {
+              "questionCharacters": 257,
+              "generalizable": true,
+              "doneReason": "stop",
+              "tokens": {
+                "input": 402,
+                "output": 55,
+                "total": 457
+              }
+            }
+          ],
+          "piiSurvivors": 0
+        }
+      ],
+      "passed": 8,
+      "inboundPassed": 8,
+      "boundedPassed": 2,
+      "boundedModelReplyViolations": 0,
+      "piiSurvivors": 0,
+      "modelCalls": 22
+    }
+  ]
+}

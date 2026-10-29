@@ -13,3 +13,14 @@ export function extractPrivateTask(source){
   const selected=clauses.filter(clause=>operation.test(clause)||clause.endsWith('?')&&(question.test(clause)||conditional.test(clause)));
   return selected.length?selected.join(' '):prose.trim()||text.trim();
 }
+
+/** Compile only actual imperative request clauses. The caller must supply
+ * locally neutralized text and independently validate every boundary layer. */
+export function compileNeutralRequest(source,{maxCharacters=320}={}){
+  const task=extractPrivateTask(source),clauses=task.split(/(?<=[.!?])\s+(?=[A-Z])|\r?\n+/).map(value=>value.trim()).filter(Boolean);
+  const imperative=/^(?:please\s+)?(calculate|compute|compare|summarize|summarise|write|draft|explain|find|identify|list|extract|analyze|analyse|provide|select|describe|recommend|create|generate|outline|derive|determine|rank|return|format|answer|respond|use|round)\b/i;
+  if(!clauses.length||clauses.some(value=>!imperative.test(value)||/[:;{}\r\n]/.test(value)))return{eligible:false,code:'COMPILER_REQUIRES_IMPERATIVE_REQUEST'};
+  const body=clauses.map(value=>value.replace(/[.!?]+$/,'').replace(/^please\s+/i,'').replace(/^[A-Za-z]+/,word=>word.toLowerCase())).join(' and '),question='How can someone '+body+'?';
+  if(question.length>maxCharacters)return{eligible:false,code:'COMPILER_OVER_CHARACTER_LIMIT'};
+  return{eligible:true,code:'COMPILED_IMPERATIVE_REQUEST',question};
+}

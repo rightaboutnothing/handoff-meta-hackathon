@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "kind": "authored-positive-union-ner-provenance",
+  "seed": 20261027,
+  "models": {
+    "meta": "llama3.2:3b",
+    "google": "gemma3:4b"
+  },
+  "contextTokens": 4096,
+  "checkMaxTokens": 256,
+  "maximumProtocolRepairs": 3,
+  "thresholdChanges": false,
+  "applicationHelperChanged": false,
+  "frozenItemsUsed": false,
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "helperSha256": "085064537f9634afda1dac28fcb17910872fbc52daa61d880bf08dbd6169ca52",
+  "fixtureSha256": "47558b60164f3b2c1f81ff8a1c4a05dc7ffd2e92271d7db3f3051e2d71b33695",
+  "probeScriptSha256": "ba71ab2a98619f741ee022b1572d1050cefe474f9ec9dcafa4062015920431d9",
+  "privateMetadataSha256": "64989f37ed9f533e1492791eca2f3414c90a77e3ca2bf9a2fa08db8b2bdb508b",
+  "priorDevelopmentManifestSha256": "24713f4fb7d293856aec94e8edfc71cd86af943600188dcb75eac023ba5fa091",
+  "network": {
+    "localRequests": 6,
+    "metadataRequests": 0,
+    "modelCalls": 6,
+    "externalRequests": 0,
+    "blockedExternalRequests": 0,
+    "blockedLocalRequests": 0,
+    "byModel": {
+      "llama3.2:3b": 3,
+      "gemma3:4b": 3
+    }
+  },
+  "actualLocalModelCalls": 6,
+  "excludedWarmupCalls": 2,
+  "injectedProtocolFailures": 6,
+  "cases": [
+    {
+      "lens": "meta",
+      "id": "authored-union-real-pointer",
+      "status": "PASS",
+      "blocked": true,
+      "privacyDetected": true,
+      "availabilityError": false,
+      "code": "OUTPUT_PRIVATE_DETAILS",
+      "noReleasePermit": true,
+      "logicalCalls": 2,
+      "actualCalls": 1,
+      "injectedInitialMixedPositive": true,
+      "injectedReversedPointer": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_INVALID_SPAN",
+          "recovered": true,
+          "latencyMs": 0.37189999999998236,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "modelId": "authored-injected-protocol-fixture",
+          "mode": "literal",
+          "findingsCount": 1
+        },
+        {
+          "attempt": 2,
+          "status": "PASS",
+          "latencyMs": 152.1343,
+          "tokens": {
+            "input": 302,
+            "output": 9,
+            "total": 311
+          },
+          "modelId": "llama3.2:3b",
+          "mode": "pointer_repair",
+          "window": 1,
+          "windows": 1,
+          "candidateHash": "bc860ed22422bd2c6cc938b4992137ace83af20b0c078cabeaf1712dd6fae54e",
+          "findingsCount": 0
+        }
+      ]
+    },
+    {
+      "lens": "meta",
+      "id": "authored-union-reversed-then-real-pointer",
+      "status": "PASS",
+      "blocked": true,
+      "privacyDetected": true,
+      "availabilityError": false,
+      "code": "OUTPUT_PRIVATE_DETAILS",
+      "noReleasePermit": true,
+      "logicalCalls": 3,
+      "actualCalls": 1,
+      "injectedInitialMixedPositive": true,
+      "injectedReversedPointer": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_INVALID_SPAN",
+          "recovered": true,
+          "latencyMs": 0.12360000000001037,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "modelId": "authored-injected-protocol-fixture",
+          "mode": "literal",
+          "findingsCount": 1
+        },
+        {
+          "attempt": 2,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_INVALID_SPAN",
+          "recovered": true,
+          "latencyMs": 0.12229999999999563,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "modelId": "authored-injected-protocol-fixture",
+          "mode": "pointer_repair",
+          "window": 1,
+          "windows": 1,
+          "candidateHash": "bc860ed22422bd2c6cc938b4992137ace83af20b0c078cabeaf1712dd6fae54e",
+          "findingsCount": 0
+        },
+        {
+          "attempt": 3,
+          "status": "PASS",
+          "latencyMs": 88.23490000000004,
+          "tokens": {
+            "input": 340,
+            "output": 8,
+            "total": 348
+          },
+          "modelId": "llama3.2:3b",
+          "mode": "pointer_repair",
+          "window": 1,
+          "windows": 1,
+          "candidateHash": "bc860ed22422bd2c6cc938b4992137ace83af20b0c078cabeaf1712dd6fae54e",
+          "findingsCount": 0
+        }
+      ]
+    },
+    {
+      "lens": "google",
+      "id": "authored-union-real-pointer",
+      "status": "PASS",
+      "blocked": true,
+      "privacyDetected": true,
+      "availabilityError": false,
+      "code": "OUTPUT_PRIVATE_DETAILS",
+      "noReleasePermit": true,
+      "logicalCalls": 2,
+      "actualCalls": 1,
+      "injectedInitialMixedPositive": true,
+      "injectedReversedPointer": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_INVALID_SPAN",
+          "recovered": true,
+          "latencyMs": 0.06520000000000437,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "modelId": "authored-injected-protocol-fixture",
+          "mode": "literal",
+          "findingsCount": 1
+        },
+        {
+          "attempt": 2,
+          "status": "PASS",
+          "latencyMs": 254.87519999999995,
+          "tokens": {
+            "input": 295,
+            "output": 22,
+            "total": 317
+          },
+          "modelId": "gemma3:4b",
+          "mode": "pointer_repair",
+          "window": 1,
+          "windows": 1,
+          "candidateHash": "bc860ed22422bd2c6cc938b4992137ace83af20b0c078cabeaf1712dd6fae54e",
+          "findingsCount": 1
+        }
+      ]
+    },
+    {
+      "lens": "google",
+      "id": "authored-union-reversed-then-real-pointer",
+      "status": "PASS",
+      "blocked": true,
+      "privacyDetected": true,
+      "availabilityError": false,
+      "code": "OUTPUT_PRIVATE_DETAILS",
+      "noReleasePermit": true,
+      "logicalCalls": 3,
+      "actualCalls": 1,
+      "injectedInitialMixedPositive": true,
+      "injectedReversedPointer": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_INVALID_SPAN",
+          "recovered": true,
+          "latencyMs": 0.058600000000069485,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "modelId": "authored-injected-protocol-fixture",
+          "mode": "literal",
+          "findingsCount": 1
+        },
+        {
+          "attempt": 2,
+          "status": "ERROR",
+          "code": "PRIVACY_LOCAL_INVALID_SPAN",
+          "recovered": true,
+          "latencyMs": 0.20000000000004547,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "modelId": "authored-injected-protocol-fixture",
+          "mode": "pointer_repair",
+          "window": 1,
+          "windows": 1,
+          "candidateHash": "bc860ed22422bd2c6cc938b4992137ace83af20b0c078cabeaf1712dd6fae54e",
+          "findingsCount": 0
+        },
+        {
+          "attempt": 3,
+          "status": "PASS",
+          "latencyMs": 184.13779999999997,
+          "tokens": {
+            "input": 333,
+            "output": 8,
+            "total": 341
+          },
+          "modelId": "gemma3:4b",
+          "mode": "pointer_repair",
+          "window": 1,
+          "windows": 1,
+          "candidateHash": "bc860ed22422bd2c6cc938b4992137ace83af20b0c078cabeaf1712dd6fae54e",
+          "findingsCount": 0
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "total": 4,
+    "inboundStillBlocked": 4,
+    "noReleasePermit": 4,
+    "actualPointerRepliesEmpty": 3,
+    "actualModelExecutionErrors": 0
+  },
+  "qualification": "Initial mixed-positive and reversed-pointer errors are injected authored fixtures, not actual model failures. Real local pointer replies must validate. This tests protocol recovery and irrevocable positive latching, not semantic NER recall. Prior R2 semantic NER misses remain preserved. No frozen results or locked gates were changed."
+}

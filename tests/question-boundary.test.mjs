@@ -12,9 +12,9 @@ import {readLiveMuseConfig} from '../src/server/live-muse.mjs';
 import {privacyDependencies,GENERAL_TEST_QUESTION} from './helpers/question-boundary.mjs';
 import {sha256} from '../src/rag/receipts.mjs';
 
-const safeItem={id:'synthetic-private-task',suite:'company-rag',category:'company-data single-doc',safety:{kind:'safe',cloudEligible:true},prompt:'Analyze a fictional private sales report.'};
+const safeItem={id:'synthetic-private-task',suite:'company-rag',category:'company-data single-doc',safety:{kind:'safe',cloudEligible:true},prompt:'Given a fictional private sales report, analyze the report.'};
 async function directory(t){const folder=await mkdtemp(path.join(os.tmpdir(),'handoff-question-boundary-'));t.after(async()=>{assert.equal(path.dirname(path.resolve(folder)),path.resolve(os.tmpdir()));assert.ok(path.basename(folder).startsWith('handoff-question-boundary-'));await rm(folder,{recursive:true,force:true});});return folder;}
-async function prepared(t,options={}){const dataDir=await directory(t);return prepareQuestionOnly(safeItem,{dataDir,...options,dependencies:{...(options.dependencies??privacyDependencies()),keyDirectory:path.join(dataDir,'machine-local-test-keys')}});}
+async function prepared(t,options={}){const dataDir=await directory(t);return prepareQuestionOnly(safeItem,{dataDir,...options,dependencies:{...(options.dependencies??privacyDependencies({question:GENERAL_TEST_QUESTION})),keyDirectory:path.join(dataDir,'machine-local-test-keys')}});}
 
 test('local vault uses opaque random tokens and AES-GCM encrypted storage with local-only restoration',async t=>{
   const folder=await directory(t),keyDirectory=path.join(folder,'test-machine-keys'),vault=await createQuestionTokenVault(folder,{keyDirectory}),text='Contact: synthetic-person@example.invalid',start=text.indexOf('synthetic-person');

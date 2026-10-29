@@ -86,9 +86,9 @@ export function buildLiteralSpanWindows(text,{contextTokens=4096,maxTokens=256,o
 export function parseLiteralSpanPointers(result,contract){
   const {coordinates,first,last,sourceHash}=contract;
   if(sha256(coordinates.text)!==sourceHash)throw failure('PRIVACY_LOCAL_SPAN_SOURCE_CHANGED');
-  const value=parseReply(result,'private_spans');
-  if(!Array.isArray(value.private_spans)||value.private_spans.length>16)throw failure('PRIVACY_LOCAL_INVALID_SCHEMA');
-  const findings=[];let invalid=false;
+  const value=parseReply(result);
+  if(!Array.isArray(value.private_spans))throw failure('PRIVACY_LOCAL_INVALID_SCHEMA');
+  const findings=[],schemaInvalid=Object.keys(value).sort().join(',')!=='private_spans'||value.private_spans.length>16;let invalid=schemaInvalid;
   for(const row of value.private_spans){
     if(!row||Array.isArray(row)||Object.keys(row).sort().join(',')!=='end,start,type'||!types.includes(row.type)||!Number.isInteger(row.start)||!Number.isInteger(row.end)||row.start<first||row.end>last||row.start>=row.end){invalid=true;continue;}
     let start=coordinates.boundaries[row.start],end=coordinates.boundaries[row.end];
@@ -102,7 +102,7 @@ export function parseLiteralSpanPointers(result,contract){
     try{for(const literal of segments)parseLiteralValues({text:JSON.stringify({private_values:[{value:literal,type:row.type}]}),doneReason:'stop'},coordinates.text);}catch{invalid=true;continue;}
     findings.push({type:privateType[row.type],value:actual,start,end});
   }
-  if(invalid)throw Object.assign(failure('PRIVACY_LOCAL_INVALID_SPAN'),{positiveFindings:findings});
+  if(invalid)throw Object.assign(failure(schemaInvalid?'PRIVACY_LOCAL_INVALID_SCHEMA':'PRIVACY_LOCAL_INVALID_SPAN'),{positiveFindings:findings});
   return findings;
 }
 
@@ -110,14 +110,15 @@ const metadata=result=>({...(/^[a-f0-9]{64}$/.test(result?.evaluationCallHash??'
 const safeCode=caught=>/^[A-Z_0-9]{1,80}$/.test(caught?.code??'')?caught.code:'LOCAL_STEP_UNAVAILABLE';
 const retryable=new Set(['PRIVACY_LOCAL_INVALID_JSON','PRIVACY_LOCAL_INVALID_SCHEMA','PRIVACY_LOCAL_TRUNCATED','PRIVACY_LOCAL_CONTEXT_LIMIT']);
 
-/** Protocol repair only. Positive findings are never retried away. The first
- * normal literal request is unchanged; source-pointer repair is activated only
- * for invalid literal spans with no independently valid positive siblings. */
+/** Protocol repair only. Every independently validated privacy positive is
+ * latched permanently, even if a later valid repair returns empty. A normal
+ * valid positive returns immediately; only malformed representation is repaired
+ * with a finite pointer pass over the full unchanged candidate. */
 export async function inspectLiteralValues(text,{call,maxTokens=256,contextTokens=4096}={}){
   if(typeof call!=='function'||typeof text!=='string')throw failure('PRIVACY_LOCAL_INSPECTOR_INVALID');
-  const attempts=[],tokens=emptyTokens(),positives=[];let lastResult,repairBudget=3;
-  const union=rows=>{for(const row of rows??[])if(!positives.some(prior=>prior.type===row.type&&prior.value===row.value))positives.push(row);};
-  const aggregate=(status,code)=>({...lastResult,status,...(code?{code}:{}),tokens,attempts,evaluationReused:attempts.length>0&&attempts.every(row=>row.reused===true)});
+  const attempts=[],tokens=emptyTokens(),positives=[];let lastResult,repairBudget=3,requiredWindows=0,completedWindows=0;
+  const union=rows=>{for(const row of rows??[])if(!positives.some(prior=>prior.type===row.type&&prior.value===row.value))positives.push(Object.freeze({type:row.type,value:row.value}));};
+  const aggregate=(status,code)=>({...lastResult,status,...(code?{code}:{}),tokens,attempts,findingsCount:positives.length,requiredWindows,completedWindows,protocolRecovered:status==='PASS'&&attempts.some(row=>row.status==='ERROR'),evaluationReused:attempts.length>0&&attempts.every(row=>row.reused===true)});
   const invoke=async(messages,schema,validate,extra={})=>{
     const started=performance.now();let result;
     try{
@@ -128,21 +129,22 @@ export async function inspectLiteralValues(text,{call,maxTokens=256,contextToken
     }
   };
   const repair=async(request,schema,validate,extra)=>{
-    for(;;){try{return await invoke(request,schema,validate,extra);}catch(caught){const protocolRepair=retryable.has(caught.code)||extra.mode==='pointer_repair'&&caught.code==='PRIVACY_LOCAL_INVALID_SPAN';if(positives.length||!protocolRepair||repairBudget<=0)throw caught;repairBudget--;request=request.map(row=>({...row}));request[0].content+=' Protocol repair: return only compact JSON matching the schema. Do not invent literal values or IDs. Every start ID must be smaller than its exclusive end ID and select non-whitespace source text.';}}
+    for(;;){try{return await invoke(request,schema,validate,extra);}catch(caught){const pointerMode=extra.mode==='pointer_repair',protocolRepair=retryable.has(caught.code)||pointerMode&&caught.code==='PRIVACY_LOCAL_INVALID_SPAN';if(!pointerMode&&positives.length||!protocolRepair||repairBudget<=0)throw caught;repairBudget--;request=request.map(row=>({...row}));request[0].content+=' Protocol repair: return only compact JSON matching the schema. Do not invent literal values or IDs. Every start ID must be smaller than its exclusive end ID and select non-whitespace source text.';}}
   };
   try{
     const values=await repair(literalInspectionMessages(text),initialSchema,result=>parseLiteralValues(result,text),{mode:'literal'});
-    union(values);for(const row of attempts)if(row.status==='ERROR')row.recovered=true;return{value:positives,result:aggregate('PASS')};
+    union(values);for(const row of attempts)if(row.status==='ERROR')row.recovered=true;return{value:Object.freeze([...positives]),result:aggregate('PASS')};
   }catch(caught){
-    if(positives.length||caught.code!=='PRIVACY_LOCAL_INVALID_SPAN'||repairBudget<=0)throw caught;
+    const pointerRepair=caught.code==='PRIVACY_LOCAL_INVALID_SPAN'||caught.code==='PRIVACY_LOCAL_INVALID_SCHEMA'&&positives.length;
+    if(!pointerRepair||repairBudget<=0)throw caught;
     repairBudget--;
-    let windows;try{windows=buildLiteralSpanWindows(text,{maxTokens,contextTokens});}catch(error){throw Object.assign(error,{positiveFindings:[],localProtocol:aggregate('ERROR',error.code)});}
+    let windows;try{windows=buildLiteralSpanWindows(text,{maxTokens,contextTokens});requiredWindows=windows.length;}catch(error){throw Object.assign(error,{positiveFindings:[...positives],localProtocol:aggregate('ERROR',error.code)});}
     try{
       for(let index=0;index<windows.length;index++){
-        const window=windows[index],values=await repair(window.messages,window.schema,result=>parseLiteralSpanPointers(result,window),{mode:'pointer_repair',window:index+1,windows:windows.length,candidateHash:window.sourceHash});union(values);
+        const window=windows[index],values=await repair(window.messages,window.schema,result=>parseLiteralSpanPointers(result,window),{mode:'pointer_repair',window:index+1,windows:windows.length,candidateHash:window.sourceHash});union(values);completedWindows++;
       }
       for(const row of attempts)if(row.status==='ERROR')row.recovered=true;
-      return{value:positives.map(({type,value})=>({type,value})),result:{...aggregate('PASS'),spanRepair:true,windows:windows.length}};
+      return{value:Object.freeze([...positives]),result:{...aggregate('PASS'),spanRepair:true,windows:windows.length}};
     }catch(error){throw Object.assign(error,{positiveFindings:[...positives],localProtocol:aggregate('ERROR',error.code)});}
   }
 }

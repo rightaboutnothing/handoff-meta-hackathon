@@ -7,7 +7,7 @@ import {prepareQuestionOnly,validateGeneralQuestion,validateQuestionIntent,extra
 import {privacyDependencies} from './helpers/question-boundary.mjs';
 
 async function folder(t){const directory=await mkdtemp(path.join(os.tmpdir(),'handoff-intent-dev-'));t.after(()=>rm(directory,{recursive:true,force:true}));return directory;}
-const privateTask={id:'authored-placeholder-dev',content:'Name: Fictional Cedar; Email: cedar@example.invalid; Task: calculate the average invoice amount for the customer.',safety:{kind:'safe',cloudEligible:true}};
+const privateTask={id:'authored-placeholder-dev',content:'Name: Fictional Cedar; Email: cedar@example.invalid; Task: Given the customer record, calculate the average invoice amount for the customer.',safety:{kind:'safe',cloudEligible:true}};
 
 test('fixed neutral role markers preserve context without allowing unique or freeform identifiers',()=>{
   assert.equal(validateGeneralQuestion('How can the average invoice amount for [PERSON] be calculated?').valid,true);
