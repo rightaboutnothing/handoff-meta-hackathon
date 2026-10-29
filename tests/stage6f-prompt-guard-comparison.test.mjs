@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {compileNeutralRequest} from '../src/privacy/request-task.mjs';
-import {createPromptGuardComparisonProof,screenPromptGuardComparison} from '../src/privacy/prompt-guard-comparison.mjs';
+import {createPromptGuardComparisonProof,screenPromptGuardComparison,PROMPT_GUARD_PROVENANCE_LIMITS} from '../src/privacy/prompt-guard-comparison.mjs';
 
 const decode=async()=>({variants:[],issues:[],failClosed:false});
 const raw=(score,variant='86m')=>({status:score>=.5?'BLOCKED':'PASS',available:true,detected:score>=.5,variant,threshold:.5,maxScore:score,windows:1,latencyMs:1,modelId:'synthetic-local-injection-guard'});
@@ -106,4 +106,52 @@ test('threshold mismatch and inconsistent raw verdicts fail closed',async()=>{
 
 test('the 22M comparison uses the same policy and unchanged threshold',async()=>{
   const result=await screenPromptGuardComparison(authored(),{...options(.1,.9),variant:'22m'});assert.equal(result.variant,'22m');assert.equal(result.threshold,.5);assert.equal(result.status,'PASS');assert.equal(result.comparison.rewrite.variant,'22m');
+});
+
+test('canonical role possessives retain a literal source apostrophe for every role type',async()=>{
+  const cases=[['PERSON','PERSON_NAME'],['COMPANY','COMPANY'],['AMOUNT','AMOUNT'],['DATE','DATE'],['IDENTIFIER','PRIVATE_IDENTIFIER'],['ADDRESS','ADDRESS'],['PHONE','PHONE'],['EMAIL','EMAIL'],['VALUE','ENTITY_VALUE'],['PRODUCT','PRODUCT_CODE'],['RECORD','RECORD']];
+  for(const [marker,type]of cases){
+    // RECORD is not emitted by a finding type; an unchanged canonical role is
+    // still a valid lexical atom without fabricating a finding conversion.
+    const literal=marker==='RECORD'?'[RECORD]':'Grove',sourceText='Compare '+literal+"'s prices.",neutralTask='Compare ['+marker+"]'s prices.",question=compileNeutralRequest(neutralTask).question,proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues:marker==='RECORD'?[]:[{type,value:literal}]}),result=await screenPromptGuardComparison({sourceText,question,proof},options(.1,.9));
+    assert.equal(proof.proofKind,'compiled',marker);assert.equal(result.status,'PASS',marker);assert.equal(result.comparison.rewrite.status,'BLOCKED',marker);
+  }
+});
+
+test('bare source possessives preserve the same apostrophe outside an exact finding',()=>{
+  for(const marker of ['PERSON','COMPANY','PRODUCT']){const sourceText="Compare Spruces' prices.",neutralTask='Compare ['+marker+"]' prices.",question=compileNeutralRequest(neutralTask).question,type=marker==='PERSON'?'PERSON_NAME':marker==='COMPANY'?'COMPANY':'PRODUCT_CODE',proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues:[{type,value:'Spruces'}]});assert.equal(proof.proofKind,'compiled');}
+});
+
+test('literal contractions remain allowed without ignoring opening or closing quotes',()=>{
+  const sourceText="Explain why public costs don't change.",question=compileNeutralRequest(sourceText).question,proof=createPromptGuardComparisonProof({sourceText,question,neutralTask:sourceText,rewriteStrategy:'compiled_neutral_request'});assert.equal(proof.proofKind,'compiled');
+  for(const neutralTask of ["Compare '[PERSON]' prices.","Compare '[PERSON]'s prices'.",'Compare "[PERSON]\'s prices".',"Compare ‘[PERSON]’ prices.","Compare '[PERSON] and '[COMPANY]' prices'."]){const candidate=compileNeutralRequest(neutralTask).question??'How can public prices be compared?',denied=createPromptGuardComparisonProof({sourceText:neutralTask,question:candidate,neutralTask,rewriteStrategy:'compiled_neutral_request'});assert.equal(denied.proofKind,'unproved');}
+});
+
+test('unknown nested indexed and unsupported role apostrophes cannot obtain a proof',()=>{
+  for(const neutralTask of ["Compare [UNKNOWN]'s prices.","Compare [PERSON1]'s prices.","Compare [[PERSON]]'s prices.","Compare [PERSON]'ss prices.","Compare [PERSON]'other prices."]){const question=compileNeutralRequest(neutralTask).question,proof=createPromptGuardComparisonProof({sourceText:neutralTask,question,neutralTask,rewriteStrategy:'compiled_neutral_request'});assert.equal(proof.proofKind,'unproved');}
+});
+
+test('new apostrophes and source findings that swallow a possessive remain unproved',()=>{
+  for(const [sourceText,neutralTask,value]of [['Compare Grove prices.',"Compare [PERSON]'s prices.",'Grove'],["Compare Spruces' prices.",'Compare [PERSON] prices.',"Spruces'"]]){const question=compileNeutralRequest(neutralTask).question,proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues:[{type:'PERSON_NAME',value}]});assert.equal(proof.proofKind,'unproved');}
+});
+
+test('repeated literal anchors accept one exact typed-finding derivation',()=>{
+  const sourceText='Compare Grove and Spruce and Birch prices.',neutralTask='Compare [PRODUCT] and [PRODUCT] and [PRODUCT] prices.',question=compileNeutralRequest(neutralTask).question,privateValues=['Grove','Spruce','Birch'].map(value=>({type:'PRODUCT_CODE',value})),proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues});assert.equal(proof.proofKind,'compiled');
+});
+
+test('duplicate findings do not fabricate multiple derivations',()=>{
+  const sourceText='Compare Grove prices.',neutralTask='Compare [PRODUCT] prices.',question=compileNeutralRequest(neutralTask).question,privateValues=[{type:'PRODUCT_CODE',value:'Grove'},{type:'PRODUCT_NAME',value:'Grove'},{type:'PRODUCT_CODE',value:'GROVE'}],proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues});assert.equal(proof.proofKind,'compiled');
+});
+
+test('two genuinely complete value alignments fail closed',()=>{
+  const sourceText='Compare ABCDE prices.',neutralTask='Compare [PERSON][PERSON] prices.',question=compileNeutralRequest(neutralTask).question,privateValues=['AB','CDE','ABC','DE'].map(value=>({type:'PERSON_NAME',value})),proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues});assert.equal(proof.proofKind,'unproved');
+  const unique=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues:privateValues.filter(row=>['ABC','DE'].includes(row.value))});assert.equal(unique.proofKind,'compiled');
+});
+
+test('a finding budget overflow fails closed instead of truncating the candidate list',()=>{
+  const sourceText='Compare Grove prices.',neutralTask='Compare [PRODUCT] prices.',question=compileNeutralRequest(neutralTask).question,privateValues=[{type:'PRODUCT_CODE',value:'Grove'},...Array.from({length:PROMPT_GUARD_PROVENANCE_LIMITS.maxFindings},(_,index)=>({type:'PRODUCT_CODE',value:'Fictional'+index}))],proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues});assert.equal(proof.proofKind,'unproved');
+});
+
+test('a broad unresolved prefix lattice terminates under the fixed state budget',{timeout:1500},()=>{
+  const sourceText='Compare '+'A'.repeat(256)+' other costs.',neutralTask='Compare '+'[PERSON]'.repeat(22)+' costs.',question=compileNeutralRequest(neutralTask).question,privateValues=Array.from({length:256},(_,index)=>({type:'PERSON_NAME',value:'A'.repeat(index+1)})),proof=createPromptGuardComparisonProof({sourceText,question,neutralTask,rewriteStrategy:'compiled_neutral_request',privateValues});assert.equal(proof.proofKind,'unproved');
 });

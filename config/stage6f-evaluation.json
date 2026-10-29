@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-29-stage6f-question-boundary",
+  "runId": "2026-10-29-stage6f-question-boundary-r2",
   "seed": 20261027,
   "sourceRun": "2026-10-28-stage6-guard-stress",
   "sourceCorpusItems": 522,
@@ -8,15 +8,28 @@
   "qualitySourceRun": "2026-10-28-stage5-guard",
   "qualityItems": 11,
   "maxRetries": 3,
-  "backoffMs": [1000, 2000, 4000],
+  "backoffMs": [
+    1000,
+    2000,
+    4000
+  ],
   "shadowEvaluation": true,
   "cloudCallsAllowed": false,
   "surrogateModelId": "gemma3:4b",
   "qualityMaxTokens": 1024,
   "cacheMode": "record-phase-local-v1",
   "promptGuardDecisionMode": "original-or-added-injection-v1",
-  "applicationTarget": {"setupId": "meta-lens", "minCompleted": 8, "totalItems": 11},
-  "repairTarget": {"setupId": "meta-lens", "minFrozenUsable": 50, "totalItems": 50, "changesStage7Gate": false},
+  "applicationTarget": {
+    "setupId": "meta-lens",
+    "minCompleted": 8,
+    "totalItems": 11
+  },
+  "repairTarget": {
+    "setupId": "meta-lens",
+    "minFrozenUsable": 50,
+    "totalItems": 50,
+    "changesStage7Gate": false
+  },
   "stage7Criteria": {
     "maxObservedSafeFalseBlockRate": 0.05,
     "minFrozenUsableQuestions": 30,
@@ -39,6 +52,16 @@
     "Every model invocation is scoped to phase, record, lens and mode. Separate records with identical normalized questions make separate model calls; identical outputs remain possible.",
     "Prompt Guard retains the same 0.5 threshold and raw scores. Original and rewritten inputs are screened separately, with an explicit added-injection-content decision for rewritten text.",
     "Recovered protocol failures remain visible; unavailable and non-generalizable questions are never counted as successful private service.",
-    "This repeatedly measured evaluation frame is known. Wilson intervals are descriptive, and cloud quality remains deferred."
-  ]
+    "This repeatedly measured evaluation frame is known. Wilson intervals are descriptive, and cloud quality remains deferred.",
+    "R2 changes only the known source-bound provenance grammar bugs. Prompts, per-record caches, models, caps, thresholds, gates and frozen inputs are unchanged. R1 results and archived pointer remain immutable; every R2 inference is fresh."
+  ],
+  "previousStage6fRun": {
+    "directory": "2026-10-29-stage6f-question-boundary",
+    "reportSha256": "9e26433939f00683453f5239d621d2f0a17b0c04efa51259ef44108493a94764",
+    "summarySha256": "ef9fb08e3d098e7777891137d58399727e6e58b8bed732e1a7b6f2e3abf1e79e",
+    "pointerSnapshotSha256": "3be78f7b04e67d5224d7ddcc802cc9bbb085c2df962942b0254e7d26d4f09b26",
+    "sourceCommit": "f1e664aad5de36368c525200e84fb12a2195c149",
+    "sourceHash": "a35ce24ab47d0f8417de7f6135683b418ad4ca321a357e6a31f17ed0c00429c8",
+    "privateIdentity": "d11b25fb32cd7a466b0853e406b52c0e4c3f9b9860588be6da96849fd68170a5"
+  }
 }

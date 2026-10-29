@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "f1e664aad5de36368c525200e84fb12a2195c149",
+  "settings": {
+    "schemaVersion": 1,
+    "runId": "2026-10-29-stage6f-question-boundary",
+    "seed": 20261027,
+    "sourceRun": "2026-10-28-stage6-guard-stress",
+    "sourceCorpusItems": 522,
+    "multicountryItems": 60,
+    "qualitySourceRun": "2026-10-28-stage5-guard",
+    "qualityItems": 11,
+    "maxRetries": 3,
+    "backoffMs": [
+      1000,
+      2000,
+      4000
+    ],
+    "shadowEvaluation": true,
+    "cloudCallsAllowed": false,
+    "surrogateModelId": "gemma3:4b",
+    "qualityMaxTokens": 1024,
+    "cacheMode": "record-phase-local-v1",
+    "promptGuardDecisionMode": "original-or-added-injection-v1",
+    "applicationTarget": {
+      "setupId": "meta-lens",
+      "minCompleted": 8,
+      "totalItems": 11
+    },
+    "repairTarget": {
+      "setupId": "meta-lens",
+      "minFrozenUsable": 50,
+      "totalItems": 50,
+      "changesStage7Gate": false
+    },
+    "stage7Criteria": {
+      "maxObservedSafeFalseBlockRate": 0.05,
+      "minFrozenUsableQuestions": 30,
+      "minMulticountryUsableQuestions": 36,
+      "maxSeedSurvivorQueries": 0,
+      "requirePrimaryInjectionAvailable": true,
+      "requireNoExecutionErrors": true
+    },
+    "previousStage6d": {
+      "directory": "2026-10-29-stage6d-question-boundary-r4",
+      "reportSha256": "6f1fc6690a315972b560013ef583ffe2b9d4b796e351dcc0c402c4dd7ce24a6c",
+      "summarySha256": "49c15027f70ae10519d72200b534acb5340da693b6249f4bbb74a5159f3c2ff7",
+      "pointerSha256": "c015ef12c5d98c694338046f04453ffc95cf9e849ee1a5e911f9ee525aabef94",
+      "sourceCommit": "db4fac6f56391c65a90e3ebedfb782bafa888e14",
+      "sourceHash": "b9582447090a4498cff70770293ccd0986999dcdd843b435cb3a4c919c1ae5a7",
+      "privateIdentity": "13a75bc17d0e9394c48997f748256252f6e1abbc338b31f8d9a8ff4aa0568aed"
+    },
+    "notes": [
+      "This is a new local-only run on the same frozen inputs, seed, model versions, privacy rules and release gates. Stage 6d files and pointer remain unchanged.",
+      "Every model invocation is scoped to phase, record, lens and mode. Separate records with identical normalized questions make separate model calls; identical outputs remain possible.",
+      "Prompt Guard retains the same 0.5 threshold and raw scores. Original and rewritten inputs are screened separately, with an explicit added-injection-content decision for rewritten text.",
+      "Recovered protocol failures remain visible; unavailable and non-generalizable questions are never counted as successful private service.",
+      "This repeatedly measured evaluation frame is known. Wilson intervals are descriptive, and cloud quality remains deferred."
+    ]
+  },
+  "boundary": {
+    "schemaVersion": 1,
+    "method": "question-only-layered-privacy-v7",
+    "seed": 20261027,
+    "temperature": 0,
+    "keepAlive": -1,
+    "contextTokens": 4096,
+    "rewriteMaxTokens": 512,
+    "checkMaxTokens": 256,
+    "applyMaxTokens": 1024,
+    "maxQuestionCharacters": 320,
+    "permitMaxAgeMs": 30000,
+    "cloudDispatchEnabled": false,
+    "meta": {
+      "rewriteModel": "llama3.2:3b",
+      "guardModel": "llama-guard3:8b",
+      "guardMaxTokens": 40
+    },
+    "google": {
+      "rewriteModel": "gemma3:4b",
+      "guardModel": "shieldgemma:2b",
+      "guardMaxTokens": 192
+    },
+    "promptGuard": {
+      "status": "LOCAL_READY",
+      "primaryVariant": "86m",
+      "comparisonVariant": "22m",
+      "threshold": 0.5,
+      "maxWindowTokens": 512,
+      "overlapTokens": 64,
+      "positiveLabel": "MALICIOUS",
+      "variants": {
+        "86m": {
+          "modelId": "meta-llama/Llama-Prompt-Guard-2-86M",
+          "directory": ".cache/models/prompt-guard-2-86m"
+        },
+        "22m": {
+          "modelId": "meta-llama/Llama-Prompt-Guard-2-22M",
+          "directory": ".cache/models/prompt-guard-2-22m"
+        }
+      }
+    }
+  }
+}

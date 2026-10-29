@@ -6,6 +6,8 @@ Handoff is a local-first private AI gateway. A business keeps its data on its ow
 
 The [Stage 6f method](docs/stage6f-method.md) keeps the frozen frame, privacy rules, model versions, thresholds and release gates. Distinct records receive separate local rewrite invocations without adding identifiers to model messages. Original and rewritten questions receive separate Prompt Guard scores at 0.5; a separate source-bound comparison policy can account for a mechanically inherited rewrite flag. Unknown transformations fail closed. Refusal handling, harmful-content models and inbound checks are unchanged. Run `npm run privacy:preflight:stage6f`, then `npm run privacy:stage6f`; only local models are used, and live dispatch stays disabled. The requested full Meta usability recovery must be measured rather than inferred from corrected cache counts.
 
+The [first Stage 6f run](results/2026-10-29-stage6f-question-boundary/summary.md) and its [interpretation](docs/stage6f-r1-interpretation.md) are preserved. A separate follow-up corrects generic possessive and literal-alignment provenance bugs with fresh checkpoints; no thresholds, prompts or refusal rules are retuned.
+
 ## Stage 6d: boundary and local-application contract repairs
 
 The [latest local results dashboard](dashboard/README.md) and [offline visual example](docs/dashboard/index.html) now read the locked Stage 6d report. Five [PNG panels and their provenance manifest](docs/dashboard/manifest.json) cover headline metrics/gates, historical progress, false-block layers, Prompt Guard and AWST provenance. Regenerate with `npm run dashboard:export:privacy`; this reads saved results only and makes no model calls.

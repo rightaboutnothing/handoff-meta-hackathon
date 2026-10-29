@@ -112,7 +112,7 @@ test('scope is cache metadata only and is absent from non-rewrite model calls',a
 
 test('method bookkeeping changes without changing the safety models, token caps, seed or disabled dispatch',async()=>{
   const current=JSON.parse(await readFile('config/stage6b.json','utf8'));
-  assert.equal(current.method,'question-only-layered-privacy-v7');assert.equal(current.cloudDispatchEnabled,false);
+  assert.equal(current.method,'question-only-layered-privacy-v8');assert.equal(current.cloudDispatchEnabled,false);
   assert.deepEqual([current.seed,current.temperature,current.keepAlive,current.contextTokens,current.rewriteMaxTokens,current.checkMaxTokens,current.applyMaxTokens,current.maxQuestionCharacters],[20261027,0,-1,4096,512,256,1024,320]);
   assert.equal(current.promptGuard.primaryVariant,'86m');assert.equal(current.promptGuard.threshold,.5);
   assert.deepEqual([current.meta.rewriteModel,current.meta.guardModel,current.google.rewriteModel,current.google.guardModel],['llama3.2:3b','llama-guard3:8b','gemma3:4b','shieldgemma:2b']);
