@@ -2,6 +2,10 @@
 
 Handoff is a local-first private AI gateway. A business keeps its data on its own machines and asks questions over it with local Llama. Only questions that need it go to Muse Spark. Llama Guard and PII redaction sit at the boundary, and every handoff gets a signed receipt. The goal is answers over company data without cloud costs that grow with every question, and without the data leaving the building. Every design choice should move towards that.
 
+## Stage 6f: record-scoped rewrites and comparative screening
+
+The [Stage 6f method](docs/stage6f-method.md) keeps the frozen frame, privacy rules, model versions, thresholds and release gates. Distinct records receive separate local rewrite invocations without adding identifiers to model messages. Original and rewritten questions receive separate Prompt Guard scores at 0.5; a separate source-bound comparison policy can account for a mechanically inherited rewrite flag. Unknown transformations fail closed. Refusal handling, harmful-content models and inbound checks are unchanged. Run `npm run privacy:preflight:stage6f`, then `npm run privacy:stage6f`; only local models are used, and live dispatch stays disabled. The requested full Meta usability recovery must be measured rather than inferred from corrected cache counts.
+
 ## Stage 6d: boundary and local-application contract repairs
 
 The [latest local results dashboard](dashboard/README.md) and [offline visual example](docs/dashboard/index.html) now read the locked Stage 6d report. Five [PNG panels and their provenance manifest](docs/dashboard/manifest.json) cover headline metrics/gates, historical progress, false-block layers, Prompt Guard and AWST provenance. Regenerate with `npm run dashboard:export:privacy`; this reads saved results only and makes no model calls.

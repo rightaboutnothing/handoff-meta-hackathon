@@ -1,0 +1,39 @@
+import {readFile,readdir} from 'node:fs/promises';
+import path from 'node:path';
+import {sha256} from '../rag/receipts.mjs';
+import {loadStage6cInputs,loadStage6cQuality,STAGE6C_ROOT} from './stage6c-io.mjs';
+import {fingerprintStage6d,stage6dPrivateRoot} from './stage6d-io.mjs';
+export const STAGE6F_ROOT=STAGE6C_ROOT;
+export {readStage6cJson as readStage6fJson,optionalStage6cJson as optionalStage6fJson,durableStage6cJson as durableStage6fJson,appendStage6cJsonl as appendStage6fJsonl,readStage6cJournal as readStage6fJournal} from './stage6c-io.mjs';
+export const loadStage6fQuality=loadStage6cQuality;
+export function stage6fPrivateRoot(root=STAGE6F_ROOT){const directory=path.resolve(process.env.STAGE6F_PRIVATE_ROOT??path.join(root,'../Handoff-private/stage6f')),relative=path.relative(path.resolve(root),directory);if(!relative||!relative.startsWith('..'+path.sep)&&relative!=='..'&&!path.isAbsolute(relative))throw Error('STAGE6F_PRIVATE_ROOT_MUST_BE_EXTERNAL');return directory;}
+export async function loadStage6fBaseline(root,descriptor){
+  if(descriptor?.directory!=='2026-10-29-stage6d-question-boundary-r4'||!['reportSha256','summarySha256','pointerSha256','sourceHash','privateIdentity'].every(key=>/^[a-f0-9]{64}$/.test(descriptor[key]??''))||!/^[a-f0-9]{40}$/.test(descriptor.sourceCommit??''))throw Error('STAGE6F_BASELINE_DESCRIPTOR_INVALID');
+  const folder=path.join(root,'results',descriptor.directory),raw=await readFile(path.join(folder,'report.json'),'utf8'),summary=await readFile(path.join(folder,'summary.md'),'utf8'),pointer=await readFile(path.join(root,'results/stage6d-latest.json'),'utf8');
+  if(sha256(raw)!==descriptor.reportSha256||sha256(summary)!==descriptor.summarySha256||sha256(pointer)!==descriptor.pointerSha256)throw Error('STAGE6F_BASELINE_FILES_CHANGED');
+  const report=JSON.parse(raw),savedPointer=JSON.parse(pointer),privateFolder=path.join(stage6dPrivateRoot(root),'runs',descriptor.directory),state=JSON.parse(await readFile(path.join(privateFolder,'study.json'),'utf8')),retained=JSON.parse(await readFile(path.join(privateFolder,'final-rows.json'),'utf8'));
+  if(savedPointer.directory!==descriptor.directory||savedPointer.reportSha256!==descriptor.reportSha256||report.kind!=='stage6d-question-boundary-report'||report.status!=='COMPLETE_LOCAL_ONLY'||report.runId!==descriptor.directory||report.cloudCalls!==0||report.spendUsd!==0||report.liveDispatchEnabled!==false||report.source.gitCommit!==descriptor.sourceCommit||report.source.hash!==descriptor.sourceHash||sha256(report.source.files)!==descriptor.sourceHash||state.source.hash!==descriptor.sourceHash||sha256(state.source.files)!==descriptor.sourceHash||state.source.gitCommit!==descriptor.sourceCommit||state.identity.sourceHash!==descriptor.sourceHash||sha256(state.identity)!==descriptor.privateIdentity||retained.identity!==descriptor.privateIdentity||sha256(state.identity.inputs)!==sha256(report.inputHashes)||state.identity.quality!==report.qualitySourceHash)throw Error('STAGE6F_BASELINE_IDENTITY_CHANGED');
+  const setups=report.setups.map(setup=>{
+    const rows=retained.setups[setup.id]??[],quality=retained.quality[setup.id]??[];
+    if(rows.length!==582||rows.filter(row=>row.population==='frozen').length!==522||rows.filter(row=>row.population==='multicountry').length!==60||new Set(rows.map(row=>row.id)).size!==582)throw Error('STAGE6F_BASELINE_FRAME_CHANGED');
+    const perItemScores=quality.map(row=>({id:row.id,status:row.status,scoreAfter:Number.isFinite(row.afterScore?.score)?row.afterScore.score:null}));
+    return{id:setup.id,label:setup.label,privacy:setup.privacy,metrics:setup.metrics,summary:setup.summary,gate:setup.gate,applicationTarget:setup.applicationTarget,quality:{n:setup.quality.n,completed:setup.quality.endToEndCompleted??null,fullCredit:setup.quality.applicationFullCreditAll??null,perItemScores},qualityPerItemScores:perItemScores,safeRules:rows.filter(row=>row.population==='frozen'&&row.area==='safe').map(row=>({id:row.id,category:row.category,hash:row.sourceHash??row.hash,blocked:row.hypotheticalBlocked===true,error:row.error===true,layerBlocks:row.layerBlocks??[]})),falsePositiveAttribution:setup.falsePositiveAttribution,layerLatency:setup.layerLatency};
+  });
+  return{...descriptor,inputHashes:report.inputHashes,qualitySourceHash:report.qualitySourceHash,stage7Criteria:report.settings.stage7Criteria,seed:report.settings.seed,models:report.environment.models,setups,promptGuardStandalone:report.promptGuardStandalone.map(row=>({variant:row.variant,threshold:row.threshold,attacks:row.attacks,safe:row.safe,latency:row.latency,bySource:row.bySource.map(source=>({category:source.category,attacks:source.attacks,safe:source.safe,latency:source.latency}))})),note:'Immutable Stage 6d comparison metadata only. No prior inference, answer, cache or latency enters the new measurement.'};
+}
+export async function loadStage6fInputs({root=STAGE6F_ROOT}={}){
+  const original=await loadStage6cInputs({root}),settings=JSON.parse(await readFile(path.join(root,'config/stage6f-evaluation.json'),'utf8'));
+  if(settings.schemaVersion!==1||settings.runId!=='2026-10-29-stage6f-question-boundary'||settings.seed!==20261027||settings.sourceCorpusItems!==522||settings.multicountryItems!==60||settings.qualityItems!==11||settings.cloudCallsAllowed!==false||settings.shadowEvaluation!==true||settings.maxRetries!==3||JSON.stringify(settings.backoffMs)!==JSON.stringify([1000,2000,4000])||settings.cacheMode!=='record-phase-local-v1'||settings.promptGuardDecisionMode!=='original-or-added-injection-v1'||sha256(settings.stage7Criteria)!==sha256(original.settings.stage7Criteria)||settings.applicationTarget?.setupId!=='meta-lens'||settings.applicationTarget.minCompleted!==8||settings.applicationTarget.totalItems!==11)throw Error('STAGE6F_INPUT_CONFIGURATION_INVALID');
+  if(settings.repairTarget?.setupId!=='meta-lens'||settings.repairTarget.minFrozenUsable!==50||settings.repairTarget.totalItems!==50||settings.repairTarget.changesStage7Gate!==false)throw Error('STAGE6F_REPAIR_TARGET_INVALID');
+  const baseline=await loadStage6fBaseline(root,settings.previousStage6d);
+  if(sha256(original.inputHashes)!==sha256(baseline.inputHashes)||settings.seed!==baseline.seed)throw Error('STAGE6F_FROZEN_INPUTS_CHANGED');
+  return{...original,settings,baseline,privateRoot:stage6fPrivateRoot(root)};
+}
+/** Fingerprint the exact local runtime import graph as well as all method
+ * configs. A newly added boundary helper cannot escape source identity. */
+export async function fingerprintStage6f(root=STAGE6F_ROOT){
+  const base=await fingerprintStage6d(root),files={...base.files},configFiles=(await readdir(path.join(root,'config'))).filter(name=>/^stage6f.*\.json$/.test(name)).map(name=>'config/'+name),queue=[...Object.keys(files),'src/evaluation/stage6f-cache.mjs','src/evaluation/stage6f-io.mjs','src/evaluation/stage6f-metrics.mjs','src/evaluation/stage6f-runner.mjs','scripts/run-stage6f.mjs','scripts/preflight-stage6f.mjs',...configFiles],seen=new Set();
+  while(queue.length){const name=queue.shift();if(seen.has(name))continue;seen.add(name);const absolute=path.resolve(root,name),relative=path.relative(root,absolute);if(relative.startsWith('..')||path.isAbsolute(relative))throw Error('STAGE6F_SOURCE_ESCAPED');const text=(await readFile(absolute,'utf8')).replace(/\r\n/g,'\n');files[name]=sha256(text);if(name.endsWith('.mjs'))for(const match of text.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"](\.[^'"]+)['"]/g)){const target=path.resolve(path.dirname(absolute),match[1]);if(/\.(?:mjs|json)$/.test(target))queue.push(path.relative(root,target).split(path.sep).join('/'));}}
+  for(const name of ['docs/stage6f-method.md'])try{files[name]=sha256((await readFile(path.join(root,name),'utf8')).replace(/\r\n/g,'\n'));}catch(error){if(error.code!=='ENOENT')throw error;}
+  return{hash:sha256(files),files,gitCommit:base.gitCommit};
+}

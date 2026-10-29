@@ -32,7 +32,7 @@ test('valid original questions are preserved before compiler and imperative path
 });
 
 test('compiled private-source roles still traverse strict privacy and every original safety input',async t=>{
-  const source='Name: Fictional Rowan; Email: rowan-r3@example.invalid; Task: Write a reply to Fictional Rowan about product MAPLE28.',o=await options(t);let inputs;o.dependencies.promptGuard=async(texts,{variant})=>{inputs=texts;return{status:'PASS',available:true,detected:false,variant,latencyMs:1};};const prep=await prepareQuestionOnly(item(source),o),screen=await screenQuestionOnly(prep,{dependencies:o.dependencies});assert.equal(prep.rewriteStrategy,'compiled_neutral_request');assert.equal(prep.baseBlocked,false);assert.doesNotMatch(prep.question,/Rowan|example.invalid|MAPLE28/);assert.ok(inputs.includes(source));assert.ok(inputs.includes(prep.question));assert.equal(screen.hypotheticalBlocked,false);
+  const source='Name: Fictional Rowan; Email: rowan-r3@example.invalid; Task: Write a reply to Fictional Rowan about product MAPLE28.',o=await options(t),inputs=[];o.dependencies.promptGuard=async(texts,{variant})=>{inputs.push(...texts);return{status:'PASS',available:true,detected:false,variant,latencyMs:1,windows:1,maxScore:0,threshold:.5};};const prep=await prepareQuestionOnly(item(source),o),screen=await screenQuestionOnly(prep,{dependencies:o.dependencies});assert.equal(prep.rewriteStrategy,'compiled_neutral_request');assert.equal(prep.baseBlocked,false);assert.doesNotMatch(prep.question,/Rowan|example.invalid|MAPLE28/);assert.ok(inputs.includes(source));assert.ok(inputs.includes(prep.question));assert.equal(screen.hypotheticalBlocked,false);
 });
 
 test('an unsafe Guard verdict never chooses a different candidate after compilation',async t=>{

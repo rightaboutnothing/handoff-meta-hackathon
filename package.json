@@ -27,6 +27,8 @@
     "privacy:stage6c": "node scripts/run-stage6c.mjs",
     "privacy:preflight:stage6d": "node scripts/preflight-stage6d.mjs",
     "privacy:stage6d": "node scripts/run-stage6d.mjs",
+    "privacy:preflight:stage6f": "node scripts/preflight-stage6f.mjs",
+    "privacy:stage6f": "node scripts/run-stage6f.mjs",
     "privacy:prompt-guard": "node scripts/rerun-stage6b-prompt-guard.mjs",
     "comparison:prepare-tokenizers": "node scripts/prepare-tokenizers.mjs",
     "test:comparison": "node --test tests/comparison-*.test.mjs",

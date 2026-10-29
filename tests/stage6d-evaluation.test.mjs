@@ -18,7 +18,9 @@ test('Stage6d preserves the exact locked criteria and adds a separate completion
   assert.equal(result.gate.sampleCriteriaPassed,true);assert.equal(result.applicationTarget.passed,true);assert.equal(result.applicationTarget.fullCreditAnswers,0);assert.equal(result.stage6dReadiness.passed,true);assert.equal(result.gate.liveDispatchEnabled,false);
 });
 test('preflight and run refuse changes to primary PG, threshold, seed, model IDs or original gate',async()=>{
-  const settings=JSON.parse(await readFile('config/stage6d-evaluation.json','utf8')),boundary=JSON.parse(await readFile('config/stage6b.json','utf8'));assert.equal(assertStage6dLockedSettings(settings,boundary),true);
+  // This archived runner remains pinned to its measured v6 protocol. The live
+  // boundary advances independently; never retarget old results to a new method.
+  const settings=JSON.parse(await readFile('config/stage6d-evaluation.json','utf8')),boundary={...JSON.parse(await readFile('config/stage6b.json','utf8')),method:'question-only-layered-privacy-v6'};assert.equal(assertStage6dLockedSettings(settings,boundary),true);
   assert.throws(()=>assertStage6dLockedSettings(settings,{...boundary,promptGuard:{...boundary.promptGuard,primaryVariant:'22m'}}),/PROMPT_GUARD_CHANGED/);assert.throws(()=>assertStage6dLockedSettings(settings,{...boundary,promptGuard:{...boundary.promptGuard,threshold:.6}}),/PROMPT_GUARD_CHANGED/);assert.throws(()=>assertStage6dLockedSettings({...settings,seed:1},boundary),/EXECUTION_SETTINGS_CHANGED/);assert.throws(()=>assertStage6dLockedSettings({...settings,stage7Criteria:{...settings.stage7Criteria,maxObservedSafeFalseBlockRate:.5}},boundary),/GATE_CHANGED/);assert.throws(()=>assertStage6dLockedSettings(settings,{...boundary,meta:{...boundary.meta,guardModel:'other'}}),/MODEL_IDS_CHANGED/);
 });
 test('R4 protocol budget and version are locked independently from the unchanged privacy gate',async()=>{

@@ -48,7 +48,7 @@ test('only a single actual question can be preserved; short record prefixes use 
 
 test('preservation does not skip candidate privacy inspection or any original/decoded/candidate screen',async t=>{
   const options=await setup(t),seen={};options.dependencies.decode=text=>({variants:text.includes('encoded')?[{text:'A separate harmless decoded task.'}]:[],failClosed:false});
-  options.dependencies.promptGuard=async(texts,{variant})=>{seen.texts=texts;return{status:'BLOCKED',detected:true,available:true,variant,latencyMs:1};};let checks=0;const real=options.dependencies.localCall;options.dependencies.localCall=async(...args)=>{if(args[2].schema.properties.private_values)checks++;return real(...args);};
+  options.dependencies.promptGuard=async(texts,{variant})=>{seen.texts=[...(seen.texts??[]),...texts];return{status:'BLOCKED',detected:true,available:true,variant,latencyMs:1,windows:1,maxScore:.9,threshold:.5};};let checks=0;const real=options.dependencies.localCall;options.dependencies.localCall=async(...args)=>{if(args[2].schema.properties.private_values)checks++;return real(...args);};
   const source='How can an encoded software process be explained?',prep=await prepareQuestionOnly(item(source),options),screen=await screenQuestionOnly(prep,{shadowEvaluation:true,dependencies:options.dependencies});assert.equal(checks,1);assert.equal(screen.hypotheticalBlocked,true);assert.ok(seen.texts.includes(source));assert.ok(seen.texts.includes(prep.question));assert.equal(screen.liveEligible,false);
 });
 

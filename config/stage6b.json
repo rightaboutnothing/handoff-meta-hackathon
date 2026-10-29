@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "method": "question-only-layered-privacy-v6",
+  "method": "question-only-layered-privacy-v7",
   "seed": 20261027,
   "temperature": 0,
   "keepAlive": -1,
