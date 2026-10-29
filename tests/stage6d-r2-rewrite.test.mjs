@@ -51,12 +51,12 @@ test('unrepaired semantic loss stays blocked after at most three repairs and is 
   const o=await options(t,'How can stock status be described?'),prep=await prepareQuestionOnly(item('Given a private stock report, calculate average stock prices.'),o),stage=prep.stages.find(s=>s.layerId==='rewrite');assert.equal(prep.baseBlocked,true);assert.equal(stage.status,'BLOCKED');assert.equal(stage.attempts.length,4);assert.ok(stage.attempts.every(a=>a.status==='BLOCKED'&&a.code==='QUESTION_INTENT_LOST'));assert.equal(stage.attempts.some(a=>a.status==='ERROR'),false);
 });
 
-test('a valid non-generalizable refusal accepts an empty question and never mints a permit',async t=>{
-  const o=await options(t),call=o.dependencies.localCall;o.dependencies.localCall=async(...args)=>{const result=await call(...args);if(args[2].schema.properties.generalizable)result.text=JSON.stringify({question:'',generalizable:false});return result;};const prep=await prepareQuestionOnly(item('Given a private record, explain an unsupported task.'),o),screen=await screenQuestionOnly(prep,{dependencies:o.dependencies});assert.ok(prep.reasons.includes('REWRITE_NOT_GENERALIZABLE'));assert.equal(prep.stages.some(s=>s.status==='ERROR'),false);assert.equal(screen.liveEligible,false);assert.equal(screen.releasePermit,null);
+test('a valid non-generalizable refusal normalizes a bounded question to empty and never mints a permit',async t=>{
+  const o=await options(t),call=o.dependencies.localCall;o.dependencies.localCall=async(...args)=>{const result=await call(...args);if(args[2].schema.properties.generalizable)result.text=JSON.stringify({question:'How can this local request be assessed?',generalizable:false});return result;};const prep=await prepareQuestionOnly(item('Given a private record, explain an unsupported task.'),o),screen=await screenQuestionOnly(prep,{dependencies:o.dependencies});assert.ok(prep.reasons.includes('REWRITE_NOT_GENERALIZABLE'));assert.equal(prep.stages.some(s=>s.status==='ERROR'),false);assert.equal(screen.liveEligible,false);assert.equal(screen.releasePermit,null);
 });
 
-test('the bounded model schema uses maxLength without a competing provider pattern',async t=>{
-  const o=await options(t),call=o.dependencies.localCall;let inspected=false;o.dependencies.localCall=async(...args)=>{if(args[2].schema.properties.generalizable){assert.equal(args[2].schema.properties.question.maxLength,320);assert.equal(args[2].schema.properties.question.pattern,undefined);inspected=true;}return call(...args);};await prepareQuestionOnly(item('Given a private stock report, calculate average stock costs.'),o);assert.equal(inspected,true);
+test('the bounded model schema uses a finite pattern without competing maxLength',async t=>{
+  const o=await options(t),call=o.dependencies.localCall;let inspected=false;o.dependencies.localCall=async(...args)=>{if(args[2].schema.properties.generalizable){assert.equal(args[2].schema.properties.question.maxLength,undefined);assert.equal(new RegExp(args[2].schema.properties.question.pattern).test('How can costs be calculated?'),true);inspected=true;}return call(...args);};await prepareQuestionOnly(item('Given a private stock report, calculate average stock costs.'),o);assert.equal(inspected,true);
 });
 
 test('intent frame and its hash are bound by the preparation proof',async t=>{

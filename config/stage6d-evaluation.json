@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-29-stage6d-question-boundary-r3",
+  "runId": "2026-10-29-stage6d-question-boundary-r4",
   "previousStage6dRun": {
     "directory": "2026-10-29-stage6d-question-boundary",
     "reportSha256": "62d476efab2f7e55ab5669ba0f642349a13e1b271e6291305113eca44c95f708",
@@ -39,6 +39,18 @@
       "reportSha256": "4c71bbe6c9087549623f8a9861ca5d7ef88233d7701855140d284f33d7c7cf71"
     }
   ],
+  "previousStage6dRunR3": {
+    "directory": "2026-10-29-stage6d-question-boundary-r3",
+    "reportSha256": "472c97cdda87f469450854e9d28f4ba732714d72a8f72132bcf0880eb69cc9d6",
+    "sourceCommit": "63bb72fbbe63d8cb8e7d154dcfaeb991ed344e56",
+    "sourceHash": "33dedd587f54485e112e123977450e04657a78dd692cee760cfa82a0047c838e",
+    "privateIdentity": "c2aafbb887011cf4ebf7a9b112025f395a9b21435803875cfecb4d2ab3d59010",
+    "publicFiles": {
+      "report.json": "472c97cdda87f469450854e9d28f4ba732714d72a8f72132bcf0880eb69cc9d6",
+      "summary.md": "a94f715301887b554812f25ba8b3cf6b980c5514b9784462d4aa9685fc6c0a23"
+    },
+    "pointerSnapshotSha256": "b2ff9edd6beea4a41e523ffb2088924ae69b447b37a0fc327d19761781edebb5"
+  },
   "seed": 20261027,
   "sourceRun": "2026-10-28-stage6-guard-stress",
   "sourceCorpusItems": 522,
@@ -71,7 +83,7 @@
   },
   "notes": [
     "All frozen 522 items and all 60 separate synthetic multi-country items traverse all four setups; privacy populations remain separate.",
-    "Both Stage 6c runs, their latest pointer and Stage 6d R1/R2 public files remain unchanged. Both Stage 6d source and private identities are pinned separately. This R3 run uses new source/settings/model identity checkpoints, with no inference, answer, score or latency reuse from earlier versions.",
+    "Both Stage 6c runs, their latest pointer and Stage 6d R1/R2/R3 public files remain unchanged. All earlier Stage 6d source and private identities are pinned separately. This R4 run uses new source/settings/model identity checkpoints, with no inference, answer, score or latency reuse from earlier versions.",
     "Guard thresholds, original seed and existing safety/privacy criteria are unchanged. At most 3/74 operational safe false blocks is the existing 5 percent observed criterion.",
     "The additional Stage 6d target is at least 8/11 operationally complete Meta applications after all applicable checks, valid citations and known completion. It is separate from the locked safety/privacy criteria; full-credit answer counts are reported independently, without inventing an 8-full-credit requirement.",
     "Local baseline, surrogate guidance and application caps are now 1024 instead of 768. Cloud calls and spending remain zero.",

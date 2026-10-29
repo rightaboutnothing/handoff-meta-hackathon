@@ -13,9 +13,10 @@ export async function loadStage6dInputs({root=STAGE6D_ROOT}={}){
   if(settings.applicationTarget?.setupId!=='meta-lens'||settings.applicationTarget.minCompleted!==8||settings.applicationTarget.totalItems!==11)throw Error('STAGE6D_APPLICATION_TARGET_INVALID');
   const beforeAuditText=await readFile(path.join(root,settings.safeBeforeAudit),'utf8');if(sha256(beforeAuditText)!==settings.safeBeforeAuditSha256)throw Error('STAGE6D_SAFE_AUDIT_HASH_CHANGED');
   for(const previous of settings.preservedStage6cRuns??[])await loadPreviousStage6cReport(root,previous);
-  if(settings.runId!== '2026-10-29-stage6d-question-boundary-r3'||!settings.previousStage6dRun||!settings.previousStage6dRunR2)throw Error('STAGE6D_R3_IDENTITY_REQUIRED');
+  if(settings.runId!== '2026-10-29-stage6d-question-boundary-r4'||!settings.previousStage6dRun||!settings.previousStage6dRunR2||!settings.previousStage6dRunR3)throw Error('STAGE6D_R4_IDENTITY_REQUIRED');
   await loadPriorStage6dRun(root,settings.previousStage6dRun);
   await loadPriorStage6dRun(root,settings.previousStage6dRunR2);
+  await loadPriorStage6dRun(root,settings.previousStage6dRunR3);
   return{...source,settings,privateRoot:stage6dPrivateRoot(root)};
 }
 export const loadStage6dQuality=loadStage6cQuality;
@@ -35,10 +36,10 @@ export async function loadPreviousStage6dReport(root,previous){
     return{...setup,quality:saved.quality,layerLatency:saved.layerLatency,qualityPerItemScores:qualityRows.map(row=>({id:row.id,status:row.status,scoreBefore:Number.isFinite(row.beforeScore?.score)?row.beforeScore.score:null,scoreAfter:Number.isFinite(row.afterScore?.score)?row.afterScore.score:null,code:row.reason?safeCode(row.reason):null})),safeRules,safeRulesAvailable:safeRules.length===74,safeRulesSha256:sha256(safeRules),errorStages,errorStagesAvailable:rows.length===582,qualityErrorCodes:qualityRows.filter(row=>row.reason).map(row=>({id:row.id,status:row.status,code:safeCode(row.reason)}))};
   }),beforeSafeAudit:audit,beforeSafeAuditSha256:audit?sha256(await readFile(path.join(root,'docs/stage6d-safe-before-audit.json'),'utf8')):null};
 }
-/** Immutable Stage 6d R1/R2 baseline. Only metadata is returned; no generated
+/** Immutable earlier Stage 6d baseline. Only metadata is returned; no generated
  * answers, call caches or latency observations enter the new run's work. */
 export async function loadPriorStage6dRun(root,previous){
-  if(!previous||!/^2026-10-29-stage6d-question-boundary(?:-r2)?$/.test(previous.directory??'')||!['reportSha256','sourceHash','privateIdentity'].every(key=>/^[a-f0-9]{64}$/.test(previous[key]??''))||!/^[a-f0-9]{40}$/.test(previous.sourceCommit??''))throw Error('STAGE6D_PRIOR_RUN_DESCRIPTOR_INVALID');
+  if(!previous||!/^2026-10-29-stage6d-question-boundary(?:-r[23])?$/.test(previous.directory??'')||!['reportSha256','sourceHash','privateIdentity'].every(key=>/^[a-f0-9]{64}$/.test(previous[key]??''))||!/^[a-f0-9]{40}$/.test(previous.sourceCommit??''))throw Error('STAGE6D_PRIOR_RUN_DESCRIPTOR_INVALID');
   const reportPath=path.join(root,'results',previous.directory),raw=await readFile(path.join(reportPath,'report.json'),'utf8');
   if(sha256(raw)!==previous.reportSha256)throw Error('STAGE6D_PRIOR_REPORT_HASH_CHANGED');
   for(const [name,expected]of Object.entries(previous.publicFiles??{})){if(!/^[a-z-]+\.(?:json|md)$/.test(name)||!/^[a-f0-9]{64}$/.test(expected))throw Error('STAGE6D_PRIOR_FILE_DESCRIPTOR_INVALID');if(sha256(await readFile(path.join(reportPath,name),'utf8'))!==expected)throw Error('STAGE6D_PRIOR_FILE_HASH_CHANGED');}
@@ -55,6 +56,6 @@ export async function loadPriorStage6dRun(root,previous){
 export async function fingerprintStage6d(root=STAGE6D_ROOT){
   const base=await fingerprintStage6c(root),files={...base.files};
   for(const name of ['config/stage6d-evaluation.json','docs/stage6d-safe-before-audit.json','docs/stage6d-r1-application-provenance-audit.json','docs/stage6d-r1-interpretation.md','src/evaluation/stage6d-io.mjs','src/evaluation/stage6d-metrics.mjs','src/evaluation/stage6d-runner.mjs','scripts/run-stage6d.mjs','scripts/preflight-stage6d.mjs','package.json'])files[name]=sha256((await readFile(path.join(root,name),'utf8')).replace(/\r\n/g,'\n'));
-  for(const name of ['config/stage6d-rewrite-development.json','config/stage6d-application-development.json','config/stage6d-r2-rewrite-development.json','config/stage6d-r2-rewrite-development-v1.json','config/stage6d-r2-ner-development.json','config/stage6d-r2-ner-development-v1.json','config/stage6d-r3-rewrite-development.json','config/stage6d-r3-rewrite-development-v1.json','config/stage6d-r3-ner-development.json','config/stage6d-r3-ner-development-v1.json','docs/stage6d-r2-interpretation.md'])try{files[name]=sha256((await readFile(path.join(root,name),'utf8')).replace(/\r\n/g,'\n'));}catch(error){if(error.code!=='ENOENT')throw error;}
+  for(const name of ['config/stage6d-rewrite-development.json','config/stage6d-application-development.json','config/stage6d-r2-rewrite-development.json','config/stage6d-r2-rewrite-development-v1.json','config/stage6d-r2-ner-development.json','config/stage6d-r2-ner-development-v1.json','config/stage6d-r3-rewrite-development.json','config/stage6d-r3-rewrite-development-v1.json','config/stage6d-r3-ner-development.json','config/stage6d-r3-ner-development-v1.json','config/stage6d-r4-rewrite-development.json','config/stage6d-r4-rewrite-development-v1.json','config/stage6d-r4-ner-development.json','config/stage6d-r4-ner-development-v1.json','docs/stage6d-r2-interpretation.md','docs/stage6d-r3-interpretation.md'])try{files[name]=sha256((await readFile(path.join(root,name),'utf8')).replace(/\r\n/g,'\n'));}catch(error){if(error.code!=='ENOENT')throw error;}
   return{hash:sha256(files),files,gitCommit:base.gitCommit};
 }

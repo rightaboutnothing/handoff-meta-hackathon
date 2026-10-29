@@ -34,10 +34,10 @@ test('intent checks reject vague and privacy-only answers and preserve multiple 
 });
 
 test('residual privacy check sees only the proposed question, never the original private source',async t=>{
-  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount for [PERSON] be calculated?'}),original=dependencies.localCall;let inspected=false,masked=false;
+  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount for an individual be calculated?'}),original=dependencies.localCall;let inspected=false,masked=false;
   dependencies.localCall=async(lens,messages,options)=>{const body=JSON.parse(messages.at(-1).content);if(options.schema.properties.generalizable){masked=!JSON.stringify(body).includes('cedar@example.invalid')&&!JSON.stringify(body).includes('Fictional Cedar');}if(options.schema.properties.private_values){assert.deepEqual(Object.keys(body),['proposedQuestion']);assert.equal(JSON.stringify(body).includes('cedar@example.invalid'),false);assert.equal(body.proposedQuestion.includes('[PERSON]'),false);inspected=true;}return original(lens,messages,options);};
   const result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});
-  assert.equal(result.baseBlocked,false);assert.equal(result.intent.valid,true);assert.equal(result.neutralPlaceholders.question,1);assert.equal(masked,true);assert.equal(inspected,true);assert.equal(result.question.includes('Cedar'),false);
+  assert.equal(result.baseBlocked,false);assert.equal(result.intent.valid,true);assert.equal(result.neutralPlaceholders.question,0);assert.ok(result.question.includes('an individual'));assert.equal(masked,true);assert.equal(inspected,true);assert.equal(result.question.includes('Cedar'),false);
 });
 
 test('implicit explanation preserves a wrapper but cannot replace domain operations or constraints',()=>{

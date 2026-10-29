@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "method": "question-only-layered-privacy-v5",
+  "method": "question-only-layered-privacy-v6",
   "seed": 20261027,
   "temperature": 0,
   "keepAlive": -1,
   "contextTokens": 4096,
-  "rewriteMaxTokens": 192,
+  "rewriteMaxTokens": 512,
   "checkMaxTokens": 256,
   "applyMaxTokens": 1024,
   "maxQuestionCharacters": 320,

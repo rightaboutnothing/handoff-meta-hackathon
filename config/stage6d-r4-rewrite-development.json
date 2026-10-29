@@ -1,0 +1,585 @@
+{
+  "schemaVersion": 1,
+  "seed": 20261102,
+  "count": 8,
+  "fixtureHash": "8de5451a0b7b782523e10457d60146e74cd4fbb73868bdfc3699d998e0f535a1",
+  "iterations": 2,
+  "previousIterations": [
+    {
+      "publicMetadata": "config/stage6d-r4-rewrite-development-v1.json",
+      "summaryHash": "7304417f9a23f47d81327ead425ca7b792faed50225b1fa90e99bcb3dfc77129",
+      "counts": {
+        "meta": 7,
+        "google": 8
+      },
+      "totalPerLens": 8,
+      "piiSurvivors": 0
+    }
+  ],
+  "scope": "Fresh authored benign compound preparations and local schema echo probes; no frozen corpus or Guard tuning",
+  "caps": {
+    "rewrite": 512,
+    "check": 256,
+    "previousRewrite": 192,
+    "maxQuestionCharacters": 320
+  },
+  "budgetDerivation": "At most320unescapedASCIIquestionbytes plus fewer than64requiredJSONASCIIbytes;512localtokens provides protocol headroom. Baseline192probe recorded separately.",
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "lenses": [
+    {
+      "lens": "meta",
+      "rows": [
+        {
+          "id": "r4-dev-average",
+          "sourceHash": "6db26e426cfe11a438078bce305197a9257dae390ee18180fc45b83619cff882",
+          "questionHash": "dd76583b1249f7b8e4ed2c2827e0fb0d39e6e85554ace98fdcd070d774a17d2f",
+          "frameHash": "bdbe884df5f503073243cc4faacb41824e2895d4d3e81e40eec961c595fc8553",
+          "questionCharacters": 66,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-mixed",
+          "sourceHash": "e6c71c02efb71fd56dafc4c184fdc40d778e883eef0a2d204212c174e3ce9a0c",
+          "questionHash": "4c214eb77d134b2238e6b09b3150eeb3de2c3bfe409b6a5030b0e1e9a2491024",
+          "frameHash": "b766ae161232e28a0e85486c99cdc16941b83325e8ea8f2cc04fe911122ccf3c",
+          "questionCharacters": 108,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-tie",
+          "sourceHash": "d42ef53e44fed6548ec3ca10e120e0780edbff32789071f5baea181a0f7caf01",
+          "questionHash": "81084113946c222cb8e0d27bb3fbc36a8ba416973a7f49d530231ac02b1bfdb9",
+          "frameHash": "25f8de6be263f99ece141a1db516362b6821b56da2ac4ce8d290e2e57afea10e",
+          "questionCharacters": 102,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "find"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money",
+              "inventory",
+              "identity"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-coordinated",
+          "sourceHash": "54e0450c3b0883c3df43b5086a6be2286e7b49f045f43c8af3a273fa73330114",
+          "questionHash": "da4e2dd869a9e4f791fd1c8a11decfcbc1c449cdd094c40adc7dfb33bc5cc4d2",
+          "frameHash": "b68c921be72c260d8bef0572cc4a11cc1c2150d83edbdbf8246d3c32dd4ffd39",
+          "questionCharacters": 90,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-model-role",
+          "sourceHash": "4bf1e6cd5c51794f3ae9957f7aadc413daed90c199bd9f49023c43671ec225d4",
+          "questionHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "frameHash": "40768ee48b17a89b664d54fe825fe74f18db0fc123bef384bb8895b2ac3f77f9",
+          "questionCharacters": 0,
+          "passed": false,
+          "inboundPassed": false,
+          "inboundCode": null,
+          "reasons": [
+            "REWRITE_NOT_GENERALIZABLE"
+          ],
+          "intent": null,
+          "rewriteStrategy": "model_rewrite",
+          "validatedLocalRefusal": true,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-export",
+          "sourceHash": "73761e4f54d8df791e3701debb9aee169c4d6bb0ee0b55c6fd5734d00f6f9f80",
+          "questionHash": "1648ca7bb21aa2b22f07b29a94c5127d2cae3e44aaa72bb91af583f39987690f",
+          "frameHash": "fa8b72a72204b5523d54468965f6e7b0123c956c0ce587ecdd2158a5bd735edb",
+          "questionCharacters": 76,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "policy"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-preserve",
+          "sourceHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "questionHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "frameHash": "5890de05f4a1bbff394c714658dba62f08b6ed3d684582046700ac1184c57132",
+          "questionCharacters": 73,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-private-mixed",
+          "sourceHash": "7b570b17cf528c8bc8aa51bc858db1556f24d845dd21ac04e0d1fe99cd14162d",
+          "questionHash": "e8d491e95adeb669068e798670ce824a726f24941ef75dd932be8c2b11d92ff8",
+          "frameHash": "49200698008f51175e99591e8635f1f2c6dd164aae82ab5f46ed58470cf63088",
+          "questionCharacters": 109,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money",
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        }
+      ],
+      "probes": [
+        {
+          "id": "r4-schema-320-old-cap",
+          "maxTokens": 192,
+          "expectedCharacters": 320,
+          "actualCharacters": 320,
+          "exactCopy": true,
+          "valid": true,
+          "doneReason": "stop",
+          "tokens": {
+            "input": 230,
+            "output": 172,
+            "total": 402
+          },
+          "questionHash": "e0d44c34a63322498347ca7192b66e0061a64a33458ba9f61c32b16b676dd841"
+        },
+        {
+          "id": "r4-schema-320-new-cap",
+          "maxTokens": 512,
+          "expectedCharacters": 320,
+          "actualCharacters": 320,
+          "exactCopy": true,
+          "valid": true,
+          "doneReason": "stop",
+          "tokens": {
+            "input": 230,
+            "output": 172,
+            "total": 402
+          },
+          "questionHash": "e0d44c34a63322498347ca7192b66e0061a64a33458ba9f61c32b16b676dd841"
+        },
+        {
+          "id": "r4-schema-false",
+          "maxTokens": 512,
+          "expectedCharacters": 39,
+          "actualCharacters": 39,
+          "exactCopy": true,
+          "valid": true,
+          "doneReason": "stop",
+          "tokens": {
+            "input": 79,
+            "output": 18,
+            "total": 97
+          },
+          "questionHash": "311c5625e487fccac562276f7293504517929f9ca8fc8c09c974fc9982518227"
+        }
+      ],
+      "passed": 7,
+      "inboundPassed": 7,
+      "piiSurvivors": 0,
+      "modelCalls": 18
+    },
+    {
+      "lens": "google",
+      "rows": [
+        {
+          "id": "r4-dev-average",
+          "sourceHash": "6db26e426cfe11a438078bce305197a9257dae390ee18180fc45b83619cff882",
+          "questionHash": "dd76583b1249f7b8e4ed2c2827e0fb0d39e6e85554ace98fdcd070d774a17d2f",
+          "frameHash": "bdbe884df5f503073243cc4faacb41824e2895d4d3e81e40eec961c595fc8553",
+          "questionCharacters": 66,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-mixed",
+          "sourceHash": "e6c71c02efb71fd56dafc4c184fdc40d778e883eef0a2d204212c174e3ce9a0c",
+          "questionHash": "4c214eb77d134b2238e6b09b3150eeb3de2c3bfe409b6a5030b0e1e9a2491024",
+          "frameHash": "b766ae161232e28a0e85486c99cdc16941b83325e8ea8f2cc04fe911122ccf3c",
+          "questionCharacters": 108,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-tie",
+          "sourceHash": "d42ef53e44fed6548ec3ca10e120e0780edbff32789071f5baea181a0f7caf01",
+          "questionHash": "81084113946c222cb8e0d27bb3fbc36a8ba416973a7f49d530231ac02b1bfdb9",
+          "frameHash": "25f8de6be263f99ece141a1db516362b6821b56da2ac4ce8d290e2e57afea10e",
+          "questionCharacters": 102,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "find"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money",
+              "inventory",
+              "identity"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-coordinated",
+          "sourceHash": "54e0450c3b0883c3df43b5086a6be2286e7b49f045f43c8af3a273fa73330114",
+          "questionHash": "da4e2dd869a9e4f791fd1c8a11decfcbc1c449cdd094c40adc7dfb33bc5cc4d2",
+          "frameHash": "b68c921be72c260d8bef0572cc4a11cc1c2150d83edbdbf8246d3c32dd4ffd39",
+          "questionCharacters": 90,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-model-role",
+          "sourceHash": "4bf1e6cd5c51794f3ae9957f7aadc413daed90c199bd9f49023c43671ec225d4",
+          "questionHash": "b3bcfa197140132623cfc4d6fdc6626a56690d6b53ee47cb4f79c6a2fd212da2",
+          "frameHash": "40768ee48b17a89b664d54fe825fe74f18db0fc123bef384bb8895b2ac3f77f9",
+          "questionCharacters": 157,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "explain"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "model_rewrite",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-export",
+          "sourceHash": "73761e4f54d8df791e3701debb9aee169c4d6bb0ee0b55c6fd5734d00f6f9f80",
+          "questionHash": "1648ca7bb21aa2b22f07b29a94c5127d2cae3e44aaa72bb91af583f39987690f",
+          "frameHash": "fa8b72a72204b5523d54468965f6e7b0123c956c0ce587ecdd2158a5bd735edb",
+          "questionCharacters": 76,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "policy"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-preserve",
+          "sourceHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "questionHash": "690e732010aed4323c263fd66977afac215f895889cebe424bce591dfa8626b4",
+          "frameHash": "5890de05f4a1bbff394c714658dba62f08b6ed3d684582046700ac1184c57132",
+          "questionCharacters": 73,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "compare",
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "inventory",
+              "software"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "preserved_valid_task",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        },
+        {
+          "id": "r4-dev-private-mixed",
+          "sourceHash": "7b570b17cf528c8bc8aa51bc858db1556f24d845dd21ac04e0d1fe99cd14162d",
+          "questionHash": "1f71f563380e717e90d3491c00af40fe2cf015287f37d1d6e2ab82472aaf46a6",
+          "frameHash": "49200698008f51175e99591e8635f1f2c6dd164aae82ab5f46ed58470cf63088",
+          "questionCharacters": 102,
+          "passed": true,
+          "inboundPassed": true,
+          "inboundCode": null,
+          "reasons": [],
+          "intent": {
+            "valid": true,
+            "code": "INTENT_PRESERVED",
+            "matchedActions": [
+              "calculate"
+            ],
+            "missingActions": [],
+            "matchedTopics": [
+              "money",
+              "inventory"
+            ],
+            "missingConstraints": []
+          },
+          "rewriteStrategy": "compiled_neutral_request",
+          "validatedLocalRefusal": false,
+          "attempts": [],
+          "piiSurvivors": 0
+        }
+      ],
+      "probes": [
+        {
+          "id": "r4-schema-320-old-cap",
+          "maxTokens": 192,
+          "expectedCharacters": 320,
+          "actualCharacters": null,
+          "exactCopy": false,
+          "valid": false,
+          "doneReason": "length",
+          "tokens": {
+            "input": 338,
+            "output": 192,
+            "total": 530
+          },
+          "questionHash": null
+        },
+        {
+          "id": "r4-schema-320-new-cap",
+          "maxTokens": 512,
+          "expectedCharacters": 320,
+          "actualCharacters": 296,
+          "exactCopy": false,
+          "valid": true,
+          "doneReason": "stop",
+          "tokens": {
+            "input": 338,
+            "output": 265,
+            "total": 603
+          },
+          "questionHash": "0d67f302fd3654bf9c7357e404534dca0565b8e3c954b94540ac743ca668d2bc"
+        },
+        {
+          "id": "r4-schema-false",
+          "maxTokens": 512,
+          "expectedCharacters": 39,
+          "actualCharacters": 39,
+          "exactCopy": true,
+          "valid": true,
+          "doneReason": "stop",
+          "tokens": {
+            "input": 70,
+            "output": 18,
+            "total": 88
+          },
+          "questionHash": "311c5625e487fccac562276f7293504517929f9ca8fc8c09c974fc9982518227"
+        }
+      ],
+      "passed": 8,
+      "inboundPassed": 8,
+      "piiSurvivors": 0,
+      "modelCalls": 20
+    }
+  ]
+}
