@@ -6,7 +6,7 @@ Handoff is a local-first private AI gateway. A business keeps its data on its ow
 
 Stage 6d is a new **local-only** comparison on the same frozen inputs, seed and locked release criteria. Prompt Guard 86M stays primary at **0.5**. It repairs placeholder-aware intent checks, structured-output execution failures and source-bound local citations without changing country PII rules or Stage 3 thresholds. **Live dispatch stays disabled; zero cloud calls and $0 cloud spend are authorized.** Stage 6c results below remain unchanged.
 
-Run `npm run privacy:preflight:stage6d`, then `npm run privacy:stage6d`. The [Stage 6d method](docs/stage6d-method.md) records the repair scope, bounded failure recovery, 1024-token local application budget and separate eight-of-eleven application target. Results are pending until the new measurement completes; actual Muse Spark answer quality remains deferred.
+Run `npm run privacy:preflight:stage6d`, then `npm run privacy:stage6d`. The [Stage 6d method](docs/stage6d-method.md) records the repair scope, bounded failure recovery, 1024-token local application budget and separate eight-of-eleven application target. The [first measurement](results/2026-10-29-stage6d-question-boundary/summary.md) is preserved: both lenses restored 60/60 country usability with zero planted survivors, but Meta still blocked 14/74 safe queries and completed only 1/11 applications. Its [failure interpretation](docs/stage6d-r1-interpretation.md) distinguishes actual privacy findings from incorrect entity registration and intent-contract defects. A second measurement is pending; actual Muse Spark answer quality remains deferred.
 
 ## Stage 6c: local injection screening and intent-preserving questions
 

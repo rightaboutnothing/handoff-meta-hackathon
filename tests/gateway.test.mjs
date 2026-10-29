@@ -154,7 +154,9 @@ test('the cloud payload contains only a general question, no private chunks or f
   const vault = await createPrivacyVault(dataDir);
   const redacted = vault.redact('Name: Avery Chen\nEmail: avery@example.invalid\nPhone: +61 400 000 001\nWarranty: 24 months.');
   await vault.save();
-  const chunks = [1, 2, 3, 4].map(index => ({ ...chunk(index, `${redacted.text}\n${'Synthetic evidence. '.repeat(100)}`, 0.99 - index / 100), file: `private/Avery Chen-${index}.md` }));
+  // This fixture tests private payload/filename exclusion and signed receipts.
+  // Oversized application evidence has its own fail-closed budget regression.
+  const chunks = [1, 2, 3, 4].map(index => ({ ...chunk(index, `${redacted.text}\n${'Synthetic evidence. '.repeat(2)}`, 0.99 - index / 100), file: `private/Avery Chen-${index}.md` }));
   const cloudInputs = [], guardInputs = [];
   const result = await askRag('Compare the warranty evidence for Avery Chen.', {
     dataDir, offlineMeta: false,

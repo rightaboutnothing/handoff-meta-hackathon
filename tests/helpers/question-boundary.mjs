@@ -17,6 +17,7 @@ export function privacyDependencies({question,outputSafe=true,answer,citations}=
       let body;try{body=JSON.parse(messages.at(-1).content);}catch{body={};}
       let value;if(schema.properties.generalizable)value={question:question??syntheticQuestion(body.task),generalizable:true};
       else if(schema.properties.private_values)value={private_values:[]};
+      else if(schema.properties.private_spans)value={private_spans:[]};
       else{const local=JSON.parse(messages.at(-1).content);let old;try{old=JSON.parse(local.generalGuidance);}catch{}const first=local.applicationMode==='extractive'?local.evidence.find(row=>typeof row.text==='string'&&(row.chunkId??row.id)):null;value={answer:answer??(first?first.text:old?.answer??'A supported local answer.'),citations:citations??(first?[first.chunkId??first.id]:(old?.citations??[]).filter(id=>local.evidence.some(row=>(row.chunkId??row.id)===id)))};}
       return{modelId:lens==='meta'?'synthetic-privacy-meta':'synthetic-privacy-google',text:JSON.stringify(value),tokens:{input:10,output:10,total:20},latencyMs:1,settings:{maxTokens,contextTokens:4096},doneReason:'stop'};
     },

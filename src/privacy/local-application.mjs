@@ -1,5 +1,6 @@
 import {sha256} from '../rag/receipts.mjs';
 import {calculateLocal} from '../rag/calculators.mjs';
+import {extractPrivateTask} from './request-task.mjs';
 
 const fail=code=>Object.assign(Error(code),{code});
 const normalized=text=>String(text).normalize('NFKC').replace(/\s+/g,' ').trim();
@@ -24,8 +25,37 @@ function objectInText(text){
   for(let at=start;at<text.length;at++){const char=text[at];if(quoted){if(escaped)escaped=false;else if(char==='\\')escaped=true;else if(char==='"')quoted=false;continue;}if(char==='"'){quoted=true;continue;}if(char==='{')depth++;if(char==='}'&&--depth===0){try{return{value:JSON.parse(text.slice(start,at+1)),prefix:text.slice(0,start),suffix:text.slice(at+1)};}catch{return null;}}}return null;
 }
 function unpack(source){
-  let task=source;try{const body=JSON.parse(source);if(body&&typeof body.question==='string')task=body.question;}catch{}
+  const task=extractPrivateTask(source);
   const found=objectInText(task);return{question:found?.value?.campaigns?found.prefix+' '+found.suffix:task,data:found?.value??null};
+}
+function campaignDataInSource(source,depth=0){
+  if(depth>4)return null;const found=objectInText(source);if(!found?.value||typeof found.value!=='object')return null;
+  if(Array.isArray(found.value.campaigns))return found.value;
+  for(const key of ['question','task','prompt','request'])if(typeof found.value[key]==='string'){const nested=campaignDataInSource(found.value[key],depth+1);if(nested)return nested;}
+  return null;
+}
+
+const queryStop=new Set('a an the what which who when where why how is are was were be been can could should would do does did give provide please tell show quote passage supplied actual local original private fictional synthetic document documents evidence source sources this that these those it its all both requested task question data information using based from with without for of to in on at by as or'.split(' '));
+const queryTerms=text=>[...new Set((String(text).normalize('NFKC').toLowerCase().match(/[\p{L}\p{N}]+/gu)??[]).filter(term=>term.length>1&&!queryStop.has(term)).map(term=>term.replace(/ies$/,'y').replace(/(?<!s)s$/,'')))];
+
+/** Query-only relevance signals, never labels/reference answers. These reorder
+ * actual available evidence and detect an obviously irrelevant selection; they
+ * cannot prove missing source facts exist or repair absent retrieval. */
+export function rankLocalApplicationSpans(context){
+  const terms=queryTerms(context.question),sets=new Map(context.spans.map(span=>[span.spanId,new Set(queryTerms(span.text))]));
+  const weight=term=>1+Math.log((context.spans.length+1)/(1+[...sets.values()].filter(set=>set.has(term)).length));
+  const facets=context.question.split(/\band\b|\bversus\b|\bvs\b|;/i).map(text=>queryTerms(text)).filter(words=>words.length&&context.spans.some(span=>words.some(word=>sets.get(span.spanId).has(word))));
+  const requiredFacets=facets.length>1?facets:[],ranked=context.spans.map((span,index)=>{const set=sets.get(span.spanId),matched=terms.filter(term=>set.has(term));return{...span,relevance:{score:matched.reduce((sum,term)=>sum+weight(term),0),matchedQueryTerms:matched.length,facets:requiredFacets.flatMap((facet,id)=>facet.some(term=>set.has(term))?[id]:[]),originalOrder:index}};}).sort((a,b)=>b.relevance.score-a.relevance.score||a.relevance.originalOrder-b.relevance.originalOrder);
+  const anchors=[...new Set((context.question.match(/\b(?=[A-Za-z0-9-]*\d)(?=[A-Za-z0-9-]*[A-Za-z])[A-Za-z0-9-]+\b/g)??[]).map(value=>value.toLowerCase()))];
+  return{ranked,requiredFacets:requiredFacets.map((facet,id)=>({id,termHashes:facet.map(term=>sha256(term))})),audit:{method:'actual-question lexical coverage and source-bound span ranking; not a semantic fact-coverage certificate',queryTerms:terms.length,queryTermsAvailable:terms.filter(term=>ranked.some(span=>sets.get(span.spanId).has(term))).length,requiredFacets:requiredFacets.length,queryEntityAnchors:anchors.length,missingEntityAnchors:anchors.filter(anchor=>!context.citable.some(row=>row.text.toLowerCase().includes(anchor))).length}};
+}
+
+function validateApplicationRelevance(selected,context){
+  const plan=rankLocalApplicationSpans(context),selectedIds=new Set(selected.map(span=>span.spanId)),available=plan.ranked.some(span=>span.relevance.score>0),rows=plan.ranked.filter(span=>selectedIds.has(span.spanId));
+  if(available&&!rows.some(span=>span.relevance.score>0))throw fail('LOCAL_APPLICATION_RELEVANCE_INVALID');
+  const covered=new Set(rows.flatMap(span=>span.relevance.facets)),missing=plan.requiredFacets.filter(facet=>!covered.has(facet.id));
+  if(missing.length)throw fail('LOCAL_APPLICATION_RELEVANCE_INVALID');
+  return{...plan.audit,selectedQueryTerms:rows.reduce((maximum,row)=>Math.max(maximum,row.relevance.matchedQueryTerms),0),selectedFacets:covered.size};
 }
 
 /** Private context only: task values and evidence never enter public logs. */
@@ -37,12 +67,14 @@ export function buildLocalApplicationContext(source,localContext=[]){
     const text=row.text,hash=sha256(text);if(seen.has(chunkId)&&seen.get(chunkId)!==hash)throw fail('LOCAL_APPLICATION_EVIDENCE_CONFLICT');seen.set(chunkId,hash);
     return{chunkId,text,hash,...(typeof row.file==='string'?{file:row.file}:{}),...(typeof row.location==='string'?{location:row.location}:{})};
   }).filter((row,index,rows)=>rows.findIndex(other=>other.chunkId===row.chunkId)===index);
-  const records=Array.isArray(task.data?.campaigns)?task.data.campaigns:null;
+  // Request extraction removes the surrounding record export from the task,
+  // while the actual hash-bound records are still parsed from the full source.
+  const data=task.data??campaignDataInSource(source),records=Array.isArray(data?.campaigns)?data.campaigns:null;
   const taskRecord={chunkId:sourceRecordId,text:source,hash:sourceHash,file:'local-original-task',location:'restored source'};
   const mode=evidence.length?'extractive':records?'record_extract':'general_method';
   const localRecords=records?.map((record,index)=>({chunkId:'local-record:'+sha256({sourceHash,index,record}).slice(0,24),text:JSON.stringify({campaign:record.campaign,spend_usd:record.spend_usd,conversions:record.conversions,cpa_usd:record.cpa_usd}),hash:sha256({sourceHash,index,record}),file:'local-campaign-record',location:'row:'+String(index+1)}));
   const citable=mode==='extractive'?evidence:mode==='record_extract'?localRecords:[taskRecord];
-  return{source,sourceHash,sourceRecordId,question:task.question,data:task.data,records,evidence,taskRecord,citable,mode,allowedIds:allIds(citable),spans:mode==='general_method'?[]:evidenceSpans(citable)};
+  return{source,sourceHash,sourceRecordId,question:task.question,data,records,evidence,taskRecord,citable,mode,allowedIds:allIds(citable),spans:mode==='general_method'?[]:evidenceSpans(citable)};
 }
 
 function campaignTool(context){
@@ -85,7 +117,8 @@ export function validateLocalApplication(value,context){
     if(context.mode==='general_method'||!value.answer.length||value.answer.length>8||value.answer.some(id=>typeof id!=='string')||new Set(value.answer).size!==value.answer.length)throw fail('LOCAL_APPLICATION_INVALID');
     const selected=value.answer.map(id=>context.spans.find(row=>row.spanId===id));if(selected.some(row=>!row))throw fail('LOCAL_APPLICATION_SUPPORT_INVALID');
     const actual=[...new Set(selected.map(row=>row.chunkId))];if(actual.length!==citations.length||actual.some(id=>!citations.includes(id)))throw fail('LOCAL_APPLICATION_CITATION_INVALID');
-    return{answer:selected.map(row=>row.text).join('\n'),citations,audit:{supported:true,claims:selected.length,method:'code renders selected hash-bound source spans; the model emits only enumerated pointers and cannot generate factual text',claimHashes:selected.map(row=>sha256(row.text)),selectedSpanIds:selected.map(row=>row.spanId)}};
+    const relevance=validateApplicationRelevance(selected,context);
+    return{answer:selected.map(row=>row.text).join('\n'),citations,audit:{supported:true,claims:selected.length,method:'code renders selected hash-bound source spans; the model emits only enumerated pointers and cannot generate factual text',claimHashes:selected.map(row=>sha256(row.text)),selectedSpanIds:selected.map(row=>row.spanId),relevance}};
   }
   if(typeof value.answer!=='string'||!value.answer.trim())throw fail('LOCAL_APPLICATION_INVALID');
   if(context.mode==='general_method')return{answer:value.answer.trim(),citations,audit:{supported:true,claims:null,method:'general method answer; no private-data factual claim certificate'}};
@@ -98,9 +131,10 @@ export function validateLocalApplication(value,context){
 }
 
 export function localApplicationMessages(context,{abstractQuestion,guidance,repairCode}={}){
+  const relevance=rankLocalApplicationSpans(context);
   return[
     {role:'system',content:context.mode==='general_method'?'Answer the original private task using the checked general guidance. Return compact answer and citations JSON. Use only the enumerated citation IDs; citations may be empty for a general method. Do not invent private facts.': 'Answer the original private task by SELECTING the actual LOCAL EVIDENCE spans needed. Return answer as an array of spanId pointers, not generated prose, and citations as the unique chunkId values of those selected spans. Select every span needed for all requested facts, across documents when necessary. For a request to quote an entire passage, select all its consecutive spans. Use only enumerated IDs. Code will render the selected source text locally. Never invent an ID or factual text, paraphrase, calculate unsupported results, or repeat the generic method. All source data remains local.'},
-    {role:'user',content:JSON.stringify({applicationMode:context.mode,task:context.question,evidence:context.spans,allowedCitationIds:context.allowedIds,allowedSpanIds:context.spans.map(row=>row.spanId),abstractQuestion,generalGuidance:guidance,...(repairCode?{repair:{code:repairCode,instruction:'The previous local attempt failed validation. Select valid source span pointers and their actual chunk IDs from the same evidence; do not fabricate, omit unsupported citation errors, or change the question.'}}:{})})},
+    {role:'user',content:JSON.stringify({applicationMode:context.mode,task:context.question,evidence:relevance.ranked,sourceCoverage:relevance.audit,requiredFacets:relevance.requiredFacets,allowedCitationIds:context.allowedIds,allowedSpanIds:context.spans.map(row=>row.spanId),abstractQuestion,generalGuidance:guidance,...(repairCode?{repair:{code:repairCode,instruction:'The previous local attempt failed validation. Select valid source span pointers and their actual chunk IDs from the same evidence; cover the actual question facets present in evidence; do not fabricate, omit unsupported citation errors, or change the question.'}}:{})})},
   ];
 }
 

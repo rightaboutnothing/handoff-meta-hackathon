@@ -24,7 +24,7 @@ export async function createQuestionTokenVault(directory,{keyDirectory}={}){
     let result='',position=0;for(const row of chosen){const value=input.slice(row.start,row.end),token=register(value,row.type);result+=input.slice(position,row.start)+token;position=row.end;}result+=input.slice(position);
     return{text:result,replacements:chosen.length,tokens:chosen.map(row=>byValue.get(input.slice(row.start,row.end)))};
   }
-  function tokenizeValues(text,values=[]){let result=String(text),replacements=0;for(const row of [...values].sort((a,b)=>String(b.value).length-String(a.value).length)){if(typeof row.value!=='string'||!row.value)continue;const token=register(row.value,row.type),parts=result.split(row.value);replacements+=parts.length-1;result=parts.join(token);}return{text:result,replacements};}
+  function tokenizeValues(text,values=[]){let result=String(text),replacements=0;for(const row of [...values].sort((a,b)=>String(b.value).length-String(a.value).length)){if(typeof row.value!=='string'||!row.value)continue;const token=register(row.value,row.type);result=result.split(/(\[(?:PERSON|COMPANY|AMOUNT|DATE|IDENTIFIER|ADDRESS|PHONE|EMAIL|VALUE|PRODUCT|RECORD)\]|\[\[LOCAL_[a-f0-9]{32}\]\])/g).map((part,index)=>{if(index%2)return part;const pieces=part.split(row.value);replacements+=pieces.length-1;return pieces.join(token);}).join('');}return{text:result,replacements};}
   async function save(){
     const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);cipher.setAAD(Buffer.from('handoff-question-map-v1'));
     const ciphertext=Buffer.concat([cipher.update(JSON.stringify([...byToken.values()]),'utf8'),cipher.final()]);

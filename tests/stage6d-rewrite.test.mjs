@@ -40,9 +40,10 @@ test('unknown proper names are replaced, never accepted through an expanded name
 
 test('only a single actual question can be preserved; short record prefixes use local abstraction',async t=>{
   for(const source of ['How can average stock costs be calculated?','Given the stock costs, how can average stock prices be calculated?']){const options=await setup(t),prep=await prepareQuestionOnly(item(source),options);assert.equal(prep.baseBlocked,false);assert.equal(prep.rewriteStrategy,'preserved_valid_task');}
-  for(const source of ['stock status: a confidential internal note; how can average stock costs be calculated?','internal evidence. How can average stock costs be calculated?','How can costs be calculated? Which supplier is best?']){
+  for(const source of ['stock status: a confidential internal note; how can average stock costs be calculated?','How can costs be calculated? Which supplier is best?']){
     const options=await setup(t,'How can average stock costs be calculated?'),real=options.dependencies.localCall;let calls=0;options.dependencies.localCall=async(...args)=>{if(args[2].schema.properties.generalizable)calls++;return real(...args);};const prep=await prepareQuestionOnly(item(source),options);assert.equal(calls,1);assert.equal(prep.rewriteStrategy,'model_rewrite');assert.equal(prep.question.includes('confidential'),false);assert.equal(prep.question.includes('internal evidence'),false);
   }
+  const extracted=await prepareQuestionOnly(item('internal evidence. How can average stock costs be calculated?'),await setup(t));assert.equal(extracted.rewriteStrategy,'preserved_valid_task');assert.equal(extracted.question.includes('internal evidence'),false);
 });
 
 test('preservation does not skip candidate privacy inspection or any original/decoded/candidate screen',async t=>{
@@ -73,7 +74,7 @@ test('invalid marker grammar is a visible schema repair and cannot create freefo
 
 test('invalid literal spans repair against the exact candidate, not source or example content',async t=>{
   const options=await setup(t);let checks=0;const real=options.dependencies.localCall;
-  options.dependencies.localCall=async(lens,messages,args)=>{if(!args.schema.properties.private_values)return real(lens,messages,args);checks++;return reply({private_values:checks===1?[{type:'person',value:'An Invented Span'}]:[]},args,{evaluationCallHash:'invalid'});};const prep=await prepareQuestionOnly(item('How can average stock costs be calculated?'),options),stage=prep.stages.find(x=>x.layerId==='llm_check');assert.equal(prep.baseBlocked,false);assert.equal(checks,2);assert.equal(stage.attempts[0].code,'PRIVACY_LOCAL_INVALID_SPAN');assert.equal(stage.recovered,true);assert.equal('callHash' in stage.attempts[0],false);
+  options.dependencies.localCall=async(lens,messages,args)=>{if(args.schema.properties.private_spans){checks++;return reply({private_spans:[]},args);}if(!args.schema.properties.private_values)return real(lens,messages,args);checks++;return reply({private_values:[{type:'person',value:'An Invented Span'}]},args,{evaluationCallHash:'invalid'});};const prep=await prepareQuestionOnly(item('How can average stock costs be calculated?'),options),stage=prep.stages.find(x=>x.layerId==='llm_check');assert.equal(prep.baseBlocked,false);assert.equal(checks,2);assert.equal(stage.attempts[0].code,'PRIVACY_LOCAL_INVALID_SPAN');assert.equal(stage.recovered,true);assert.equal('callHash' in stage.attempts[0],false);
 });
 
 test('valid private findings are never retried away on the inbound path',async()=>{
@@ -81,5 +82,5 @@ test('valid private findings are never retried away on the inbound path',async()
 });
 
 test('inbound invalid spans use the same bounded repairs without changing incoming content',async()=>{
-  const dependencies=privacyDependencies();let checks=0;dependencies.localCall=async(_lens,_messages,args)=>{checks++;return reply({private_values:checks===1?[{type:'person',value:'An Invented Span'}]:[]},args);};const text='Compare stock costs across the available local records.',checked=await prepareIncomingAnswer(makeInboundContext(item('Explain stock cost trends.')),text,{dependencies});assert.equal(checked.blocked,false);assert.equal(checks,2);assert.equal(checked.text,text);assert.equal(checked.stages[0].recovered,true);assert.equal(checked.stages[0].tokens.total,20);
+  const dependencies=privacyDependencies();let checks=0;dependencies.localCall=async(_lens,_messages,args)=>{checks++;return reply(args.schema.properties.private_spans?{private_spans:[]}:{private_values:[{type:'person',value:'An Invented Span'}]},args);};const text='Compare stock costs across the available local records.',checked=await prepareIncomingAnswer(makeInboundContext(item('Explain stock cost trends.')),text,{dependencies});assert.equal(checked.blocked,false);assert.equal(checks,2);assert.equal(checked.text,text);assert.equal(checked.stages[0].recovered,true);assert.equal(checked.stages[0].tokens.total,20);
 });

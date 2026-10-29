@@ -51,18 +51,18 @@ test('implicit explanation preserves a wrapper but cannot replace domain operati
 test('a privacy-safe boolean cannot override known values or a rewrite that loses the task',async t=>{
   for(const question of ['How should cedar@example.invalid be contacted?','What general method should be used for this task?']){
     const directory=await folder(t),dependencies=privacyDependencies({question}),result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});
-    assert.equal(result.baseBlocked,true);assert.ok(result.reasons.some(code=>['PII_RESIDUAL','QUESTION_INTENT_LOST','PRIVATE_VALUE_SURVIVED','QUESTION_CONTAINS_DATA_REFERENCE'].includes(code)));
+    assert.equal(result.baseBlocked,true);assert.ok(result.reasons.some(code=>['PII_RESIDUAL','QUESTION_INTENT_LOST','PRIVATE_VALUE_SURVIVED','QUESTION_CONTAINS_DATA_REFERENCE','PRIVACY_LOCAL_QUESTION_FORMAT'].includes(code)));
   }
 });
 
 test('invented entity spans and invalid local results continue to fail closed',async t=>{
-  const directory=await folder(t),dependencies=privacyDependencies({question:'How can an invoice amount be calculated?'}),original=dependencies.localCall;
-  dependencies.localCall=async(...args)=>{const result=await original(...args);if(args[2].schema.properties.private_values)result.text=JSON.stringify({private_values:[{type:'person',value:'Invented Person'}]});return result;};
+  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount be calculated?'}),original=dependencies.localCall;
+  dependencies.localCall=async(...args)=>{const result=await original(...args);if(args[2].schema.properties.private_values)result.text=JSON.stringify({private_values:[{type:'person',value:'Invented Person'}]});if(args[2].schema.properties.private_spans)result.text=JSON.stringify({private_spans:[{type:'person',start:-1,end:999}]});return result;};
   const result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});assert.equal(result.baseBlocked,true);assert.ok(result.reasons.includes('PRIVACY_LOCAL_INVALID_SPAN'));
 });
 
 test('literal extraction replaces only actual spans and preserves the requested calculation',async t=>{
-  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount for unseen-person@example.invalid be calculated?'}),original=dependencies.localCall;
-  dependencies.localCall=async(...args)=>{const result=await original(...args);if(args[2].schema.properties.private_values)result.text=JSON.stringify({private_values:[{type:'email',value:'unseen-person@example.invalid'}]});return result;};
-  const result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});assert.equal(result.baseBlocked,false);assert.equal(result.question.includes('unseen-person@example.invalid'),false);assert.equal(result.question.includes('[EMAIL]'),true);assert.equal(result.intent.valid,true);
+  const directory=await folder(t),dependencies=privacyDependencies({question:'How can the average invoice amount for unseen alder be calculated?'}),original=dependencies.localCall;
+  dependencies.localCall=async(...args)=>{const result=await original(...args);if(args[2].schema.properties.private_values)result.text=JSON.stringify({private_values:[{type:'person',value:'unseen alder'}]});return result;};
+  const result=await prepareQuestionOnly(privateTask,{dataDir:directory,dependencies:{...dependencies,keyDirectory:path.join(directory,'keys')}});assert.equal(result.baseBlocked,false);assert.equal(result.question.includes('unseen alder'),false);assert.equal(result.question.includes('[PERSON]'),true);assert.equal(result.intent.valid,true);
 });

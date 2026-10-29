@@ -22,13 +22,16 @@ export function metaAccessEnabled() {
 export async function localChat(model, messages, { json = false, maxTokens = ragConfig.maxOutputTokens, schema } = {}) {
   if (schema !== undefined && (!schema || typeof schema !== 'object' || Array.isArray(schema))) throw new Error('Local structured output schema must be an object');
   const start = performance.now();
+  const body={ model, messages, stream: false, keep_alive: ragConfig.keepAlive,
+    ...(schema ? { format: schema } : json ? { format: 'json' } : {}), options: { temperature: ragConfig.temperature, seed: ragConfig.seed, num_predict: maxTokens, num_ctx: 4096 } };
   const response = await fetch(`${localBase}/api/chat`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages, stream: false, keep_alive: ragConfig.keepAlive,
-      ...(schema ? { format: schema } : json ? { format: 'json' } : {}), options: { temperature: ragConfig.temperature, seed: ragConfig.seed, num_predict: maxTokens, num_ctx: 4096 } }),
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(180000),
   });
-  if (!response.ok) throw new Error(`Local model ${model} returned HTTP ${response.status}`);
+  // The body may contain prompts or backend details. Preserve only an explicit
+  // status and immutable request identity; retries belong to the run supervisor.
+  if (!response.ok) throw Object.assign(new Error('LOCAL_HTTP_ERROR'),{code:'LOCAL_HTTP_ERROR',status:response.status,modelId:model,requestHash:sha256(body),latencyMs:performance.now()-start});
   const data = await response.json();
   return { text: data.message?.content ?? '', modelId: model, latencyMs: performance.now() - start, doneReason:data.done_reason??null,
     tokens: { input: data.prompt_eval_count ?? 0, output: data.eval_count ?? 0, total: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0) },

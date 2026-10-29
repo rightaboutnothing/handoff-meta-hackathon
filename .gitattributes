@@ -1,6 +1,7 @@
 demo_data/** text eol=lf
 results/*.json text eol=lf
 results/**/*.json text eol=lf
+results/**/*.md text eol=lf
 tasks/comparison/** text eol=lf
 src/comparison/** text eol=lf
 src/server/comparison-models.mjs text eol=lf

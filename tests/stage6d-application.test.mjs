@@ -7,7 +7,7 @@ import {sha256} from '../src/rag/receipts.mjs';
 import {createQuestionTokenVault} from '../src/privacy/token-vault.mjs';
 import {checkIncomingAnswer,applyAnswerLocally} from '../src/privacy/question-boundary.mjs';
 import {privacyDependencies} from './helpers/question-boundary.mjs';
-import {buildLocalApplicationContext,computeLocalApplication,localApplicationSchema,validateLocalApplication,localApplicationMessages,assertLocalApplicationInputBudget} from '../src/privacy/local-application.mjs';
+import {buildLocalApplicationContext,computeLocalApplication,localApplicationSchema,validateLocalApplication,localApplicationMessages,assertLocalApplicationInputBudget,rankLocalApplicationSpans} from '../src/privacy/local-application.mjs';
 
 const campaigns=[{campaign:'North',spend_usd:120,conversions:20,cpa_usd:6},{campaign:'South',spend_usd:90,conversions:10,cpa_usd:9},{campaign:'East',spend_usd:180,conversions:30,cpa_usd:6}];
 const source=question=>question+'\n'+JSON.stringify({campaigns,private_customer_fields_not_needed_for_task:[{email:'fictional-contact@example.invalid'}]});
@@ -61,6 +61,21 @@ test('gateway source envelopes are unwrapped instead of duplicating retrieved ev
 test('oversized local evidence fails closed without silently dropping a required source',()=>{
   const context=buildLocalApplicationContext('Quote the supplied text.',[{chunkId:'large-source',text:'A long but authored development policy. '.repeat(1000)}]);assert.throws(()=>assertLocalApplicationInputBudget(localApplicationMessages(context)),{code:'LOCAL_APPLICATION_CONTEXT_BUDGET'});assert.equal(context.citable.length,1);
 });
+test('actual request extraction preserves operands while keeping record totals out of calculator task text',()=>{
+  const task='This is a fictional record export containing 9999 rows.\nCalculate the price for 2 units.\n'+JSON.stringify({campaigns});const context=buildLocalApplicationContext(task);assert.equal(context.question,'Calculate the price for 2 units.');assert.equal(context.source,task);assert.equal(context.sourceHash,sha256(task));assert.equal(context.records.length,3);
+});
+test('nested task envelopes retain their real campaign records after request-clause extraction',()=>{
+  const task=JSON.stringify({question:source('Which campaign has the highest CPA?'),evidence:[]}),context=buildLocalApplicationContext(task);assert.equal(context.records.length,3);assert.equal(JSON.parse(computeLocalApplication(context).answer).campaign,'South');
+});
+test('actual-question relevance ranks relevant hash-bound evidence before an unrelated span without dropping sources',()=>{
+  const context=buildLocalApplicationContext('What is the warranty?',[{chunkId:'inventory',text:'Inventory stock is counted daily.'},...evidence]),plan=rankLocalApplicationSpans(context),body=JSON.parse(localApplicationMessages(context)[1].content);assert.equal(plan.ranked[0].chunkId,'authored-warranty');assert.equal(body.evidence[0].chunkId,'authored-warranty');assert.equal(context.spans.length,2);assert.equal(context.citable.length,2);assert.throws(()=>validateLocalApplication({answer:[context.spans[0].spanId],citations:['inventory']},context),{code:'LOCAL_APPLICATION_RELEVANCE_INVALID'});
+});
+test('query facets require relevant facts across multiple supplied documents',()=>{
+  const context=buildLocalApplicationContext('What are the warranty and support hours?',[...evidence,{chunkId:'support-hours',text:'Support hours are nine to five.'}]);assert.throws(()=>validateLocalApplication({answer:[context.spans[0].spanId],citations:['authored-warranty']},context),{code:'LOCAL_APPLICATION_RELEVANCE_INVALID'});const result=validateLocalApplication({answer:context.spans.map(row=>row.spanId),citations:context.allowedIds},context);assert.equal(result.audit.relevance.requiredFacets,2);assert.equal(result.audit.relevance.selectedFacets,2);assert.equal(result.audit.claims,2);
+});
+test('absent source entities are diagnosed honestly and never injected from a reference',()=>{
+  const context=buildLocalApplicationContext('What is the warranty for PX700?',[{chunkId:'unrelated',text:'Support hours are nine to five.'}]),plan=rankLocalApplicationSpans(context);assert.equal(plan.audit.missingEntityAnchors,1);assert.equal(plan.audit.queryTermsAvailable,0);assert.equal(context.citable.length,1);assert.match(plan.audit.method,/not a semantic fact-coverage certificate/);assert.equal(context.citable[0].text,'Support hours are nine to five.');
+});
 
 async function checkedFixture(t,{task='What is the warranty?',localCall}={}){
   const directory=await mkdtemp(path.join(os.tmpdir(),'handoff-application-'));t.after(()=>rm(directory,{recursive:true,force:true}));
@@ -90,4 +105,7 @@ test('a missing application permit cannot invoke even the deterministic tool',as
 });
 test('source mutations during an answer attempt are detected before returning any answer',async t=>{
   const fixture=await checkedFixture(t);fixture.dependencies.localCall=async()=>{fixture.prepared.sourceText+=' changed';return response({answer:'60 months.',citations:['authored-warranty']});};await assert.rejects(applyAnswerLocally(fixture.prepared,fixture.checked,{localContext:evidence,dependencies:fixture.dependencies}),{code:'CHECKED_LOCAL_APPLICATION_REQUIRED'});
+});
+test('a transport failure is not an answer-protocol retry and retains only safe HTTP metadata',async t=>{
+  let calls=0;const fixture=await checkedFixture(t,{localCall:async()=>{calls++;throw Object.assign(Error('Do not publish this backend body'),{code:'LOCAL_HTTP_ERROR',status:503,modelId:'authored-local',requestHash:'c'.repeat(64)});}});await assert.rejects(applyAnswerLocally(fixture.prepared,fixture.checked,{localContext:evidence,dependencies:fixture.dependencies}),error=>error.code==='LOCAL_HTTP_ERROR'&&error.attemptStages.length===1&&error.attemptStages[0].httpStatus===503&&error.attemptStages[0].requestHash==='c'.repeat(64));assert.equal(calls,1);
 });

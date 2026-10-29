@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-29-stage6d-question-boundary",
+  "runId": "2026-10-29-stage6d-question-boundary-r2",
+  "previousStage6dRun": {
+    "directory": "2026-10-29-stage6d-question-boundary",
+    "reportSha256": "62d476efab2f7e55ab5669ba0f642349a13e1b271e6291305113eca44c95f708",
+    "sourceCommit": "ba6f169c85053b7e5f869cae4de38b0cd486a67a",
+    "sourceHash": "440a4ef2c0a57d1664de7543f67c586d7158796ab89078c9d62bf84bcfd2c3ef",
+    "privateIdentity": "d3d251d1c9bf73bc356566f3ce5bbe2857bcb980acee227442039e922710f708",
+    "publicFiles": {
+      "report.json": "62d476efab2f7e55ab5669ba0f642349a13e1b271e6291305113eca44c95f708",
+      "summary.md": "09f24434eb828f7adad318dc3038e25676be631d7ab6828b0ae15bdf89bfb3b3"
+    },
+    "pointerSnapshotSha256": "9ac9f22ecd716002d7765c0ad2e652f1fcb3acc40b072f609994a63af62633fd"
+  },
   "previousStage6cRun": {
     "directory": "2026-10-29-stage6c-question-boundary-r2",
     "reportSha256": "4c71bbe6c9087549623f8a9861ca5d7ef88233d7701855140d284f33d7c7cf71"
@@ -47,7 +59,7 @@
   },
   "notes": [
     "All frozen 522 items and all 60 separate synthetic multi-country items traverse all four setups; privacy populations remain separate.",
-    "Both Stage 6c runs and the Stage 6c latest pointer remain unchanged. This run uses new source/model identity checkpoints, with no inference or latency reuse from earlier versions.",
+    "Both Stage 6c runs, their latest pointer and Stage 6d R1 public files remain unchanged. R1 source and private identity are pinned separately. This R2 run uses new source/settings/model identity checkpoints, with no inference, answer, score or latency reuse from earlier versions.",
     "Guard thresholds, original seed and existing safety/privacy criteria are unchanged. At most 3/74 operational safe false blocks is the existing 5 percent observed criterion.",
     "The additional Stage 6d target is at least 8/11 operationally complete Meta applications after all applicable checks, valid citations and known completion. It is separate from the locked safety/privacy criteria; full-credit answer counts are reported independently, without inventing an 8-full-credit requirement.",
     "Local baseline, surrogate guidance and application caps are now 1024 instead of 768. Cloud calls and spending remain zero.",

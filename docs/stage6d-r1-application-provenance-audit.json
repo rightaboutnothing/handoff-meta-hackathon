@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "kind": "stage6d-r1-private-application-metadata-audit",
+  "sourceRun": "2026-10-29-stage6d-question-boundary",
+  "sourceCommit": "ba6f169",
+  "readOnly": true,
+  "actualCloudCalls": 0,
+  "knownValueBlocks": {
+    "meta-lens": {"blockedItems": 7, "totalItems": 11},
+    "google-lens": {"blockedItems": 7, "totalItems": 11},
+    "initialMatchedType": "ENTITY_VALUE",
+    "provenance": "Initial capitalization extraction over an unextracted multiline record and request; not the subsequent literal NER result",
+    "sourceTaskExtractionChanged": false,
+    "matches": [
+      {
+        "valueSha256": "86e1de74820a9b252ba33b2eed445b0cd02c445b5f4b8007205aff1762d7301a",
+        "classification": "generic_sentence_opening_function_word",
+        "sourceWordKind": "ordinary_function_word_at_instruction_boundary",
+        "metaItems": 7,
+        "googleItems": 7,
+        "guideMatch": "whole_word"
+      },
+      {
+        "valueSha256": "4786cd5110a4a25d7f290ecdc62053c3e521475e725dcee6df863e0e86fd9c60",
+        "classification": "generic_instruction_verb",
+        "sourceWordKind": "task_operation_verb_at_instruction_boundary",
+        "metaItems": 4,
+        "googleItems": 7,
+        "guideMatch": "whole_word"
+      },
+      {
+        "valueSha256": "b6ce788d9786917c9d19adaa0d904213365607c7f683d7277f508dcf142b4cc2",
+        "classification": "unclassified_remains_protected",
+        "sourceWordKind": "unresolved_capitalized_source_word",
+        "metaItems": 0,
+        "googleItems": 1,
+        "itemId": "business-12",
+        "guideMatch": "substring_inside_larger_word"
+      }
+    ],
+    "scope": "This identifies structural registration false positives; it is not a waiver of known genuine PII, and contains no matched literal values."
+  },
+  "frozenEvidenceMismatch": {
+    "itemId": "acme-047",
+    "classification": "required_facts_absent_from_frozen_application_context",
+    "actualContextChunks": 1,
+    "expectedSourceChunksForAuditOnly": 2,
+    "availableSpanCount": 2,
+    "selectedSpanCount": 2,
+    "entireAvailableContextScore": 0,
+    "entireAvailableContextFactCoverage": 0,
+    "entireAvailableContextCitationPrecision": 0,
+    "inferredRetrievalCompleteness": 1,
+    "contextSourceSha256": "7a78ed0de89270d7ac3a2542962ab797631a4bf8cb1537300556e709fcabeade",
+    "taskQuestionSha256": "8ddac01e33d5fd727180f263a0b6b085cfea5990c19056d9f1384d103d0643f3",
+    "interpretation": "Ranking cannot recover absent evidence. Both available spans were selected and the entire supplied context scores zero. Preserve this quality failure; no expected source or reference is inserted into runtime evidence."
+  },
+  "transportIncident": {
+    "classification": "LOCAL_STEP_UNAVAILABLE",
+    "modelId": "gemma3:4b",
+    "cacheKeySha256": "a04471c3309f328eca5ef54810af95083609c852ef6bddae3bdf794c468c21fb",
+    "requestSha256": "6f100230037cb24281b2d9892404529da72268a6e279d0453589e370a31d98a0",
+    "attempts": 4,
+    "firstFailureUtc": "2026-10-29T00:03:05.660Z",
+    "lastFailureUtc": "2026-10-29T00:03:16.185Z",
+    "httpStatus": null,
+    "backendCause": "UNKNOWN_CURRENT_SERVER_LOG_UNAVAILABLE",
+    "distinctFromResolvedAuthoredDevelopmentErrors": true,
+    "qualification": "The old Ollama logs predate the active server; a new diagnostic metadata capture cannot retroactively recover this status."
+  }
+}
