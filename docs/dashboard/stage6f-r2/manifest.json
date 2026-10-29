@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "privacy-dashboard-snapshots",
+  "generatedAt": "2026-10-29T03:12:32.446Z",
+  "measurement": {
+    "stage": "6f",
+    "runId": "2026-10-29-stage6f-question-boundary-r2",
+    "reportSha256": "ba5490df83c0e127508b4e13ebf7664d941f63604fed1f0d89863617278984b1",
+    "sourceHash": "8478fb94c02fdc1002e074dfe230d061b1994ba173bc6485785f55ba6ce693b0",
+    "sourceCommit": "e00d1c70b845952cf427ad26f62eab051bfb2811",
+    "seed": 20261027,
+    "timestamp": "2026-10-29T03:07:18.887Z",
+    "timestampAwst": "29 Oct 2026, 11:07:18 AWST (Perth)",
+    "cloudCalls": 0,
+    "spendUsd": 0,
+    "liveDispatchEnabled": false
+  },
+  "html": {
+    "file": "index.html",
+    "sha256": "769ec00622352cf37fa08b61efcb48b534c24869364e2711f3d19b1e0d8c200a"
+  },
+  "panels": [
+    {
+      "id": "headline",
+      "file": "stage6f-headline.png",
+      "sha256": "4e137c68730ff83d3c1914182f48bc15b858169362286486820698e07bd4264c",
+      "width": 1440,
+      "height": 1134
+    },
+    {
+      "id": "progress",
+      "file": "stage6f-progress.png",
+      "sha256": "84cd6a09d576ecdd1b2e3b1067a734b12f70243ae00549705e5b55080eb7f11a",
+      "width": 1440,
+      "height": 1099
+    },
+    {
+      "id": "attribution",
+      "file": "stage6f-attribution.png",
+      "sha256": "b6548f8efb4fb4ae2571073f62f90618caf18342a73229e69d41a7552ef0242b",
+      "width": 1440,
+      "height": 691
+    },
+    {
+      "id": "prompt-guard",
+      "file": "stage6f-prompt-guard.png",
+      "sha256": "040f5d329d5e6651d983c89151450cff4cef0b4e4c8c7832208c5b72e30dd59e",
+      "width": 1440,
+      "height": 617
+    },
+    {
+      "id": "provenance",
+      "file": "stage6f-provenance.png",
+      "sha256": "bcba64a902d510a0229d2dda464aaa82d67e1ca4863a458868bedaea4c475630",
+      "width": 1440,
+      "height": 600
+    }
+  ],
+  "rendererSourceHashes": {
+    "dashboard/src/components/PrivacyResults.tsx": "84bde47eadc04d7d23141fd93e7a205cc82b720306b242d395c4f9a6a7541449",
+    "dashboard/src/components/PrivacyResults.css": "9e2b80cabfb06868f771a3e22b5deff074fa9af54255bfd93af83c14daed5c2b",
+    "dashboard/src/privacyResultsTypes.ts": "1cc02ec46b925fdc7b9fda305f585b3fd9b72b58e2356558f9f621667e13cea0",
+    "dashboard/server/privacy-results.mjs": "81c5642e33b7eb15e9feda22fdfcfb2fc71bdacf3855ea80b81ae9cb7b5de9b7",
+    "dashboard/scripts/export-privacy-dashboard.mjs": "67797c24414f2129db7dda7f04f09e4af24f31c986173bc42748075e2e4854d5"
+  },
+  "rendering": {
+    "sameComponentAsDashboard": true,
+    "browser": "installed-chrome",
+    "externalRequests": 0,
+    "embeddedRawReport": false,
+    "modelCalls": 0
+  },
+  "destination": {
+    "outputSubdirectory": "stage6f-r2",
+    "filenamePrefix": "stage6f"
+  }
+}

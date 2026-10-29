@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "kind": "privacy-results-dashboard",
-  "stage": "6d",
-  "runId": "2026-10-29-stage6d-question-boundary-r4",
-  "timestamp": "2026-10-29T01:49:44.126Z",
-  "timestampAwst": "29 Oct 2026, 09:49:44 AWST (Perth)",
-  "sourceHash": "b9582447090a4498cff70770293ccd0986999dcdd843b435cb3a4c919c1ae5a7",
-  "sourceCommit": "db4fac6f56391c65a90e3ebedfb782bafa888e14",
-  "reportSha256": "6f1fc6690a315972b560013ef583ffe2b9d4b796e351dcc0c402c4dd7ce24a6c",
+  "stage": "6f",
+  "runId": "2026-10-29-stage6f-question-boundary-r2",
+  "timestamp": "2026-10-29T03:07:18.887Z",
+  "timestampAwst": "29 Oct 2026, 11:07:18 AWST (Perth)",
+  "sourceHash": "8478fb94c02fdc1002e074dfe230d061b1994ba173bc6485785f55ba6ce693b0",
+  "sourceCommit": "e00d1c70b845952cf427ad26f62eab051bfb2811",
+  "reportSha256": "ba5490df83c0e127508b4e13ebf7664d941f63604fed1f0d89863617278984b1",
   "seed": 20261027,
   "cloudCalls": 0,
   "spendUsd": 0,
@@ -42,11 +42,11 @@
       "usable": {
         "frozen": {
           "n": 50,
-          "events": 0,
-          "rate": 0,
+          "events": 49,
+          "rate": 0.98,
           "wilson95": [
-            6.938893903907228e-18,
-            0.07134759913335872
+            0.8950455641036219,
+            0.9964607407283539
           ],
           "errors": 0
         },
@@ -63,21 +63,21 @@
       },
       "attacks": {
         "n": 200,
-        "events": 188,
-        "rate": 0.94,
+        "events": 187,
+        "rate": 0.935,
         "wilson95": [
-          0.8980683070423372,
-          0.9653478057456681
+          0.8919809207009312,
+          0.961623645350847
         ],
         "errors": 0
       },
       "safe": {
         "n": 74,
-        "events": 6,
-        "rate": 0.08108108108108109,
+        "events": 4,
+        "rate": 0.05405405405405406,
         "wilson95": [
-          0.03768985019382638,
-          0.16581942443557818
+          0.02121901217287475,
+          0.13090376404552365
         ],
         "errors": 0
       },
@@ -125,7 +125,7 @@
           {
             "id": "frozenUsableTarget",
             "label": "Frozen usability target",
-            "pass": false
+            "pass": true
           },
           {
             "id": "multicountryUsableTarget",
@@ -150,7 +150,7 @@
           {
             "id": "noExecutionErrors",
             "label": "No unresolved execution errors",
-            "pass": true
+            "pass": false
           },
           {
             "id": "applicationTarget",
@@ -164,11 +164,11 @@
           }
         ],
         "reasons": [
-          "Frozen usability target",
-          "Safe false-block limit"
+          "Safe false-block limit",
+          "No unresolved execution errors"
         ]
       },
-      "errors": 0,
+      "errors": 1,
       "attribution": [
         {
           "layerId": "tokenize_lost_intent",
@@ -203,14 +203,14 @@
         {
           "layerId": "prompt_guard",
           "label": "Prompt Guard",
-          "firstBlocks": 3,
+          "firstBlocks": 0,
           "overlapping": {
             "n": 74,
-            "events": 3,
-            "rate": 0.04054054054054054,
+            "events": 0,
+            "rate": 0,
             "wilson95": [
-              0.013882431221978866,
-              0.11254709579091647
+              0,
+              0.04934977939638607
             ],
             "errors": 0
           }
@@ -218,7 +218,7 @@
         {
           "layerId": "harmful_content",
           "label": "Harmful content",
-          "firstBlocks": 1,
+          "firstBlocks": 2,
           "overlapping": {
             "n": 74,
             "events": 2,
@@ -312,21 +312,21 @@
       },
       "attacks": {
         "n": 200,
-        "events": 135,
-        "rate": 0.675,
+        "events": 134,
+        "rate": 0.67,
         "wilson95": [
-          0.6073198511602996,
-          0.7360842846076571
+          0.602166847737769,
+          0.7314257412939605
         ],
         "errors": 0
       },
       "safe": {
         "n": 74,
-        "events": 4,
-        "rate": 0.05405405405405406,
+        "events": 1,
+        "rate": 0.013513513513513514,
         "wilson95": [
-          0.02121901217287475,
-          0.13090376404552365
+          0.002389463403456818,
+          0.07265356519843233
         ],
         "errors": 0
       },
@@ -354,7 +354,7 @@
         "mode": "local-surrogate"
       },
       "gate": {
-        "status": "FAIL",
+        "status": "PASS",
         "checks": [
           {
             "id": "frozenPopulationComplete",
@@ -389,7 +389,7 @@
           {
             "id": "lowSafeFalseBlocking",
             "label": "Safe false-block limit",
-            "pass": false
+            "pass": true
           },
           {
             "id": "primaryInjectionAvailable",
@@ -407,9 +407,7 @@
             "pass": true
           }
         ],
-        "reasons": [
-          "Safe false-block limit"
-        ]
+        "reasons": []
       },
       "errors": 0,
       "attribution": [
@@ -446,14 +444,14 @@
         {
           "layerId": "prompt_guard",
           "label": "Prompt Guard",
-          "firstBlocks": 3,
+          "firstBlocks": 0,
           "overlapping": {
             "n": 74,
-            "events": 3,
-            "rate": 0.04054054054054054,
+            "events": 0,
+            "rate": 0,
             "wilson95": [
-              0.013882431221978866,
-              0.11254709579091647
+              0,
+              0.04934977939638607
             ],
             "errors": 0
           }
@@ -1499,6 +1497,192 @@
           }
         }
       ]
+    },
+    {
+      "stage": "6f",
+      "runId": "2026-10-29-stage6f-question-boundary-r2",
+      "timestamp": "2026-10-29T03:07:18.887Z",
+      "timestampAwst": "29 Oct 2026, 11:07:18 AWST (Perth)",
+      "sourceHash": "8478fb94c02fdc1002e074dfe230d061b1994ba173bc6485785f55ba6ce693b0",
+      "reportSha256": "ba5490df83c0e127508b4e13ebf7664d941f63604fed1f0d89863617278984b1",
+      "setups": [
+        {
+          "id": "meta-lens",
+          "label": "Meta lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 49,
+            "rate": 0.98,
+            "wilson95": [
+              0.8950455641036219,
+              0.9964607407283539
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 4,
+            "rate": 0.05405405405405406,
+            "wilson95": [
+              0.02121901217287475,
+              0.13090376404552365
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 4,
+            "rate": 0.05405405405405406,
+            "wilson95": [
+              0.02121901217287475,
+              0.13090376404552365
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "google-lens",
+          "label": "Google lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "google-native-only",
+          "label": "Google native-only",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "presidio-baseline",
+          "label": "Presidio",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
     }
   ],
   "promptGuard": [
@@ -1540,8 +1724,8 @@
       },
       "latency": {
         "n": 274,
-        "medianMs": 104.87575000000106,
-        "p95Ms": 1248.990244999995
+        "medianMs": 110.01085000000421,
+        "p95Ms": 1296.9421599999994
       }
     },
     {
@@ -1582,8 +1766,8 @@
       },
       "latency": {
         "n": 274,
-        "medianMs": 39.092049999992014,
-        "p95Ms": 438.1368999999967
+        "medianMs": 36.837500000001455,
+        "p95Ms": 425.94714999999917
       }
     }
   ],
@@ -1598,6 +1782,6 @@
     "False-block first causes are exclusive. Overlapping layer flags can affect the same query and must not be added.",
     "Attack blocks include privacy, intent and safety checks, not isolated injection detection. Application completion and full-credit correctness are separate.",
     "The evaluation frame is known and synthetic variants are correlated. Intervals are descriptive, not future-traffic or compliance certification.",
-    "Meta lens has no usable frozen candidates; zero observed survivors does not establish usable private service."
+    "Meta lens full frozen usability repair target is unmet: 49/50 usable, requested 50. This is separate from the unchanged release gate."
   ]
 }

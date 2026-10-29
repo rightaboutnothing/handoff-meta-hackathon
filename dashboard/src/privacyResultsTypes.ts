@@ -28,7 +28,7 @@ export interface PrivacySetup {
 }
 
 export interface PrivacyProgress {
-  stage:'6b'|'6c'|'6d';
+  stage:'6b'|'6c'|'6d'|'6f';
   runId:string|null;
   timestamp:string|null;
   timestampAwst?:string|null;
@@ -52,7 +52,7 @@ export interface PrivacyPromptGuard {
 export interface PrivacyResultsReport {
   schemaVersion:1;
   kind:'privacy-results-dashboard';
-  stage:'6d'|'6c';
+  stage:'6f'|'6d'|'6c';
   runId:string;
   timestamp:string;
   timestampAwst:string;

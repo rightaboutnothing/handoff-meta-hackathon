@@ -1,7 +1,18 @@
 import assert from 'node:assert/strict';
+import path from 'node:path';
 import {readPrivacyResults} from '../server/privacy-results.mjs';
 import {wilsonInterval} from '../../src/comparison/metrics.mjs';
-import {createPrivacyRenderer,privacyExampleHtml,PRIVACY_PANELS} from './export-privacy-dashboard.mjs';
+import {createPrivacyRenderer,privacyExampleHtml,privacyExportTarget,parsePrivacyExportArguments,PRIVACY_PANELS} from './export-privacy-dashboard.mjs';
+
+// Validate destinations without opening a browser or writing any existing
+// snapshot. Versioned exports cannot name the preserved root assets.
+const defaultTarget=privacyExportTarget(),versionedOptions={outputSubdirectory:'stage6f-r2',filenamePrefix:'stage6f'},versionedTarget=privacyExportTarget(versionedOptions);
+assert.equal(defaultTarget.outputDirectory,defaultTarget.baseDirectory);assert.equal(defaultTarget.filenamePrefix,'stage6e');
+assert.equal(path.dirname(versionedTarget.outputDirectory),defaultTarget.baseDirectory);assert.equal(path.basename(versionedTarget.outputDirectory),'stage6f-r2');assert.equal(versionedTarget.filenamePrefix,'stage6f');
+assert.deepEqual(parsePrivacyExportArguments([]),{});assert.deepEqual(parsePrivacyExportArguments(['--output-subdir','stage6f-r2','--prefix','stage6f']),versionedOptions);
+let destinationChecks=4;
+for(const bad of [null,[],{other:'stage6f-r2'},{outputSubdirectory:''},{outputSubdirectory:'../stage6d'},{outputSubdirectory:'..\\stage6d'},{outputSubdirectory:'C:\\outside'},{outputSubdirectory:'/outside'},{outputSubdirectory:'stage6f/old'},{outputSubdirectory:'.'},{outputSubdirectory:'con'},{outputSubdirectory:'with space'},{filenamePrefix:'../old'},{filenamePrefix:'with space'},{filenamePrefix:''},{filenamePrefix:'x'.repeat(65)}]){assert.throws(()=>privacyExportTarget(bad));destinationChecks++;}
+for(const args of [['--other','value'],['--prefix'],['--prefix','--output-subdir'],['--prefix','stage6f','--prefix','old'],['--output-subdir','../old']]){assert.throws(()=>parsePrivacyExportArguments(args));destinationChecks++;}
 
 const component=await createPrivacyRenderer();
 const visible=html=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/&#x([a-f0-9]+);/gi,(_,value)=>String.fromCodePoint(parseInt(value,16))).replace(/&#([0-9]+);/g,(_,value)=>String.fromCodePoint(parseInt(value,10))).replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/\s+/g,' ').trim();
@@ -28,7 +39,7 @@ for(const panel of [undefined,...PRIVACY_PANELS]){
 }
 
 const report=await readPrivacyResults();
-assert.ok(report,'A hash-verified completed local report is required for Stage 6e exports');
+assert.ok(report,'A hash-verified completed local report is required for privacy dashboard exports');
 assert.equal(report.cloudCalls,0);assert.equal(report.spendUsd,0);assert.equal(report.liveDispatchEnabled,false);
 const all=render(report);
 for(const panel of PRIVACY_PANELS)assert.equal((all.html.match(new RegExp(`data-export-panel="${panel}"`,'g'))??[]).length,1);
@@ -90,4 +101,4 @@ assert.match(example,/default-src &#x27;none&#x27;|default-src 'none'/);assert.o
 for(const panel of PRIVACY_PANELS)assert.equal((example.match(new RegExp(`data-export-panel="${panel}"`,'g'))??[]).length,1);
 assert.ok(visible(example).includes(report.sourceHash));
 
-console.log(JSON.stringify({check:'privacy-results-ui-semantic-rendering',passed:true,renderCases:cases,runId:report.runId,stage:report.stage,coverage:['same component for live and static examples','all four setup rows','counts and Wilson intervals','complete versus full-credit applications','zero-useful-candidate warning','three-stage distinct history','exclusive first and overlapping attribution','Prompt Guard jailbreak versus injection','Perth measurement time and source hashes','nonhardcoded fixture mutation','private fields and usage values absent','missing measurements pending','invalid offline identity hidden','self-contained script-free static example'],modelCalls:0,cloudCalls:0,browserCalls:0}));
+console.log(JSON.stringify({check:'privacy-results-ui-semantic-rendering',passed:true,renderCases:cases,destinationChecks,runId:report.runId,stage:report.stage,coverage:['same component for live and static examples','all four setup rows','counts and Wilson intervals','complete versus full-credit applications','zero-useful-candidate warning','distinct measured history stages','exclusive first and overlapping attribution','Prompt Guard jailbreak versus injection','Perth measurement time and source hashes','nonhardcoded fixture mutation','private fields and usage values absent','missing measurements pending','invalid offline identity hidden','self-contained script-free static example','versioned export destination preserves root assets','traversal and invalid export arguments rejected'],modelCalls:0,cloudCalls:0,browserCalls:0}));

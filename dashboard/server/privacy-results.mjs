@@ -6,7 +6,7 @@ import {wilsonInterval} from '../../src/comparison/metrics.mjs';
 import {canonicalJSON} from '../../src/rag/receipts.mjs';
 
 const defaultRoot=fileURLToPath(new URL('../../results/',import.meta.url));
-const stages=['6b','6c','6d'];
+const stages=['6b','6c','6d','6f'];
 const labels={'meta-lens':'Meta lens','google-lens':'Google lens','google-native-only':'Google native-only','presidio-baseline':'Presidio'};
 const attributionLabels={tokenize_lost_intent:'Tokenize lost-intent',question_validation:'Question validation',prompt_guard:'Prompt Guard',harmful_content:'Harmful content',rewrite:'Rewrite refusal / contract',other:'Other checks'};
 const checkLabels={frozenPopulationComplete:'Frozen population complete',multicountryPopulationComplete:'Country population complete',noPlantedSurvivors:'No planted PII survivors',frozenUsableTarget:'Frozen usability target',multicountryUsableTarget:'Country usability target',safePopulationComplete:'Safe population complete',lowSafeFalseBlocking:'Safe false-block limit',primaryInjectionAvailable:'Primary injection detector available',noExecutionErrors:'No unresolved execution errors',applicationTarget:'Local application target',productionCandidate:'Complete production-candidate pipeline'};
@@ -64,7 +64,7 @@ function gate(setup){
   for(const [id,label]of Object.entries(checkLabels)){if(id==='applicationTarget'||id==='productionCandidate')continue;const pass=setup.gate?.checks?.[id];if(pass!==undefined){if(typeof pass!=='boolean')fail();checks.push({id,label,pass});}}
   if(setup.applicationTarget?.appliesToThisSetup===true){if(typeof setup.applicationTarget.passed!=='boolean')fail();checks.push({id:'applicationTarget',label:checkLabels.applicationTarget,pass:setup.applicationTarget.passed});}
   if(typeof setup.productionCandidate!=='boolean')fail();checks.push({id:'productionCandidate',label:checkLabels.productionCandidate,pass:setup.productionCandidate});
-  const recorded=setup.stage6dReadiness?.passed??setup.gate?.stage7Allowed??setup.gate?.liveReleaseAllowed;
+  const recorded=setup.stage6fReadiness?.passed??setup.stage6dReadiness?.passed??setup.gate?.stage7Allowed??setup.gate?.liveReleaseAllowed;
   if(recorded!==undefined&&typeof recorded!=='boolean')fail();
   if(recorded===true&&checks.some(row=>row.pass===false))throw new Error('PRIVACY_RESULTS_GATE_CONTRADICTION');
   const status=setup.productionCandidate===false||recorded===false?'FAIL':recorded===true?'PASS':'PENDING';
@@ -110,7 +110,7 @@ function detector(value){
  * payloads and token/key material are structurally absent from the public DTO. */
 export async function readPrivacyResults({resultsDir=defaultRoot}={}){
   let base;try{base=await realpath(resultsDir);}catch(error){if(error.code==='ENOENT')return null;throw error;}
-  const runs=await Promise.all(stages.map(stage=>published(base,stage))),chosen=[runs[2],runs[1]].find(value=>value?.complete);
+  const runs=await Promise.all(stages.map(stage=>published(base,stage))),chosen=[runs[3],runs[2],runs[1]].find(value=>value?.complete);
   if(!chosen)return null;
   const gaps=[];for(let i=0;i<runs.length;i++)if(!runs[i]?.complete)gaps.push(`Stage ${stages[i]} has no completed, published measurement.`);
   const report=chosen.report,setups=Object.keys(labels).map(id=>{const setup=report.setups.find(row=>row.id===id);if(!setup)fail();return normalizeSetup(setup,gaps);});
@@ -118,11 +118,12 @@ export async function readPrivacyResults({resultsDir=defaultRoot}={}){
   if(!runs[0]?.report.setups.every(setup=>setup.privacy?.multicountry))gaps.push('Stage 6b did not publish the separate multi-country population.');
   if(setups.some(setup=>setup.id==='presidio-baseline'&&!setup.applications.complete))gaps.push('Local answer application is not applicable to the Presidio comparison.');
   if(!Array.isArray(report.promptGuardStandalone)||!report.promptGuardStandalone.length)gaps.push('Standalone Prompt Guard jailbreak, injection and latency measurements are pending.');
-  const progress=runs.map((run,index)=>{
+  const progress=runs.slice(0,chosen.stage==='6f'?4:3).map((run,index)=>{
     if(!run?.complete)return{stage:stages[index],runId:null,timestamp:null,timestampAwst:null,sourceHash:null,reportSha256:null,setups:[]};
     const value=run.report;return{stage:stages[index],runId:value.runId,timestamp:value.timestamp,timestampAwst:awst(value.timestamp),sourceHash:value.source.hash,reportSha256:run.pointer.reportSha256,setups:Object.keys(labels).map(id=>{const setup=value.setups.find(row=>row.id===id);if(!setup)fail();return{id,label:labels[id],usableFrozen:privacy(setup,'frozen').usable,usableMulticountry:privacy(setup,'multicountry').usable,safeOperational:findMetric(setup,'safe-operational'),safeDetected:findMetric(setup,'safe-detected')};})};
   });
   const notes=['All figures come from hash-verified local result files. Wilson intervals are derived from the recorded counts.','PII survivors are per query with any planted value retained. Zero survivors with no usable questions is not successful service.','Stage 6b operational false blocks include the pending injection layer; available-check detections are a separate series. The methods differ between stages.','False-block first causes are exclusive. Overlapping layer flags can affect the same query and must not be added.','Attack blocks include privacy, intent and safety checks, not isolated injection detection. Application completion and full-credit correctness are separate.','The evaluation frame is known and synthetic variants are correlated. Intervals are descriptive, not future-traffic or compliance certification.'];
   for(const setup of setups)if(setup.usable.frozen?.n>0&&setup.usable.frozen.events===0)notes.push(`${setup.label} has no usable frozen candidates; zero observed survivors does not establish usable private service.`);
+  for(const setup of report.setups)if(setup.repairTarget?.applies===true){const goal=setup.repairTarget;if(![goal.usable,goal.attempted,goal.target].every(integer)||goal.usable>goal.attempted||goal.target>goal.attempted||typeof goal.passed!=='boolean'||goal.passed!==(goal.usable>=goal.target))fail();if(!goal.passed)notes.push(`${labels[setup.id]} full frozen usability repair target is unmet: ${goal.usable}/${goal.attempted} usable, requested ${goal.target}. This is separate from the unchanged release gate.`);}
   return{schemaVersion:1,kind:'privacy-results-dashboard',stage:chosen.stage,runId:report.runId,timestamp:report.timestamp,timestampAwst:awst(report.timestamp),sourceHash:report.source.hash,sourceCommit:report.source.gitCommit,reportSha256:chosen.pointer.reportSha256,seed:report.settings.seed,cloudCalls:report.cloudCalls,spendUsd:report.spendUsd,liveDispatchEnabled:false,setups,progress,promptGuard:(report.promptGuardStandalone??[]).map(detector),gaps:[...new Set(gaps)],notes};
 }

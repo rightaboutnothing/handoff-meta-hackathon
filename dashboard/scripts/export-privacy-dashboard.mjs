@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {existsSync} from 'node:fs';
-import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {lstat,mkdir,readFile,realpath,writeFile} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
@@ -12,6 +12,44 @@ const dashboardRoot=fileURLToPath(new URL('../',import.meta.url));
 const repositoryRoot=path.resolve(dashboardRoot,'..');
 const require=createRequire(import.meta.url);
 const sha=value=>createHash('sha256').update(value).digest('hex');
+const exportBasename=/^[a-z][a-z0-9-]{0,63}$/;
+
+/** Versioned exports are one ordinary child folder, never a path. Keeping the
+ * default destination unchanged also keeps existing export commands compatible. */
+export function privacyExportTarget(options={}){
+  if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>!['outputSubdirectory','filenamePrefix'].includes(key)))throw Error('PRIVACY_EXPORT_INVALID_OPTIONS');
+  const {outputSubdirectory,filenamePrefix='stage6e'}=options;
+  if(outputSubdirectory!==undefined&&(typeof outputSubdirectory!=='string'||!exportBasename.test(outputSubdirectory)||/^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(outputSubdirectory)))throw Error('PRIVACY_EXPORT_INVALID_SUBDIRECTORY');
+  if(typeof filenamePrefix!=='string'||!exportBasename.test(filenamePrefix))throw Error('PRIVACY_EXPORT_INVALID_PREFIX');
+  const baseDirectory=path.join(repositoryRoot,'docs/dashboard');
+  return{baseDirectory,outputDirectory:outputSubdirectory?path.join(baseDirectory,outputSubdirectory):baseDirectory,outputSubdirectory:outputSubdirectory??null,filenamePrefix};
+}
+
+export function parsePrivacyExportArguments(args){
+  if(!Array.isArray(args))throw Error('PRIVACY_EXPORT_INVALID_ARGUMENTS');
+  const options={};
+  for(let index=0;index<args.length;index++){
+    const key=args[index]==='--output-subdir'?'outputSubdirectory':args[index]==='--prefix'?'filenamePrefix':null;
+    if(!key||Object.hasOwn(options,key)||typeof args[index+1]!=='string'||args[index+1].startsWith('--'))throw Error('PRIVACY_EXPORT_INVALID_ARGUMENTS');
+    options[key]=args[++index];
+  }
+  privacyExportTarget(options);
+  return options;
+}
+
+async function prepareExportDirectory(target){
+  await mkdir(target.baseDirectory,{recursive:true});
+  const baseInfo=await lstat(target.baseDirectory);
+  if(!baseInfo.isDirectory()||baseInfo.isSymbolicLink())throw Error('PRIVACY_EXPORT_UNSAFE_DIRECTORY');
+  const base=await realpath(target.baseDirectory);
+  const repository=await realpath(repositoryRoot),relative=path.relative(repository,base);
+  if(!relative||relative.startsWith('..'+path.sep)||relative==='..'||path.isAbsolute(relative))throw Error('PRIVACY_EXPORT_UNSAFE_DIRECTORY');
+  if(target.outputSubdirectory){
+    await mkdir(target.outputDirectory,{recursive:true});
+    const info=await lstat(target.outputDirectory),resolved=await realpath(target.outputDirectory);
+    if(!info.isDirectory()||info.isSymbolicLink()||path.dirname(resolved).toLowerCase()!==base.toLowerCase())throw Error('PRIVACY_EXPORT_UNSAFE_DIRECTORY');
+  }
+}
 
 /** The static examples and the live app share the exact same React component.
  * Only the adapter's aggregate DTO is accepted; it is never embedded as JSON. */
@@ -44,14 +82,15 @@ async function chooseBrowser(chromium){
   throw Error('PRIVACY_EXPORT_LOCAL_BROWSER_UNAVAILABLE');
 }
 
-export async function exportPrivacyDashboard(){
+export async function exportPrivacyDashboard(options={}){
+  const target=privacyExportTarget(options);
   const {readPrivacyResults}=await import('../server/privacy-results.mjs');
   const report=await readPrivacyResults();
   if(!report)throw Error('PRIVACY_EXPORT_LOCKED_RESULTS_PENDING');
   assert.equal(report.cloudCalls,0);assert.equal(report.spendUsd,0);assert.equal(report.liveDispatchEnabled,false);
   for(const value of [report.sourceHash,report.reportSha256])assert.match(value,/^[a-f0-9]{64}$/);
-  const outputDirectory=path.join(repositoryRoot,'docs/dashboard');
-  await mkdir(outputDirectory,{recursive:true});
+  const {outputDirectory}=target;
+  await prepareExportDirectory(target);
   const html=await privacyExampleHtml(report),htmlFile=path.join(outputDirectory,'index.html');
   await writeFile(htmlFile,html,'utf8');
   const {chromium}=await import('@playwright/test'),choice=await chooseBrowser(chromium);
@@ -75,7 +114,7 @@ export async function exportPrivacyDashboard(){
       assert.equal(await panel.count(),1,'A snapshot panel must have exactly one source element');
       await panel.scrollIntoViewIfNeeded();
       const box=await panel.boundingBox();assert.ok(box&&box.width>0&&box.height>0);
-      const filename=`stage6e-${id}.png`,bytes=await panel.screenshot({type:'png',animations:'disabled',scale:'css'});
+      const filename=`${target.filenamePrefix}-${id}.png`,bytes=await panel.screenshot({type:'png',animations:'disabled',scale:'css'});
       await writeFile(path.join(outputDirectory,filename),bytes);
       panels.push({id,file:filename,sha256:sha(bytes),width:Math.ceil(box.width),height:Math.ceil(box.height)});
     }
@@ -85,11 +124,12 @@ export async function exportPrivacyDashboard(){
   const rendererSourceHashes={};
   for(const name of ['src/components/PrivacyResults.tsx','src/components/PrivacyResults.css','src/privacyResultsTypes.ts','server/privacy-results.mjs','scripts/export-privacy-dashboard.mjs'])rendererSourceHashes['dashboard/'+name]=sha(await readFile(path.join(dashboardRoot,name)));
   const manifest={schemaVersion:1,kind:'privacy-dashboard-snapshots',generatedAt:new Date().toISOString(),measurement:{stage:report.stage,runId:report.runId,reportSha256:report.reportSha256,sourceHash:report.sourceHash,sourceCommit:report.sourceCommit,seed:report.seed,timestamp:report.timestamp,timestampAwst:report.timestampAwst,cloudCalls:report.cloudCalls,spendUsd:report.spendUsd,liveDispatchEnabled:report.liveDispatchEnabled},html:{file:'index.html',sha256:sha(html)},panels,rendererSourceHashes,rendering:{sameComponentAsDashboard:true,browser:choice.kind,externalRequests,embeddedRawReport:false,modelCalls:0}};
+  if(target.outputSubdirectory||target.filenamePrefix!=='stage6e')manifest.destination={outputSubdirectory:target.outputSubdirectory,filenamePrefix:target.filenamePrefix};
   await writeFile(path.join(outputDirectory,'manifest.json'),JSON.stringify(manifest,null,2)+'\n','utf8');
   return{runId:report.runId,outputDirectory,html:'index.html',panels:panels.map(({id,file,width,height})=>({id,file,width,height})),manifest:'manifest.json',modelCalls:0,cloudCalls:0,externalRequests};
 }
 
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
-  try{console.log(JSON.stringify(await exportPrivacyDashboard()));}
+  try{console.log(JSON.stringify(await exportPrivacyDashboard(parsePrivacyExportArguments(process.argv.slice(2)))));}
   catch{console.error('Local privacy dashboard export failed. No private content or credentials were printed.');process.exitCode=1;}
 }

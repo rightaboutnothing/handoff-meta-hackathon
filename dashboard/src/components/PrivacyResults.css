@@ -5,3 +5,5 @@
 /* Keep metric groups distinct from the plain label spans above them. */
 .pvr-pg-rates .pvr-measure{display:grid;gap:6px;margin:0;color:var(--pvr-ink)}.pvr-pg-rates .pvr-measure>span{font-size:12px}.pvr-pg-rates .pvr-measure small{font-size:10px;white-space:normal;line-height:1.6}
 @media(prefers-reduced-motion:reduce){.pvr-view *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.pvr-progress-table{table-layout:fixed}.pvr-progress-table th,.pvr-progress-table td{width:auto}
