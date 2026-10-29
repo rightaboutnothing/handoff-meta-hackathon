@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "privacy-dashboard-snapshots",
+  "generatedAt": "2026-10-29T02:04:15.857Z",
+  "measurement": {
+    "stage": "6d",
+    "runId": "2026-10-29-stage6d-question-boundary-r4",
+    "reportSha256": "6f1fc6690a315972b560013ef583ffe2b9d4b796e351dcc0c402c4dd7ce24a6c",
+    "sourceHash": "b9582447090a4498cff70770293ccd0986999dcdd843b435cb3a4c919c1ae5a7",
+    "sourceCommit": "db4fac6f56391c65a90e3ebedfb782bafa888e14",
+    "seed": 20261027,
+    "timestamp": "2026-10-29T01:49:44.126Z",
+    "timestampAwst": "29 Oct 2026, 09:49:44 AWST (Perth)",
+    "cloudCalls": 0,
+    "spendUsd": 0,
+    "liveDispatchEnabled": false
+  },
+  "html": {
+    "file": "index.html",
+    "sha256": "3cf12ba2ecb3fa26c8572bcf6edf2415c9588b8498aff1997c1f0b6fa2256992"
+  },
+  "panels": [
+    {
+      "id": "headline",
+      "file": "stage6e-headline.png",
+      "sha256": "236f2078563e16c18a469aa83a3a4cb051e305fe6bd11093084aab99dd540c32",
+      "width": 1440,
+      "height": 1230
+    },
+    {
+      "id": "progress",
+      "file": "stage6e-progress.png",
+      "sha256": "33589807a4ad7bc5066c8488fe657476f4c0f1729e830bca810b19eba0f515e0",
+      "width": 1440,
+      "height": 1099
+    },
+    {
+      "id": "attribution",
+      "file": "stage6e-attribution.png",
+      "sha256": "3b02320cf71270f16c80e95609c0f0fc9da89c96c3c343d3c49974441a1302c3",
+      "width": 1440,
+      "height": 691
+    },
+    {
+      "id": "prompt-guard",
+      "file": "stage6e-prompt-guard.png",
+      "sha256": "4950b4b96c7c9cb2cc3c82939434f5c120a756202f51076d3f4517f7e887961a",
+      "width": 1440,
+      "height": 617
+    },
+    {
+      "id": "provenance",
+      "file": "stage6e-provenance.png",
+      "sha256": "bf7642426d0c83e0fd8843cea73a80bb353c107ae4b3b65d94c49f0d2994e6f5",
+      "width": 1440,
+      "height": 600
+    }
+  ],
+  "rendererSourceHashes": {
+    "dashboard/src/components/PrivacyResults.tsx": "5c95a2a434708c2d16c6cfe9273d98a735901891da9e55d6ca43ace3676110b4",
+    "dashboard/src/components/PrivacyResults.css": "cfcfb08aa2e66154c540276a10e4956cf964b3f40912d5751204fe8c9effa6bc",
+    "dashboard/src/privacyResultsTypes.ts": "2d2c4280ea118c88825c67df07cc4f6fff7e04fb31e2e96e8fa38586dbe632d6",
+    "dashboard/server/privacy-results.mjs": "cae41fa3a27d6ce71e954ee5c8b7e6ff557777d7aa943cb835648556f85d2f38",
+    "dashboard/scripts/export-privacy-dashboard.mjs": "0d7e01ec66871604734ca2409cc5e5e3cf25ab68e962ab053c7423d5419fd7eb"
+  },
+  "rendering": {
+    "sameComponentAsDashboard": true,
+    "browser": "installed-chrome",
+    "externalRequests": 0,
+    "embeddedRawReport": false,
+    "modelCalls": 0
+  }
+}

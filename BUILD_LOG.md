@@ -1,5 +1,13 @@
 # Handoff build log
 
+## 29 October 2026: Stage 6e locked-results dashboard and judging assets
+
+Added a shared data-bound Results view at `http://127.0.0.1:4173/#results`, also leading Trust and Benchmarks, selected from completed Stage 6d with Stage 6c fallback. The loader validates report/source hashes and publishes numeric aggregates and provenance only. Historical methods remain separate, first-block bars do not double-count overlapping flags, and zero survivors with no usable questions remains a visible failure.
+
+The [offline visual example](docs/dashboard/index.html) and five [PNG snapshots](docs/dashboard/manifest.json) render the same component as the app: [headline](docs/dashboard/stage6e-headline.png), [progress](docs/dashboard/stage6e-progress.png), [attribution](docs/dashboard/stage6e-attribution.png), [Prompt Guard](docs/dashboard/stage6e-prompt-guard.png) and [provenance](docs/dashboard/stage6e-provenance.png). The manifest records the measured source/report hashes, seed, AWST run time, renderer hashes and image hashes. Export made zero model/cloud calls and zero external page requests. All original result files remain unchanged.
+
+All **638/638 unit tests** pass, including Windows junction confinement, plus the dashboard build/safety checks and 23 new privacy-view semantic cases. No new benchmark or model run was performed. Stage 6b has no separate multi-country population; Presidio has no applicable local-answer study. Those gaps stay unmeasured rather than receiving invented figures.
+
 ## 28 October 2026: Interim offline-Meta benchmark
 
 The resumable benchmark has reached **900/1200 effective results**. This is an interim checkpoint, not the final six-suite result: **300 Meta-dependent items remain deferred until Meta access is explicitly confirmed restored**.

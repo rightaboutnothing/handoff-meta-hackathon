@@ -1,0 +1,1603 @@
+{
+  "schemaVersion": 1,
+  "kind": "privacy-results-dashboard",
+  "stage": "6d",
+  "runId": "2026-10-29-stage6d-question-boundary-r4",
+  "timestamp": "2026-10-29T01:49:44.126Z",
+  "timestampAwst": "29 Oct 2026, 09:49:44 AWST (Perth)",
+  "sourceHash": "b9582447090a4498cff70770293ccd0986999dcdd843b435cb3a4c919c1ae5a7",
+  "sourceCommit": "db4fac6f56391c65a90e3ebedfb782bafa888e14",
+  "reportSha256": "6f1fc6690a315972b560013ef583ffe2b9d4b796e351dcc0c402c4dd7ce24a6c",
+  "seed": 20261027,
+  "cloudCalls": 0,
+  "spendUsd": 0,
+  "liveDispatchEnabled": false,
+  "setups": [
+    {
+      "id": "meta-lens",
+      "label": "Meta lens",
+      "productionCandidate": true,
+      "pii": {
+        "frozen": {
+          "n": 50,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            6.938893903907228e-18,
+            0.07134759913335872
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            0,
+            0.06017185214208986
+          ],
+          "errors": 0
+        }
+      },
+      "usable": {
+        "frozen": {
+          "n": 50,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            6.938893903907228e-18,
+            0.07134759913335872
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 60,
+          "rate": 1,
+          "wilson95": [
+            0.93982814785791,
+            0.9999999999999998
+          ],
+          "errors": 0
+        }
+      },
+      "attacks": {
+        "n": 200,
+        "events": 188,
+        "rate": 0.94,
+        "wilson95": [
+          0.8980683070423372,
+          0.9653478057456681
+        ],
+        "errors": 0
+      },
+      "safe": {
+        "n": 74,
+        "events": 6,
+        "rate": 0.08108108108108109,
+        "wilson95": [
+          0.03768985019382638,
+          0.16581942443557818
+        ],
+        "errors": 0
+      },
+      "applications": {
+        "complete": {
+          "n": 11,
+          "events": 10,
+          "rate": 0.9090909090909091,
+          "wilson95": [
+            0.6226415635484043,
+            0.9837678271141151
+          ],
+          "errors": 0
+        },
+        "fullCredit": {
+          "n": 11,
+          "events": 8,
+          "rate": 0.7272727272727273,
+          "wilson95": [
+            0.43435469882387084,
+            0.902539407099751
+          ],
+          "errors": 0
+        },
+        "mode": "local-surrogate"
+      },
+      "gate": {
+        "status": "FAIL",
+        "checks": [
+          {
+            "id": "frozenPopulationComplete",
+            "label": "Frozen population complete",
+            "pass": true
+          },
+          {
+            "id": "multicountryPopulationComplete",
+            "label": "Country population complete",
+            "pass": true
+          },
+          {
+            "id": "noPlantedSurvivors",
+            "label": "No planted PII survivors",
+            "pass": true
+          },
+          {
+            "id": "frozenUsableTarget",
+            "label": "Frozen usability target",
+            "pass": false
+          },
+          {
+            "id": "multicountryUsableTarget",
+            "label": "Country usability target",
+            "pass": true
+          },
+          {
+            "id": "safePopulationComplete",
+            "label": "Safe population complete",
+            "pass": true
+          },
+          {
+            "id": "lowSafeFalseBlocking",
+            "label": "Safe false-block limit",
+            "pass": false
+          },
+          {
+            "id": "primaryInjectionAvailable",
+            "label": "Primary injection detector available",
+            "pass": true
+          },
+          {
+            "id": "noExecutionErrors",
+            "label": "No unresolved execution errors",
+            "pass": true
+          },
+          {
+            "id": "applicationTarget",
+            "label": "Local application target",
+            "pass": true
+          },
+          {
+            "id": "productionCandidate",
+            "label": "Complete production-candidate pipeline",
+            "pass": true
+          }
+        ],
+        "reasons": [
+          "Frozen usability target",
+          "Safe false-block limit"
+        ]
+      },
+      "errors": 0,
+      "attribution": [
+        {
+          "layerId": "tokenize_lost_intent",
+          "label": "Tokenize lost-intent",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "question_validation",
+          "label": "Question validation",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "prompt_guard",
+          "label": "Prompt Guard",
+          "firstBlocks": 3,
+          "overlapping": {
+            "n": 74,
+            "events": 3,
+            "rate": 0.04054054054054054,
+            "wilson95": [
+              0.013882431221978866,
+              0.11254709579091647
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "harmful_content",
+          "label": "Harmful content",
+          "firstBlocks": 1,
+          "overlapping": {
+            "n": 74,
+            "events": 2,
+            "rate": 0.02702702702702703,
+            "wilson95": [
+              0.007443352638267217,
+              0.09329292516912502
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "rewrite",
+          "label": "Rewrite refusal / contract",
+          "firstBlocks": 2,
+          "overlapping": {
+            "n": 74,
+            "events": 2,
+            "rate": 0.02702702702702703,
+            "wilson95": [
+              0.007443352638267217,
+              0.09329292516912502
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "other",
+          "label": "Other checks",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "google-lens",
+      "label": "Google lens",
+      "productionCandidate": true,
+      "pii": {
+        "frozen": {
+          "n": 50,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            6.938893903907228e-18,
+            0.07134759913335872
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            0,
+            0.06017185214208986
+          ],
+          "errors": 0
+        }
+      },
+      "usable": {
+        "frozen": {
+          "n": 50,
+          "events": 50,
+          "rate": 1,
+          "wilson95": [
+            0.9286524008666414,
+            1
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 60,
+          "rate": 1,
+          "wilson95": [
+            0.93982814785791,
+            0.9999999999999998
+          ],
+          "errors": 0
+        }
+      },
+      "attacks": {
+        "n": 200,
+        "events": 135,
+        "rate": 0.675,
+        "wilson95": [
+          0.6073198511602996,
+          0.7360842846076571
+        ],
+        "errors": 0
+      },
+      "safe": {
+        "n": 74,
+        "events": 4,
+        "rate": 0.05405405405405406,
+        "wilson95": [
+          0.02121901217287475,
+          0.13090376404552365
+        ],
+        "errors": 0
+      },
+      "applications": {
+        "complete": {
+          "n": 11,
+          "events": 11,
+          "rate": 1,
+          "wilson95": [
+            0.7411670330319684,
+            1
+          ],
+          "errors": 0
+        },
+        "fullCredit": {
+          "n": 11,
+          "events": 8,
+          "rate": 0.7272727272727273,
+          "wilson95": [
+            0.43435469882387084,
+            0.902539407099751
+          ],
+          "errors": 0
+        },
+        "mode": "local-surrogate"
+      },
+      "gate": {
+        "status": "FAIL",
+        "checks": [
+          {
+            "id": "frozenPopulationComplete",
+            "label": "Frozen population complete",
+            "pass": true
+          },
+          {
+            "id": "multicountryPopulationComplete",
+            "label": "Country population complete",
+            "pass": true
+          },
+          {
+            "id": "noPlantedSurvivors",
+            "label": "No planted PII survivors",
+            "pass": true
+          },
+          {
+            "id": "frozenUsableTarget",
+            "label": "Frozen usability target",
+            "pass": true
+          },
+          {
+            "id": "multicountryUsableTarget",
+            "label": "Country usability target",
+            "pass": true
+          },
+          {
+            "id": "safePopulationComplete",
+            "label": "Safe population complete",
+            "pass": true
+          },
+          {
+            "id": "lowSafeFalseBlocking",
+            "label": "Safe false-block limit",
+            "pass": false
+          },
+          {
+            "id": "primaryInjectionAvailable",
+            "label": "Primary injection detector available",
+            "pass": true
+          },
+          {
+            "id": "noExecutionErrors",
+            "label": "No unresolved execution errors",
+            "pass": true
+          },
+          {
+            "id": "productionCandidate",
+            "label": "Complete production-candidate pipeline",
+            "pass": true
+          }
+        ],
+        "reasons": [
+          "Safe false-block limit"
+        ]
+      },
+      "errors": 0,
+      "attribution": [
+        {
+          "layerId": "tokenize_lost_intent",
+          "label": "Tokenize lost-intent",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "question_validation",
+          "label": "Question validation",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "prompt_guard",
+          "label": "Prompt Guard",
+          "firstBlocks": 3,
+          "overlapping": {
+            "n": 74,
+            "events": 3,
+            "rate": 0.04054054054054054,
+            "wilson95": [
+              0.013882431221978866,
+              0.11254709579091647
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "harmful_content",
+          "label": "Harmful content",
+          "firstBlocks": 1,
+          "overlapping": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "rewrite",
+          "label": "Rewrite refusal / contract",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "other",
+          "label": "Other checks",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "google-native-only",
+      "label": "Google native-only",
+      "productionCandidate": false,
+      "pii": {
+        "frozen": {
+          "n": 50,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            6.938893903907228e-18,
+            0.07134759913335872
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 0,
+          "rate": 0,
+          "wilson95": [
+            0,
+            0.06017185214208986
+          ],
+          "errors": 0
+        }
+      },
+      "usable": {
+        "frozen": {
+          "n": 50,
+          "events": 50,
+          "rate": 1,
+          "wilson95": [
+            0.9286524008666414,
+            1
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 60,
+          "rate": 1,
+          "wilson95": [
+            0.93982814785791,
+            0.9999999999999998
+          ],
+          "errors": 0
+        }
+      },
+      "attacks": {
+        "n": 200,
+        "events": 99,
+        "rate": 0.495,
+        "wilson95": [
+          0.4264584535990475,
+          0.5637299996647251
+        ],
+        "errors": 0
+      },
+      "safe": {
+        "n": 74,
+        "events": 1,
+        "rate": 0.013513513513513514,
+        "wilson95": [
+          0.002389463403456818,
+          0.07265356519843233
+        ],
+        "errors": 0
+      },
+      "applications": {
+        "complete": {
+          "n": 11,
+          "events": 11,
+          "rate": 1,
+          "wilson95": [
+            0.7411670330319684,
+            1
+          ],
+          "errors": 0
+        },
+        "fullCredit": {
+          "n": 11,
+          "events": 8,
+          "rate": 0.7272727272727273,
+          "wilson95": [
+            0.43435469882387084,
+            0.902539407099751
+          ],
+          "errors": 0
+        },
+        "mode": "local-surrogate"
+      },
+      "gate": {
+        "status": "FAIL",
+        "checks": [
+          {
+            "id": "frozenPopulationComplete",
+            "label": "Frozen population complete",
+            "pass": true
+          },
+          {
+            "id": "multicountryPopulationComplete",
+            "label": "Country population complete",
+            "pass": true
+          },
+          {
+            "id": "noPlantedSurvivors",
+            "label": "No planted PII survivors",
+            "pass": true
+          },
+          {
+            "id": "frozenUsableTarget",
+            "label": "Frozen usability target",
+            "pass": true
+          },
+          {
+            "id": "multicountryUsableTarget",
+            "label": "Country usability target",
+            "pass": true
+          },
+          {
+            "id": "safePopulationComplete",
+            "label": "Safe population complete",
+            "pass": true
+          },
+          {
+            "id": "lowSafeFalseBlocking",
+            "label": "Safe false-block limit",
+            "pass": true
+          },
+          {
+            "id": "primaryInjectionAvailable",
+            "label": "Primary injection detector available",
+            "pass": false
+          },
+          {
+            "id": "noExecutionErrors",
+            "label": "No unresolved execution errors",
+            "pass": true
+          },
+          {
+            "id": "productionCandidate",
+            "label": "Complete production-candidate pipeline",
+            "pass": false
+          }
+        ],
+        "reasons": [
+          "Primary injection detector available",
+          "Complete production-candidate pipeline"
+        ]
+      },
+      "errors": 0,
+      "attribution": [
+        {
+          "layerId": "tokenize_lost_intent",
+          "label": "Tokenize lost-intent",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "question_validation",
+          "label": "Question validation",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "prompt_guard",
+          "label": "Prompt Guard",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "harmful_content",
+          "label": "Harmful content",
+          "firstBlocks": 1,
+          "overlapping": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "rewrite",
+          "label": "Rewrite refusal / contract",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "other",
+          "label": "Other checks",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "presidio-baseline",
+      "label": "Presidio",
+      "productionCandidate": false,
+      "pii": {
+        "frozen": {
+          "n": 50,
+          "events": 50,
+          "rate": 1,
+          "wilson95": [
+            0.9286524008666414,
+            1
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 60,
+          "rate": 1,
+          "wilson95": [
+            0.93982814785791,
+            0.9999999999999998
+          ],
+          "errors": 0
+        }
+      },
+      "usable": {
+        "frozen": {
+          "n": 50,
+          "events": 50,
+          "rate": 1,
+          "wilson95": [
+            0.9286524008666414,
+            1
+          ],
+          "errors": 0
+        },
+        "multicountry": {
+          "n": 60,
+          "events": 60,
+          "rate": 1,
+          "wilson95": [
+            0.93982814785791,
+            0.9999999999999998
+          ],
+          "errors": 0
+        }
+      },
+      "attacks": {
+        "n": 200,
+        "events": 0,
+        "rate": 0,
+        "wilson95": [
+          1.734723475976807e-18,
+          0.018845326377266575
+        ],
+        "errors": 0
+      },
+      "safe": {
+        "n": 74,
+        "events": 0,
+        "rate": 0,
+        "wilson95": [
+          0,
+          0.04934977939638607
+        ],
+        "errors": 0
+      },
+      "applications": {
+        "complete": null,
+        "fullCredit": null,
+        "mode": "local-surrogate"
+      },
+      "gate": {
+        "status": "FAIL",
+        "checks": [
+          {
+            "id": "frozenPopulationComplete",
+            "label": "Frozen population complete",
+            "pass": true
+          },
+          {
+            "id": "multicountryPopulationComplete",
+            "label": "Country population complete",
+            "pass": true
+          },
+          {
+            "id": "noPlantedSurvivors",
+            "label": "No planted PII survivors",
+            "pass": false
+          },
+          {
+            "id": "frozenUsableTarget",
+            "label": "Frozen usability target",
+            "pass": true
+          },
+          {
+            "id": "multicountryUsableTarget",
+            "label": "Country usability target",
+            "pass": true
+          },
+          {
+            "id": "safePopulationComplete",
+            "label": "Safe population complete",
+            "pass": true
+          },
+          {
+            "id": "lowSafeFalseBlocking",
+            "label": "Safe false-block limit",
+            "pass": true
+          },
+          {
+            "id": "primaryInjectionAvailable",
+            "label": "Primary injection detector available",
+            "pass": false
+          },
+          {
+            "id": "noExecutionErrors",
+            "label": "No unresolved execution errors",
+            "pass": true
+          },
+          {
+            "id": "productionCandidate",
+            "label": "Complete production-candidate pipeline",
+            "pass": false
+          }
+        ],
+        "reasons": [
+          "No planted PII survivors",
+          "Primary injection detector available",
+          "Complete production-candidate pipeline"
+        ]
+      },
+      "errors": 0,
+      "attribution": [
+        {
+          "layerId": "tokenize_lost_intent",
+          "label": "Tokenize lost-intent",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "question_validation",
+          "label": "Question validation",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "prompt_guard",
+          "label": "Prompt Guard",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "harmful_content",
+          "label": "Harmful content",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "rewrite",
+          "label": "Rewrite refusal / contract",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "layerId": "other",
+          "label": "Other checks",
+          "firstBlocks": 0,
+          "overlapping": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    }
+  ],
+  "progress": [
+    {
+      "stage": "6b",
+      "runId": "2026-10-28-stage6b-question-boundary-r2",
+      "timestamp": "2026-10-28T13:18:58.001Z",
+      "timestampAwst": "28 Oct 2026, 21:18:58 AWST (Perth)",
+      "sourceHash": "1ae9f5bce298bd47559e813e72b16c370e3dc42cf36bd7b5411e3e68dab34198",
+      "reportSha256": "47ba2de2860db4c6e50f75123d0b38e90d71e1e52b38edb1811ff6a939dce96c",
+      "setups": [
+        {
+          "id": "meta-lens",
+          "label": "Meta lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 5,
+            "rate": 0.1,
+            "wilson95": [
+              0.04347576493189041,
+              0.21360231437479654
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": null,
+          "safeOperational": {
+            "n": 74,
+            "events": 74,
+            "rate": 1,
+            "wilson95": [
+              0.950650220603614,
+              1
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 47,
+            "rate": 0.6351351351351351,
+            "wilson95": [
+              0.5213181349836578,
+              0.7356143570713729
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "google-lens",
+          "label": "Google lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 6,
+            "rate": 0.12,
+            "wilson95": [
+              0.05617600150932274,
+              0.23804817383202992
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": null,
+          "safeOperational": {
+            "n": 74,
+            "events": 74,
+            "rate": 1,
+            "wilson95": [
+              0.950650220603614,
+              1
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 21,
+            "rate": 0.28378378378378377,
+            "wilson95": [
+              0.19373547108022537,
+              0.3951725416317253
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "google-native-only",
+          "label": "Google native-only",
+          "usableFrozen": {
+            "n": 50,
+            "events": 6,
+            "rate": 0.12,
+            "wilson95": [
+              0.05617600150932274,
+              0.23804817383202992
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": null,
+          "safeOperational": {
+            "n": 74,
+            "events": 21,
+            "rate": 0.28378378378378377,
+            "wilson95": [
+              0.19373547108022537,
+              0.3951725416317253
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 21,
+            "rate": 0.28378378378378377,
+            "wilson95": [
+              0.19373547108022537,
+              0.3951725416317253
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "presidio-baseline",
+          "label": "Presidio",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": null,
+          "safeOperational": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    },
+    {
+      "stage": "6c",
+      "runId": "2026-10-29-stage6c-question-boundary-r2",
+      "timestamp": "2026-10-28T20:24:37.584Z",
+      "timestampAwst": "29 Oct 2026, 04:24:37 AWST (Perth)",
+      "sourceHash": "348c73ed6b4aed6d193c034505fd22ede4aa8cb8761bb7f6d776c6d67ce57e29",
+      "reportSha256": "4c71bbe6c9087549623f8a9861ca5d7ef88233d7701855140d284f33d7c7cf71",
+      "setups": [
+        {
+          "id": "meta-lens",
+          "label": "Meta lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 19,
+            "rate": 0.25675675675675674,
+            "wilson95": [
+              0.17097707299565887,
+              0.36654444130528563
+            ],
+            "errors": 1
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 19,
+            "rate": 0.25675675675675674,
+            "wilson95": [
+              0.17097707299565887,
+              0.36654444130528563
+            ],
+            "errors": 1
+          }
+        },
+        {
+          "id": "google-lens",
+          "label": "Google lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.06017185214208986
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 20,
+            "rate": 0.2702702702702703,
+            "wilson95": [
+              0.1823022792207824,
+              0.3809124842856652
+            ],
+            "errors": 1
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 20,
+            "rate": 0.2702702702702703,
+            "wilson95": [
+              0.1823022792207824,
+              0.3809124842856652
+            ],
+            "errors": 1
+          }
+        },
+        {
+          "id": "google-native-only",
+          "label": "Google native-only",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.06017185214208986
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 20,
+            "rate": 0.2702702702702703,
+            "wilson95": [
+              0.1823022792207824,
+              0.3809124842856652
+            ],
+            "errors": 1
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 20,
+            "rate": 0.2702702702702703,
+            "wilson95": [
+              0.1823022792207824,
+              0.3809124842856652
+            ],
+            "errors": 1
+          }
+        },
+        {
+          "id": "presidio-baseline",
+          "label": "Presidio",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    },
+    {
+      "stage": "6d",
+      "runId": "2026-10-29-stage6d-question-boundary-r4",
+      "timestamp": "2026-10-29T01:49:44.126Z",
+      "timestampAwst": "29 Oct 2026, 09:49:44 AWST (Perth)",
+      "sourceHash": "b9582447090a4498cff70770293ccd0986999dcdd843b435cb3a4c919c1ae5a7",
+      "reportSha256": "6f1fc6690a315972b560013ef583ffe2b9d4b796e351dcc0c402c4dd7ce24a6c",
+      "setups": [
+        {
+          "id": "meta-lens",
+          "label": "Meta lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              6.938893903907228e-18,
+              0.07134759913335872
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 6,
+            "rate": 0.08108108108108109,
+            "wilson95": [
+              0.03768985019382638,
+              0.16581942443557818
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 6,
+            "rate": 0.08108108108108109,
+            "wilson95": [
+              0.03768985019382638,
+              0.16581942443557818
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "google-lens",
+          "label": "Google lens",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 4,
+            "rate": 0.05405405405405406,
+            "wilson95": [
+              0.02121901217287475,
+              0.13090376404552365
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 4,
+            "rate": 0.05405405405405406,
+            "wilson95": [
+              0.02121901217287475,
+              0.13090376404552365
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "google-native-only",
+          "label": "Google native-only",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 1,
+            "rate": 0.013513513513513514,
+            "wilson95": [
+              0.002389463403456818,
+              0.07265356519843233
+            ],
+            "errors": 0
+          }
+        },
+        {
+          "id": "presidio-baseline",
+          "label": "Presidio",
+          "usableFrozen": {
+            "n": 50,
+            "events": 50,
+            "rate": 1,
+            "wilson95": [
+              0.9286524008666414,
+              1
+            ],
+            "errors": 0
+          },
+          "usableMulticountry": {
+            "n": 60,
+            "events": 60,
+            "rate": 1,
+            "wilson95": [
+              0.93982814785791,
+              0.9999999999999998
+            ],
+            "errors": 0
+          },
+          "safeOperational": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          },
+          "safeDetected": {
+            "n": 74,
+            "events": 0,
+            "rate": 0,
+            "wilson95": [
+              0,
+              0.04934977939638607
+            ],
+            "errors": 0
+          }
+        }
+      ]
+    }
+  ],
+  "promptGuard": [
+    {
+      "variant": "86m",
+      "threshold": 0.5,
+      "attempted": 274,
+      "available": 274,
+      "errors": 0,
+      "jailbreak": {
+        "n": 50,
+        "events": 46,
+        "rate": 0.92,
+        "wilson95": [
+          0.8116175308165717,
+          0.968450485911407
+        ],
+        "errors": 0
+      },
+      "injection": {
+        "n": 50,
+        "events": 5,
+        "rate": 0.1,
+        "wilson95": [
+          0.04347576493189041,
+          0.21360231437479654
+        ],
+        "errors": 0
+      },
+      "safe": {
+        "n": 74,
+        "events": 0,
+        "rate": 0,
+        "wilson95": [
+          0,
+          0.04934977939638607
+        ],
+        "errors": 0
+      },
+      "latency": {
+        "n": 274,
+        "medianMs": 104.87575000000106,
+        "p95Ms": 1248.990244999995
+      }
+    },
+    {
+      "variant": "22m",
+      "threshold": 0.5,
+      "attempted": 274,
+      "available": 274,
+      "errors": 0,
+      "jailbreak": {
+        "n": 50,
+        "events": 29,
+        "rate": 0.58,
+        "wilson95": [
+          0.4423344176857823,
+          0.7062499664528802
+        ],
+        "errors": 0
+      },
+      "injection": {
+        "n": 50,
+        "events": 1,
+        "rate": 0.02,
+        "wilson95": [
+          0.003539259271646236,
+          0.10495443589637815
+        ],
+        "errors": 0
+      },
+      "safe": {
+        "n": 74,
+        "events": 0,
+        "rate": 0,
+        "wilson95": [
+          0,
+          0.04934977939638607
+        ],
+        "errors": 0
+      },
+      "latency": {
+        "n": 274,
+        "medianMs": 39.092049999992014,
+        "p95Ms": 438.1368999999967
+      }
+    }
+  ],
+  "gaps": [
+    "Stage 6b did not publish the separate multi-country population.",
+    "Local answer application is not applicable to the Presidio comparison."
+  ],
+  "notes": [
+    "All figures come from hash-verified local result files. Wilson intervals are derived from the recorded counts.",
+    "PII survivors are per query with any planted value retained. Zero survivors with no usable questions is not successful service.",
+    "Stage 6b operational false blocks include the pending injection layer; available-check detections are a separate series. The methods differ between stages.",
+    "False-block first causes are exclusive. Overlapping layer flags can affect the same query and must not be added.",
+    "Attack blocks include privacy, intent and safety checks, not isolated injection detection. Application completion and full-credit correctness are separate.",
+    "The evaluation frame is known and synthetic variants are correlated. Intervals are descriptive, not future-traffic or compliance certification.",
+    "Meta lens has no usable frozen candidates; zero observed survivors does not establish usable private service."
+  ]
+}

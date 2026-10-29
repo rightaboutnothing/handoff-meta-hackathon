@@ -13,6 +13,14 @@ npm run dashboard
 
 The dashboard opens at `http://127.0.0.1:4173`.
 
+## Latest locked privacy results (Stage 6e)
+
+Open `http://127.0.0.1:4173/#results`. Results also lead Trust and Benchmarks; earlier studies stay collapsed and explicitly historical. `/api/company/privacy-results` is a read-only aggregate endpoint: it verifies the latest completed Stage 6d report and canonical source hash, falling back to completed Stage 6c when needed. A bad hash fails closed. Builds export the same DTO to `public/privacy-results.json`; no raw prompts, model outputs, request bodies, credentials or usage-token records are published.
+
+Five panels cover all four setups and their Wilson intervals/gates, Stage 6b→6c→6d progress, exclusive first-block attribution alongside overlapping flags, standalone Prompt Guard jailbreak/injection/latency comparisons, and source/seed/AWST provenance. Figures come from the result files, including the Meta usability regression. Missing historical multi-country measurements and Presidio application results remain explicitly unmeasured.
+
+`npm run dashboard:export:privacy` at the repository root regenerates [the offline visual example](../docs/dashboard/index.html), five `stage6e-*.png` snapshots and [their manifest](../docs/dashboard/manifest.json). The example uses the same React component as the app, contains no JavaScript or raw report JSON, and requires no network. PNG export uses an installed local browser with external page requests blocked. The manifest records measured run/source/report hashes, seed, Perth time, renderer hashes and image hashes. Export makes no model calls and never enables dispatch.
+
 The current Ask flow uses configured local Llama, Llama Guard and **Muse Spark**. Stage 4 Benchmarks, Savings and Trust show one saved-results report with workload slices, Wilson intervals, local latency, provider fee projections and the privacy boundary. It recommends Gemma 12B for company documents; this reporting change does not automatically switch Ask's production configuration. Earlier Meta/Google matrix studies and Grok results remain separately labelled, with Grok only under **Historical (retired)**.
 
 ## Modes

@@ -5,6 +5,7 @@ import { loadTraceSummary } from "./trace-summary.mjs";
 import { readStage4Results } from "../server/stage4-results.mjs";
 import { readStage5Results } from "../server/stage5-results.mjs";
 import { readStage6Results } from "../server/stage6-results.mjs";
+import { readPrivacyResults } from "../server/privacy-results.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dashboardRoot = path.resolve(here, "..");
@@ -114,6 +115,10 @@ const stage6=await readStage6Results(),stage6File=path.join(dashboardRoot,'publi
 const stage6Body=JSON.stringify(stage6,null,2)+'\n';
 let previousStage6;try{previousStage6=await readFile(stage6File,'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
 if(previousStage6!==stage6Body)await writeFile(stage6File,stage6Body,'utf8');
+const privacyResults=await readPrivacyResults(),privacyFile=path.join(dashboardRoot,'public','privacy-results.json');
+const privacyBody=JSON.stringify(privacyResults,null,2)+'\n';
+let previousPrivacy;try{previousPrivacy=await readFile(privacyFile,'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
+if(previousPrivacy!==privacyBody)await writeFile(privacyFile,privacyBody,'utf8');
 if(stage4){
   const source=path.join(repoRoot,'results',stage4.runId,'charts'),destination=path.join(dashboardRoot,'public','stage4-charts');
   const chartFiles=['local-acceptance-quality.png','cloud-costs-by-slice.png','company-workload-savings.png','privacy-boundary.png','manifest.json'];

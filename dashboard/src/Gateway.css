@@ -5,3 +5,6 @@
 .gw-compact .gw-thesis{display:none}.gw-compact .gw-landing{padding-top:12px}.gw-compact .gw-overview-rail{border-top:0;padding-top:20px}
 .gw-study-context{font-size:11px;line-height:1.6;color:var(--gw-muted);margin:12px 0 0}.gw-source-records{display:grid;gap:5px;text-align:right}@media(max-width:760px){.gw-source-records{text-align:left}}
 .gw-chart-downloads nav{display:flex;flex-wrap:wrap;gap:14px 28px;padding:16px 0}.gw-chart-downloads a{color:var(--gw-blue);font-size:12px;text-underline-offset:4px}.gw-chart-downloads a:focus-visible{outline:2px solid var(--gw-blue);outline-offset:4px}
+
+.gw-navigation{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:760px){.gw-navigation{grid-template-columns:repeat(5,minmax(68px,1fr));overflow-x:auto;gap:8px}.gw-navigation button>span{font-size:12px}}

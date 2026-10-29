@@ -36,6 +36,7 @@
     "dashboard": "npm --prefix dashboard run dev",
     "dashboard:build": "npm --prefix dashboard run build",
     "dashboard:check": "npm --prefix dashboard run check",
+    "dashboard:export:privacy": "npm --prefix dashboard run export:privacy",
     "tasks:build": "node scripts/build-task-suites.mjs && node scripts/generate-ad-privacy.mjs",
     "tasks:fetch-gpqa": "node scripts/fetch-gpqa.mjs",
     "benchmark:dry": "node scripts/run-benchmark.mjs --limit 3",

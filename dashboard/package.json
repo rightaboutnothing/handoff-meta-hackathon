@@ -11,7 +11,8 @@
     "build": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "check:safety": "node scripts/check-bundle-safety.mjs",
-    "check": "npm run build && npm run check:safety && node scripts/check-gateway-ui.mjs && node scripts/check-comparison.mjs && node scripts/check-stage4-ui.mjs && node scripts/check-stage5-ui.mjs && node scripts/check-stage6-ui.mjs"
+    "export:privacy": "node scripts/export-privacy-dashboard.mjs",
+    "check": "npm run build && npm run check:safety && node scripts/check-gateway-ui.mjs && node scripts/check-comparison.mjs && node scripts/check-stage4-ui.mjs && node scripts/check-stage5-ui.mjs && node scripts/check-stage6-ui.mjs && node scripts/check-privacy-ui.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.23.24",
